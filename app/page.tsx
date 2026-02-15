@@ -982,7 +982,7 @@ const PerspectiveOverlay = ({ perspectiveMode, setPerspectiveMode, onApply, extr
 };
 
 export default function AirsoftSimulator() {
-  const [baseImg, setBaseImg] = useState({ src: null, mm: 800, widthPx: 0, transparentMode: false });
+  const [baseImg, setBaseImg] = useState({ src: null, mm: 800, widthPx: 0, transparentMode: true, flip: false });
   const [parts, setParts] = useState([]);
   const [selectedPartId, setSelectedPartId] = useState(null);
   const [isBaseSelected, setIsBaseSelected] = useState(false);
@@ -1038,7 +1038,7 @@ export default function AirsoftSimulator() {
               metricType: 'width',
               rotation: 0,
               flip: false,
-              transparentMode: false,
+              transparentMode: true,
               visible: true,
               position: { x: 50, y: 50 }
           };
@@ -1236,7 +1236,7 @@ export default function AirsoftSimulator() {
       metricType: 'width', // サイズ基準 ('width' | 'height')
       rotation: 0,
       flip: false,
-      transparentMode: false,
+      transparentMode: true,
       visible: true, // 可視性を追加
       position: { x: 50, y: 50 } // 初期位置
     };
@@ -1353,15 +1353,24 @@ export default function AirsoftSimulator() {
                       ...data.part,
                       id: crypto.randomUUID(), // IDは新しく振り直す
                       position: { x: 50, y: 50 }, // 位置はリセット
-                      visible: true
+                      transparentMode: true, // 読み込んだものもデフォルトは透過にしておくか？ あるいは設定維持？ ここでは設定維持しつつデフォルトtrue
+                      visible: true,
+                      ...data.part // 上書き
                    };
+                   // ただしJSONに保存されている値があればそれを優先したいので順番を調整
+                   // いや、デフォルト透過にしてほしいなら、JSONにfalseが入っていても強制的にtrueにするべきか？
+                   // ユーザーとしては「デフォルトで透過」と言っているので、新規追加時はtrue。
+                   // しかしロード時は保存された状態を復元するのが筋。
+                   // ここは「データにtransparentModeが含まれていなければtrue」とする。
+                   if (newPart.transparentMode === undefined) newPart.transparentMode = true;
+
                    setParts(prev => [...prev, newPart]);
                 }
                 // プロジェクトデータの場合 (baseImgがあるかで簡易判定)
                 else if (data.baseImg) {
                    if (confirm("プロジェクトファイルを読み込みますか？\n現在の作業内容は上書きされます。")) {
-                      if (data.baseImg) setBaseImg(data.baseImg);
-                      if (data.parts) setParts(data.parts);
+                      if (data.baseImg) setBaseImg({...data.baseImg, transparentMode: data.baseImg.transparentMode ?? true}); // 互換性のため
+                      if (data.parts) setParts(data.parts.map(p => ({...p, transparentMode: p.transparentMode ?? true}))); // 互換性のため
                       if (data.zoom) setZoom(data.zoom);
                       setSelectedPartId(null);
                    }
@@ -1630,7 +1639,7 @@ export default function AirsoftSimulator() {
                  step="0.1"
                  value={zoom}
                  onChange={(e) => setZoom(Number(e.target.value))}
-                 className="w-16 border rounded p-1 text-right text-sm"
+                 className="w-14 border rounded p-1 text-right text-sm"
                />
                <span className="text-sm">倍</span>
             </div>
@@ -1647,17 +1656,22 @@ export default function AirsoftSimulator() {
           {/* 本体ファイルアップロード (シンプル化) */}
           <div className="bg-white p-3 rounded-lg shadow border flex items-center gap-4">
              <span className="text-sm font-bold text-blue-600 whitespace-nowrap">本体画像:</span>
-             <input 
-               type="file" 
-               accept="image/*"
-               onChange={(e) => setBaseImg({...baseImg, src: URL.createObjectURL(e.target.files[0])})} 
-               className="text-sm text-gray-500
-                 file:mr-4 file:py-1 file:px-3
-                 file:rounded-full file:border-0
-                 file:text-xs file:font-semibold
-                 file:bg-blue-50 file:text-blue-700
-                 hover:file:bg-blue-100"
-             />
+             <label className="cursor-pointer bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-200 text-xs font-semibold hover:bg-blue-100 transition-colors flex max-w-[200px] truncate">
+                 {baseImg.src ? '画像を変更...' : '画像を選択...'}
+                 <input 
+                   type="file" 
+                   accept="image/*"
+                   onChange={(e) => {
+                       if (e.target.files?.[0]) {
+                           setBaseImg({...baseImg, src: URL.createObjectURL(e.target.files[0])});
+                       }
+                   }} 
+                   className="hidden"
+                 />
+             </label>
+             {baseImg.src && (
+                  <button onClick={() => setBaseImg({...baseImg, src: null})} className="text-xs text-red-400 hover:text-red-600">解除</button>
+             )}
           </div>
 
           {/* シミュレーション画面 */}
@@ -1695,7 +1709,10 @@ export default function AirsoftSimulator() {
                 src={baseImg.src} 
                 onLoad={updateBaseImageSize}
                 className="max-w-full max-h-full object-contain shadow-lg"
-                style={{ mixBlendMode: baseImg.transparentMode ? 'multiply' : 'normal' }}
+                style={{ 
+                  mixBlendMode: baseImg.transparentMode ? 'multiply' : 'normal',
+                  transform: `scaleX(${baseImg.flip ? -1 : 1})`
+                }}
                 alt="Base"
                 draggable={false}
               />
@@ -1736,11 +1753,20 @@ export default function AirsoftSimulator() {
                         <label className="flex items-center gap-2 cursor-pointer w-full hover:bg-gray-50 p-1 rounded">
                            <input 
                              type="checkbox" 
-                             checked={baseImg.transparentMode} 
+                             checked={baseImg.transparentMode || false} 
                              onChange={(e) => setBaseImg(prev => ({ ...prev, transparentMode: e.target.checked }))}
                              className="w-4 h-4 accent-blue-600 rounded"
                            />
                            <span className="text-xs font-bold text-gray-700">背景透過（乗算）</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer w-full hover:bg-gray-50 p-1 rounded">
+                           <input 
+                             type="checkbox" 
+                             checked={baseImg.flip || false} 
+                             onChange={(e) => setBaseImg(prev => ({ ...prev, flip: e.target.checked }))}
+                             className="w-4 h-4 accent-blue-600 rounded"
+                           />
+                           <span className="text-xs font-bold text-gray-700">左右反転</span>
                         </label>
                      </div>
 
