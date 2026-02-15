@@ -217,8 +217,7 @@ const DraggablePart = ({ part, scale, zoom, onSelect, isSelected, updatePart, co
           src={part.src} 
           className={`transition-shadow select-none ${isSelected ? 'ring-2 ring-blue-500 shadow-xl' : 'hover:ring-1 ring-blue-300'} ${isHeightMetric ? 'h-full w-auto' : 'w-full h-auto'}`}
           style={{ 
-            transform: `rotate(${part.rotation}deg) scaleX(${part.flip ? -1 : 1})`,
-            mixBlendMode: part.transparentMode ? 'multiply' : 'normal'
+            transform: `rotate(${part.rotation}deg) scaleX(${part.flip ? -1 : 1})`
           }}
           alt="Part"
           draggable={false}
@@ -1228,20 +1227,35 @@ export default function AirsoftSimulator() {
   // ファイル追加処理 (共通)
   const addPartFile = (file) => {
     if (!file) return;
+    const initialSrc = URL.createObjectURL(file);
+    const newPartId = crypto.randomUUID();
+
     const newPart = {
-      id: crypto.randomUUID(),
+      id: newPartId,
       name: file.name, // ファイル名を追加
-      src: URL.createObjectURL(file),
+      src: initialSrc,
+      originalSrc: initialSrc, // 自動透過前の元画像として保持
       mm: 150, // 初期サイズ
       metricType: 'width', // サイズ基準 ('width' | 'height')
       rotation: 0,
       flip: false,
-      transparentMode: true,
+      transparentMode: false, // 乗算モード廃止
       visible: true, // 可視性を追加
       position: { x: 50, y: 50 } // 初期位置
     };
+    
     setParts(prev => [...prev, newPart]);
     setSelectedPartId(newPart.id);
+
+    // 自動背景透過を実行 (一番明るい色を透過)
+    processRemoving(initialSrc, (processedSrc) => {
+        setParts(prev => prev.map(p => {
+            if (p.id === newPartId) {
+                return { ...p, src: processedSrc };
+            }
+            return p;
+        }));
+    });
   };
 
   // 画像ロード時やリサイズ時に表示サイズを取得してStateを更新
@@ -1391,7 +1405,14 @@ export default function AirsoftSimulator() {
     // ベース画像がまだ設定されていない場合、最初の1枚をベース画像として扱う
     let startIdx = 0;
     if (!baseImg.src) {
-      setBaseImg(prev => ({ ...prev, src: URL.createObjectURL(files[0]) }));
+      const src = URL.createObjectURL(files[0]);
+      setBaseImg(prev => ({ ...prev, src, originalSrc: src, transparentMode: false }));
+      
+      // 自動背景透過
+      processRemoving(src, (processedSrc) => {
+         setBaseImg(prev => ({ ...prev, src: processedSrc }));
+      });
+
       startIdx = 1; // 1枚目は消費したので次から
     }
 
@@ -1411,7 +1432,7 @@ export default function AirsoftSimulator() {
     const part = parts.find(p => p.id === partId);
     if (!part) return;
 
-    if (!confirm("自動背景透過を実行しますか？\n(左上の色を基準に透過します)")) return;
+    if (!confirm("自動背景透過を実行しますか？\n(最も明るい色を透過します)")) return;
 
     processRemoving(part.src, (newSrc) => {
         updatePart(partId, {
@@ -1424,7 +1445,7 @@ export default function AirsoftSimulator() {
   const processRemoveBackgroundBase = () => {
     if (!baseImg.src) return;
 
-    if (!confirm("本体画像の自動背景透過を実行しますか？\n(左上の色を基準に透過します)")) return;
+    if (!confirm("本体画像の自動背景透過を実行しますか？\n(最も明るい色を透過します)")) return;
 
     processRemoving(baseImg.src, (newSrc) => {
         setBaseImg(prev => ({
@@ -1435,7 +1456,7 @@ export default function AirsoftSimulator() {
     });
   };
 
-  const processRemoving = (src, callback) => {
+  function processRemoving(src: string, callback: (newSrc: string) => void) {
     const img = new Image();
     img.crossOrigin = "Anonymous";
     img.src = src;
@@ -1449,11 +1470,32 @@ export default function AirsoftSimulator() {
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
         
-        // 左上(0,0)の色を背景色と仮定
-        const bgR = data[0];
-        const bgG = data[1];
-        const bgB = data[2];
-        const threshold = 40; // 閾値 (少し緩めに設定)
+        // 最も明るい色を探索して背景色とする
+        let maxBrightness = -1;
+        let bgR = 255;
+        let bgG = 255;
+        let bgB = 255;
+
+        for (let i = 0; i < data.length; i += 4) {
+            // 透明度が低いピクセルは無視
+            if (data[i+3] < 10) continue;
+
+            const r = data[i];
+            const g = data[i+1];
+            const b = data[i+2];
+            
+            // 輝度計算 (Rec. 601)
+            const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+            
+            if (brightness > maxBrightness) {
+                maxBrightness = brightness;
+                bgR = r;
+                bgG = g;
+                bgB = b;
+            }
+        }
+
+        const threshold = 40; // 閾値
 
         for (let i = 0; i < data.length; i += 4) {
            const r = data[i];
@@ -1651,8 +1693,8 @@ export default function AirsoftSimulator() {
           {/* 表示ズーム */}
           <div className="p-4 bg-white shadow rounded-lg border">
             <p className="text-sm font-semibold mb-2 text-gray-700">表示ズーム</p>
-            <div className="flex items-center gap-2">
-               <span className="text-xs">縮小</span>
+            <div className="flex items-center gap-1">
+               <span className="text-[10px] text-gray-500 whitespace-nowrap">縮小</span>
                <input 
                   type="range" 
                   min="0.2" 
@@ -1660,17 +1702,19 @@ export default function AirsoftSimulator() {
                   step="0.1"
                   value={zoom} 
                   onChange={(e) => setZoom(Number(e.target.value))}
-                  className="flex-1"
+                  className="flex-1 min-w-0"
                />
-               <span className="text-xs">拡大</span>
-               <input 
-                 type="number" 
-                 step="0.1"
-                 value={zoom}
-                 onChange={(e) => setZoom(Number(e.target.value))}
-                 className="w-14 border rounded p-1 text-right text-sm"
-               />
-               <span className="text-sm">倍</span>
+               <span className="text-[10px] text-gray-500 whitespace-nowrap">拡大</span>
+               <div className="flex items-center ml-1 shrink-0">
+                 <input 
+                   type="number" 
+                   step="0.1"
+                   value={zoom}
+                   onChange={(e) => setZoom(Number(e.target.value))}
+                   className="w-12 border rounded px-1 py-0.5 text-right text-xs"
+                 />
+                 <span className="text-xs ml-0.5">倍</span>
+               </div>
             </div>
             <div className="text-center mt-1">
                <button onClick={() => setZoom(1.0)} className="text-xs text-blue-500 hover:underline">リセット</button>
@@ -1692,7 +1736,13 @@ export default function AirsoftSimulator() {
                    accept="image/*"
                    onChange={(e) => {
                        if (e.target.files?.[0]) {
-                           setBaseImg({...baseImg, src: URL.createObjectURL(e.target.files[0])});
+                           const src = URL.createObjectURL(e.target.files[0]);
+                           setBaseImg({...baseImg, src, originalSrc: src, transparentMode: false});
+                           
+                           // 自動背景透過
+                           processRemoving(src, (processedSrc) => {
+                               setBaseImg(prev => ({ ...prev, src: processedSrc }));
+                           });
                        }
                    }} 
                    className="hidden"
@@ -1739,7 +1789,6 @@ export default function AirsoftSimulator() {
                 onLoad={updateBaseImageSize}
                 className="max-w-full max-h-full object-contain shadow-lg"
                 style={{ 
-                  mixBlendMode: baseImg.transparentMode ? 'multiply' : 'normal',
                   transform: `scaleX(${baseImg.flip ? -1 : 1})`
                 }}
                 alt="Base"
@@ -1752,7 +1801,7 @@ export default function AirsoftSimulator() {
                    className="absolute top-full left-1/2 mt-8 bg-white p-3 rounded-lg shadow-xl border border-blue-500 flex flex-col gap-2"
                    style={{  
                      width: 'max-content',
-                     minWidth: '280px',
+                     minWidth: '200px',
                      maxWidth: '90vw',
                      transform: `translateX(-50%) scale(${1/zoom})`, // 中央寄せ + ズーム相殺
                      transformOrigin: 'top center', // パネル上辺を基準に
@@ -1777,17 +1826,8 @@ export default function AirsoftSimulator() {
                        <span className="text-sm font-bold text-gray-700">mm</span>
                     </div>
 
-                     {/* 背景透過設定 */}
+                     {/* 機能ボタン */}
                      <div className="flex items-center gap-2 border-t border-gray-200 pt-2 mt-1">
-                        <label className="flex items-center gap-2 cursor-pointer w-full hover:bg-gray-50 p-1 rounded">
-                           <input 
-                             type="checkbox" 
-                             checked={baseImg.transparentMode || false} 
-                             onChange={(e) => setBaseImg(prev => ({ ...prev, transparentMode: e.target.checked }))}
-                             className="w-4 h-4 accent-blue-600 rounded"
-                           />
-                           <span className="text-xs font-bold text-gray-700">背景透過（乗算）</span>
-                        </label>
                         <label className="flex items-center gap-2 cursor-pointer w-full hover:bg-gray-50 p-1 rounded">
                            <input 
                              type="checkbox" 
