@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AIRSOFT CUSTOM STUDIO v0.2
 
-## Getting Started
+エアガンとパーツの画像を、実寸比率で組み合わせるローカルの2D外観シミュレーター。
 
-First, run the development server:
+## 起動
 
-```bash
+Node.js 22.18以上（検証環境: 24.13）で実行します。
+
+```powershell
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+表示された Local URL をブラウザーで開きます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```powershell
+npm run build
+npm start
+npm run typecheck
+npm test
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 使い方
 
-## Learn More
+1. 本体の横向き画像を読み込み、画像の横幅に対応する実寸を入力します。本体は最初は固定されます。
+2. パーツ画像を追加し、同様に横幅の実寸を入力します。数字は Enter またはフォーカスを外して確定します。
+3. ドラッグ、矢印キー（1mm）、Shift + 矢印（10mm）で配置します。回転、左右反転、前後順、複製、表示、固定を調整できます。
+4. 「本体のみ」と「カスタム」を切り替えて比較します。
+5. 自動保存はブラウザーの IndexedDB に保存されます。「保存」で画像を内包するJSONをバックアップし、PNGで透過画像を書き出せます。
 
-To learn more about Next.js, take a look at the following resources:
+「デモのビルドを試す」から操作を確認できます。デモは説明用イラストで、特定商品の寸法や仕様を再現したものではありません。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## データと既存機能
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- 画像はPNG / JPEG / WebP / GIF、1ファイル15MBまで。長辺2000pxに縮小し、アニメーション画像は静止画になります。
+- 最大60レイヤー、履歴は20操作分。画像の読込・透過・書き出しはブラウザー内で実行し、サーバーにアップロードしません。
+- 左上の色に近く、外周とつながる領域だけを背景透過します。複雑な背景には適しません。許容差を調整し、元画像への復元やUndoが使えます。
+- 従来のV1プロジェクトJSON、パーツ単体JSONを読み込めます。V1の保存された表示幅を使って座標を変換します。表示幅が欠落した古いデータは位置の調整が必要なことがあります。
+- `/legacy` に元のエディターを保存しています。パース補正と切り出しは当面こちらから利用できます。旧画面で書き出したJSONを新画面で読み込んでください。旧画面はV2 JSONの読込には対応していません。
+- IndexedDBの保存先はブラウザーとURL（ポートを含む）ごとに分かれます。ブラウザーデータの削除に備えてJSONを保存してください。
+- 参考価格は手入力、合計は本体を除く全パーツ（非表示を含む）です。商品URLから画像や価格を自動取得する機能はありません。
 
-## Deploy on Vercel
+画像の余白、撮影角度、パースにより見え方が変わります。取付可否・干渉・性能は判定しません。
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 構成
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `app/page.tsx`: 新エディターのエントリー
+- `components/`: 編集フロー、キャンバス、ダイアログ、共通アイコン
+- `lib/project.ts`: 型、寸法、V1/V2検証と変換、画像処理、PNG出力
+- `lib/storage.ts`: IndexedDB保存
+- `app/legacy/`: 既存エディター
+- `tests/project.test.mjs`: 実寸・移行・入出力検証・背景透過の回帰テスト
+
+新画面は追加のライブラリを必要としません。react-draggableは旧エディターのみで利用します。外部フォントの取得も不要です。
+
+## 今後の拡張候補
+
+- パース補正と切り出しの新エディターへの統合
+- 複数ビルドのライブラリーと比較スナップショット
+- パーツの画像・寸法・商品メモを再利用できるライブラリー
+- 商品データ入力の支援と、出典付きの仕様管理
