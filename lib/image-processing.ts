@@ -37,6 +37,7 @@ export async function cropImage(
 export async function rectifyImage(
   layer: Layer,
   points: Point[],
+  aspectRatio?: number,
 ): Promise<Partial<Layer>> {
   const map = quadMap(points);
   const image = await loadImage(layer.src);
@@ -48,6 +49,13 @@ export async function rectifyImage(
   const src = sourceCtx.getImageData(0, 0, source.width, source.height).data;
   let w = (distance(points[0], points[1]) + distance(points[3], points[2])) / 2;
   let h = (distance(points[0], points[3]) + distance(points[1], points[2])) / 2;
+  if (aspectRatio !== undefined) {
+    if (!Number.isFinite(aspectRatio) || aspectRatio <= 0)
+      throw new Error("面の比率を確認してください。");
+    const area = w * h;
+    w = Math.sqrt(area * aspectRatio);
+    h = Math.sqrt(area / aspectRatio);
+  }
   const scale = Math.min(1, 2000 / Math.max(w, h));
   w = Math.max(2, Math.round(w * scale));
   h = Math.max(2, Math.round(h * scale));

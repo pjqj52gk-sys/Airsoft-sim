@@ -10,6 +10,7 @@ import {
   initialCubeFace,
   guidePoint,
   guideFromY,
+  guideFaceAspect,
   yControls,
   projectGuide,
   textureTransform,
@@ -46,6 +47,7 @@ export default function PerspectiveWorkbench({
   );
   const initial = () => yControls(template);
   const [controls, setControls] = useState<Point[]>(initial);
+  const [perspective, setPerspective] = useState(0.35);
   const [step, setStep] = useState(0);
   const [angles, setAngles] = useState<Angles>(zero);
   const [result, setResult] = useState<Partial<Layer> | null>(null);
@@ -64,7 +66,7 @@ export default function PerspectiveWorkbench({
   let guide: ReturnType<typeof makeGuide> | null = null;
   let geometryError = "";
   try {
-    guide = guideFromY(controls, template);
+    guide = guideFromY(controls, template, perspective);
   } catch (e) {
     geometryError = e instanceof Error ? e.message : "角を合わせてください。";
   }
@@ -88,6 +90,7 @@ export default function PerspectiveWorkbench({
         await rectifyImage(
           layer,
           guide.front.map((p) => guidePoint(guide!, p)),
+          guideFaceAspect(guide),
         ),
       );
       setAngles(zero);
@@ -139,10 +142,7 @@ export default function PerspectiveWorkbench({
   let texture = "";
   if (guide) {
     if (step === 0)
-      cube = [...guide.front, ...guide.back].map((p) => ({
-        x: guide!.cx + (guide!.focal * p.x) / p.z,
-        y: guide!.cy + (guide!.focal * p.y) / p.z,
-      }));
+      cube = [...guide.front, ...guide.back].map((p) => guidePoint(guide!, p));
     else {
       const projected = projectGuide(guide, angles);
       const minX = Math.min(...projected.map((p) => p.x)),
@@ -438,6 +438,20 @@ export default function PerspectiveWorkbench({
           </svg>
         )}
       </div>
+      {step === 0 && (
+        <label className="range-label">
+          パースの強さ <span>{Math.round(perspective * 100)}%</span>
+          <input
+            aria-label="パースの強さ"
+            type="range"
+            min="0"
+            max="100"
+            value={Math.round(perspective * 100)}
+            disabled={busy}
+            onChange={(e) => setPerspective(Number(e.target.value) / 100)}
+          />
+        </label>
+      )}
       {step === 1 ? (
         <div className="cube-angle-controls">
           {(["yaw", "pitch", "roll"] as const).map((key, i) => (
@@ -472,6 +486,7 @@ export default function PerspectiveWorkbench({
           onClick={() => {
             if (step === 0) {
               setControls(initial());
+              setPerspective(0.35);
             } else setStep(step - 1);
           }}
         >
