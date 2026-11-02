@@ -2144,3 +2144,14 @@ p {
     height: 250px;
   }
 }
+
+.rakuten-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:16px;margin:16px 0; }
+.rakuten-card { display:flex;flex-direction:column;gap:9px;border:1px solid #dce8f0;border-radius:12px;padding:16px;background:white; }
+.rakuten-card > a:first-child { display:flex;flex-direction:column;gap:10px; }
+.rakuten-card img { object-fit:contain;align-self:center; }
+.rakuten-card a { color:#167ba8;text-decoration:none;font-size:13px; }
+.rakuten-card span { display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.6; }
+.rakuten-card small { color:#63758a; }
+.rakuten-card strong { font-size:18px; }
+.rakuten-pages { display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0; }
+.rakuten-credit { font-size:11px;margin-top:18px; }

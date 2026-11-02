@@ -46,7 +46,9 @@ export function purchaseLink(
       };
     return {
       href: url.href,
-      sponsored: amazonStore(input) && !!url.searchParams.get("tag"),
+      sponsored:
+        (amazonStore(input) && !!url.searchParams.get("tag")) ||
+        /(^|\.)(afl\.rakuten\.co\.jp|r10\.to)$/.test(url.hostname),
     };
   } catch {
     return null;

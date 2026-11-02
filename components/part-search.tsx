@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Dialog from "./dialog";
 import ShopImport from "./shop-import";
+import RakutenSearch from "./rakuten-search";
 import Icon from "./icon";
 import catalog from "@/lib/parts-catalog.json";
 import { matchesPart } from "@/lib/part-search";
@@ -143,8 +144,19 @@ export default function PartSearch({
         >
           ショップURL
         </button>
+        <button
+          role="tab"
+          aria-selected={source === "rakuten"}
+          className={`mini-button ${source === "rakuten" ? "toggled" : ""}`}
+          disabled={!!busy}
+          onClick={() => setSource("rakuten")}
+        >
+          楽天市場
+        </button>
       </div>
-      {source === "shop" ? (
+      {source === "rakuten" ? (
+        <RakutenSearch attachLink={attachLink} />
+      ) : source === "shop" ? (
         <ShopImport
           add={add}
           attachLink={attachLink}

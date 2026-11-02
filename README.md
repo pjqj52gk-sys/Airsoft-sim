@@ -118,3 +118,13 @@ npm test
 - Amazonの検索・広告カードを自動提供する段階では、Creators APIの登録・認証情報と表示条件への対応が別途必要です。今回のURL入力機能はAmazon公式API連携の代替ではありません。
 - 広告枠は将来、編集を妨げない購入リストや公開ビルド詳細へ配置する方針です。公開ビルド・利用分析・広告配信・同意設定は今後の実装対象です。
 - 公式参照: [Amazonアソシエイト規約](https://affiliate.amazon.co.jp/help/operating/policies)、[Creators API](https://affiliate-program.amazon.com/creatorsapi/docs/en-us/introduction)。
+
+
+### 楽天市場検索
+
+パーツ検索 → 楽天市場で、商品画像・価格・ショップ・購入リンクを表示します。APIのサムネイルは検索表示専用です。画像の編集には自分の写真や利用許諾のある画像を使ってください。
+
+`.env.example` を `.env.local` にコピーし、楽天 Developers の `RAKUTEN_APPLICATION_ID` と `RAKUTEN_ACCESS_KEY` を設定します。`RAKUTEN_AFFILIATE_ID` は任意です。APIが返すアフィリエイトリンクには広告表記を付けます。許可サイトの指定が必要な場合は `RAKUTEN_ALLOWED_ORIGIN` に登録済みサイトの Origin を指定します。キーは NEXT_PUBLIC_ にせず、Git に追加しないでください。Vercel では同じ名前をプロジェクトの環境変数に設定します。
+
+公式仕様: https://webservice.rakuten.co.jp/documentation/ichiba-item-search （20260701）
+クレジット: https://webservice.rakuten.co.jp/guide/credit
