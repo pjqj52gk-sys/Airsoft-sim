@@ -6,6 +6,8 @@ import Dialog from "./dialog";
 import ImageEditor from "./image-editor";
 import type { EditMode } from "./image-editor";
 import Shelf from "./shelf";
+import PurchaseLink from "./purchase-link";
+import { purchaseLink, monetization } from "@/lib/commerce";
 import useFileDrop from "./use-file-drop";
 import type { DropTarget } from "./use-file-drop";
 import { updateLayer } from "@/lib/attachments";
@@ -682,17 +684,19 @@ export default function Studio() {
                   選択したパーツに価格と商品URLを登録すると、購入候補をまとめられます。
                 </p>
                 {project.layers.slice(1).map((l) => (
-                  <button
-                    key={l.id}
-                    className="shopping-row"
-                    onClick={() => setSelected(l.id)}
-                  >
-                    <span>
-                      {l.name}
-                      <small>{l.category}</small>
-                    </span>
-                    <strong>{yen(l.price)}</strong>
-                  </button>
+                  <div className="shopping-entry" key={l.id}>
+                    <button
+                      className="shopping-row"
+                      onClick={() => setSelected(l.id)}
+                    >
+                      <span>
+                        {l.name}
+                        <small>{l.category}</small>
+                      </span>
+                      <strong>{yen(l.price)}</strong>
+                    </button>
+                    <PurchaseLink url={l.url} label="購入先を見る" />
+                  </div>
                 ))}
                 <div className="shopping-total">
                   <span>パーツ合計</span>
@@ -1017,16 +1021,7 @@ export default function Studio() {
                     onChange={(e) => update(layer.id, { url: e.target.value })}
                   />
                 </label>
-                {/^https?:\/\//i.test(layer.url) && (
-                  <a
-                    className="product-link"
-                    href={layer.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    商品ページを開く ↗
-                  </a>
-                )}
+                <PurchaseLink url={layer.url} />
               </div>
               <div className="layer-actions">
                 {button("copy", "複製", duplicate, project.layers.length >= 60)}
@@ -1090,14 +1085,30 @@ export default function Studio() {
           </div>
         </aside>
       </div>
+      {project.layers.some((l) => purchaseLink(l.url)?.sponsored) && (
+        <div className="affiliate-disclosure">
+          広告・アフィリエイトリンクを含みます。
+          {monetization.amazonAssociateTag &&
+            " Amazonのアソシエイトとして、当サイトは適格販売により収入を得ています。"}
+        </div>
+      )}
       <footer className="footer">
         <span>
-          AIRSOFT CUSTOM STUDIO <small>V0.4</small>
+          AIRSOFT CUSTOM STUDIO <small>V0.5</small>
         </span>
       </footer>
       {search && (
         <PartSearch
           close={() => setSearch(false)}
+          attachLink={
+            layer
+              ? (url) => {
+                  update(layer.id, { url });
+                  setSearch(false);
+                  notify("購入リンクを設定しました。");
+                }
+              : undefined
+          }
           add={async (part) => {
             if (!(await addStoredPart(part)))
               throw new Error(

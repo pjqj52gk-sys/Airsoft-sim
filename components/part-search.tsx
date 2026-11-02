@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Dialog from "./dialog";
+import ShopImport from "./shop-import";
 import Icon from "./icon";
 import catalog from "@/lib/parts-catalog.json";
 import { matchesPart } from "@/lib/part-search";
@@ -11,9 +12,11 @@ import { readImage, uid, type Layer } from "@/lib/project";
 export default function PartSearch({
   close,
   add,
+  attachLink,
 }: {
   close: () => void;
   add: (part: Layer) => Promise<void>;
+  attachLink?: (url: string) => void;
 }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
@@ -112,6 +115,7 @@ export default function PartSearch({
       <div className="shelf-tabs" role="tablist" aria-label="検索対象">
         <button
           role="tab"
+          disabled={!!busy}
           aria-selected={source === "catalog"}
           className={`mini-button ${source === "catalog" ? "toggled" : ""}`}
           onClick={() => setSource("catalog")}
@@ -120,225 +124,253 @@ export default function PartSearch({
         </button>
         <button
           role="tab"
+          disabled={!!busy}
           aria-selected={source === "saved"}
           className={`mini-button ${source === "saved" ? "toggled" : ""}`}
           onClick={() => setSource("saved")}
         >
           登録パーツ
         </button>
-      </div>
-      <div className="part-search-controls">
-        <input
-          type="search"
-          aria-label="パーツ名で検索"
-          placeholder="パーツ名・メーカー・寸法"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <select
-          aria-label="カテゴリーで絞り込み"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
+        <button
+          role="tab"
+          aria-selected={source === "shop"}
+          className={`mini-button ${source === "shop" ? "toggled" : ""}`}
+          disabled={!!busy}
+          onClick={() => {
+            setSource("shop");
+            setError("");
+          }}
         >
-          {["", "光学機器", "グリップ", "ストック", "外装", "その他"].map(
-            (c) => (
-              <option key={c} value={c}>
-                {c || "すべて"}
-              </option>
-            ),
-          )}
-        </select>
-        {source === "catalog" && (
-          <label>
+          ショップURL
+        </button>
+      </div>
+      {source === "shop" ? (
+        <ShopImport
+          add={add}
+          attachLink={attachLink}
+          onBusy={(value) => setBusy(value ? "shop" : null)}
+        />
+      ) : (
+        <>
+          <div className="part-search-controls">
             <input
-              type="checkbox"
-              checked={dimensionOnly}
-              onChange={(e) => setDimensionOnly(e.target.checked)}
+              type="search"
+              aria-label="パーツ名で検索"
+              placeholder="パーツ名・メーカー・寸法"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
             />
-            寸法あり
-          </label>
-        )}
-      </div>
-      {error && (
-        <p role="alert" className="editor-error">
-          {error}
-        </p>
-      )}
-      <p className="search-count" aria-live="polite">
-        {source === "catalog" ? results.length : stored.length}件
-      </p>
-      <div className="shelf-grid search-results">
-        {source === "catalog"
-          ? results.map((p) => (
-              <article
-                className={`shelf-card ${expanded === p.id ? "photo-expanded-card" : ""}`}
-                key={p.id}
-              >
-                <button
-                  className={`shelf-part-image catalog-photo ${expanded === p.id ? "expanded" : ""}`}
-                  disabled={!!busy || !p.images.length}
-                  aria-label={`${p.name}の写真を${expanded === p.id ? "縮小" : "拡大"}`}
-                  aria-expanded={expanded === p.id}
-                  onClick={() => setExpanded(expanded === p.id ? null : p.id)}
-                >
-                  <img
-                    key={photos[p.id] || 0}
-                    loading="lazy"
-                    src={catalogImageUrl(p, photos[p.id] || 0)}
-                    alt={p.name}
-                    onLoad={(e) => {
-                      const img = e.currentTarget;
-                      img.parentElement!.removeAttribute("data-error");
-                      const key = catalogImageUrl(p, photos[p.id] || 0),
-                        size = `${img.naturalWidth} × ${img.naturalHeight} px`;
-                      setImageSizes((prev) =>
-                        prev[key] === size ? prev : { ...prev, [key]: size },
-                      );
-                    }}
-                    onError={(e) => {
-                      e.currentTarget.parentElement!.setAttribute(
-                        "data-error",
-                        "画像を取得できません",
-                      );
-                    }}
-                  />
-                  <span className="photo-expand-label">
-                    {expanded === p.id ? "縮小" : "拡大"}
-                  </span>
-                </button>
-                <p className="photo-resolution">
-                  {imageSizes[catalogImageUrl(p, photos[p.id] || 0)] || ""}
-                </p>
-                {p.images.length > 1 && (
-                  <div className="photo-controls">
-                    <button
-                      aria-label={`${p.name}の前の写真`}
-                      disabled={!!busy}
-                      onClick={() =>
-                        setPhotos({
-                          ...photos,
-                          [p.id]:
-                            ((photos[p.id] || 0) + p.images.length - 1) %
-                            p.images.length,
-                        })
-                      }
-                    >
-                      ‹
-                    </button>
-                    <span>
-                      写真 {(photos[p.id] || 0) + 1} / {p.images.length}
-                    </span>
-                    <button
-                      aria-label={`${p.name}の次の写真`}
-                      disabled={!!busy}
-                      onClick={() =>
-                        setPhotos({
-                          ...photos,
-                          [p.id]: ((photos[p.id] || 0) + 1) % p.images.length,
-                        })
-                      }
-                    >
-                      ›
-                    </button>
-                  </div>
-                )}
-                <small>
-                  {p.manufacturer} · {p.category}
-                </small>
-                <h3>{p.name}</h3>
-                <dl className="part-dimensions">
-                  {p.dimensions.length ? (
-                    p.dimensions.map((d) => (
-                      <div key={d.label}>
-                        <dt>{d.label}</dt>
-                        <dd>{d.value}</dd>
-                      </div>
-                    ))
-                  ) : (
-                    <div>
-                      <dt>寸法</dt>
-                      <dd>公式ページに未掲載</dd>
-                    </div>
-                  )}
-                </dl>
-                <div className="shelf-card-actions">
-                  <a
-                    className="mini-button"
-                    href={p.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    公式ページ ↗
-                  </a>
-                  <button
-                    className="mini-button toggled"
-                    disabled={!!busy || !p.images.length}
-                    onClick={() => void importPart(p)}
-                  >
-                    {busy === p.id ? "読み込み中…" : "この写真を追加"}
-                  </button>
-                </div>
-              </article>
-            ))
-          : stored.map((p) => (
-              <article className="shelf-card" key={p.id}>
-                <div className="shelf-part-image">
-                  <img src={p.layer.src} alt={p.layer.name} />
-                </div>
-                <h3>{p.layer.name}</h3>
-                <dl className="part-dimensions">
-                  <div>
-                    <dt>画像横幅</dt>
-                    <dd>{p.layer.mm} mm</dd>
-                  </div>
-                </dl>
-                <button
-                  className="mini-button toggled"
-                  disabled={!!busy}
-                  onClick={async () => {
-                    setBusy(p.id);
-                    setError("");
-                    try {
-                      await add({ ...p.layer, referenceMm: undefined });
-                    } catch (e) {
-                      setError(
-                        e instanceof Error
-                          ? e.message
-                          : "追加できませんでした。",
-                      );
-                    } finally {
-                      setBusy(null);
-                    }
-                  }}
-                >
-                  追加
-                </button>
-              </article>
-            ))}
-      </div>
-      {(source === "catalog" ? results.length : stored.length) === 0 && (
-        <p className="shelf-empty">該当するパーツがありません</p>
-      )}
-      {source === "catalog" && (
-        <div className="search-footer">
-          <span>東京マルイ {catalog.length}件 · 2026/11/02確認</span>
-          <div>
-            <a
-              href={`https://www.google.com/search?tbm=isch&q=${encodeURIComponent(`${query || "エアガン パーツ"} 商品画像`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
+            <select
+              aria-label="カテゴリーで絞り込み"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
             >
-              Webで画像を探す ↗
-            </a>
-            <a
-              href={`https://www.google.com/search?q=${encodeURIComponent(`${query || "エアガン パーツ"} 全長 寸法 mm`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Webで寸法を探す ↗
-            </a>
+              {["", "光学機器", "グリップ", "ストック", "外装", "その他"].map(
+                (c) => (
+                  <option key={c} value={c}>
+                    {c || "すべて"}
+                  </option>
+                ),
+              )}
+            </select>
+            {source === "catalog" && (
+              <label>
+                <input
+                  type="checkbox"
+                  checked={dimensionOnly}
+                  onChange={(e) => setDimensionOnly(e.target.checked)}
+                />
+                寸法あり
+              </label>
+            )}
           </div>
-        </div>
+          {error && (
+            <p role="alert" className="editor-error">
+              {error}
+            </p>
+          )}
+          <p className="search-count" aria-live="polite">
+            {source === "catalog" ? results.length : stored.length}件
+          </p>
+          <div className="shelf-grid search-results">
+            {source === "catalog"
+              ? results.map((p) => (
+                  <article
+                    className={`shelf-card ${expanded === p.id ? "photo-expanded-card" : ""}`}
+                    key={p.id}
+                  >
+                    <button
+                      className={`shelf-part-image catalog-photo ${expanded === p.id ? "expanded" : ""}`}
+                      disabled={!!busy || !p.images.length}
+                      aria-label={`${p.name}の写真を${expanded === p.id ? "縮小" : "拡大"}`}
+                      aria-expanded={expanded === p.id}
+                      onClick={() =>
+                        setExpanded(expanded === p.id ? null : p.id)
+                      }
+                    >
+                      <img
+                        key={photos[p.id] || 0}
+                        loading="lazy"
+                        src={catalogImageUrl(p, photos[p.id] || 0)}
+                        alt={p.name}
+                        onLoad={(e) => {
+                          const img = e.currentTarget;
+                          img.parentElement!.removeAttribute("data-error");
+                          const key = catalogImageUrl(p, photos[p.id] || 0),
+                            size = `${img.naturalWidth} × ${img.naturalHeight} px`;
+                          setImageSizes((prev) =>
+                            prev[key] === size
+                              ? prev
+                              : { ...prev, [key]: size },
+                          );
+                        }}
+                        onError={(e) => {
+                          e.currentTarget.parentElement!.setAttribute(
+                            "data-error",
+                            "画像を取得できません",
+                          );
+                        }}
+                      />
+                      <span className="photo-expand-label">
+                        {expanded === p.id ? "縮小" : "拡大"}
+                      </span>
+                    </button>
+                    <p className="photo-resolution">
+                      {imageSizes[catalogImageUrl(p, photos[p.id] || 0)] || ""}
+                    </p>
+                    {p.images.length > 1 && (
+                      <div className="photo-controls">
+                        <button
+                          aria-label={`${p.name}の前の写真`}
+                          disabled={!!busy}
+                          onClick={() =>
+                            setPhotos({
+                              ...photos,
+                              [p.id]:
+                                ((photos[p.id] || 0) + p.images.length - 1) %
+                                p.images.length,
+                            })
+                          }
+                        >
+                          ‹
+                        </button>
+                        <span>
+                          写真 {(photos[p.id] || 0) + 1} / {p.images.length}
+                        </span>
+                        <button
+                          aria-label={`${p.name}の次の写真`}
+                          disabled={!!busy}
+                          onClick={() =>
+                            setPhotos({
+                              ...photos,
+                              [p.id]:
+                                ((photos[p.id] || 0) + 1) % p.images.length,
+                            })
+                          }
+                        >
+                          ›
+                        </button>
+                      </div>
+                    )}
+                    <small>
+                      {p.manufacturer} · {p.category}
+                    </small>
+                    <h3>{p.name}</h3>
+                    <dl className="part-dimensions">
+                      {p.dimensions.length ? (
+                        p.dimensions.map((d) => (
+                          <div key={d.label}>
+                            <dt>{d.label}</dt>
+                            <dd>{d.value}</dd>
+                          </div>
+                        ))
+                      ) : (
+                        <div>
+                          <dt>寸法</dt>
+                          <dd>公式ページに未掲載</dd>
+                        </div>
+                      )}
+                    </dl>
+                    <div className="shelf-card-actions">
+                      <a
+                        className="mini-button"
+                        href={p.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        公式ページ ↗
+                      </a>
+                      <button
+                        className="mini-button toggled"
+                        disabled={!!busy || !p.images.length}
+                        onClick={() => void importPart(p)}
+                      >
+                        {busy === p.id ? "読み込み中…" : "この写真を追加"}
+                      </button>
+                    </div>
+                  </article>
+                ))
+              : stored.map((p) => (
+                  <article className="shelf-card" key={p.id}>
+                    <div className="shelf-part-image">
+                      <img src={p.layer.src} alt={p.layer.name} />
+                    </div>
+                    <h3>{p.layer.name}</h3>
+                    <dl className="part-dimensions">
+                      <div>
+                        <dt>画像横幅</dt>
+                        <dd>{p.layer.mm} mm</dd>
+                      </div>
+                    </dl>
+                    <button
+                      className="mini-button toggled"
+                      disabled={!!busy}
+                      onClick={async () => {
+                        setBusy(p.id);
+                        setError("");
+                        try {
+                          await add({ ...p.layer, referenceMm: undefined });
+                        } catch (e) {
+                          setError(
+                            e instanceof Error
+                              ? e.message
+                              : "追加できませんでした。",
+                          );
+                        } finally {
+                          setBusy(null);
+                        }
+                      }}
+                    >
+                      追加
+                    </button>
+                  </article>
+                ))}
+          </div>
+          {(source === "catalog" ? results.length : stored.length) === 0 && (
+            <p className="shelf-empty">該当するパーツがありません</p>
+          )}
+          {source === "catalog" && (
+            <div className="search-footer">
+              <span>東京マルイ {catalog.length}件 · 2026/11/02確認</span>
+              <div>
+                <a
+                  href={`https://www.google.com/search?tbm=isch&q=${encodeURIComponent(`${query || "エアガン パーツ"} 商品画像`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Webで画像を探す ↗
+                </a>
+                <a
+                  href={`https://www.google.com/search?q=${encodeURIComponent(`${query || "エアガン パーツ"} 全長 寸法 mm`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Webで寸法を探す ↗
+                </a>
+              </div>
+            </div>
+          )}{" "}
+        </>
       )}
     </Dialog>
   );
