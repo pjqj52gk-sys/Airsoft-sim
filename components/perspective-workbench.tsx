@@ -7,6 +7,7 @@ import type { Point } from "@/lib/image-edit";
 import { rectifyImage } from "@/lib/image-processing";
 import {
   makeGuide,
+  initialCubeFace,
   projectGuide,
   textureTransform,
   type Angles,
@@ -30,14 +31,9 @@ export default function PerspectiveWorkbench({
   close: () => void;
   apply: (patch: Partial<Layer>) => void;
 }) {
-  const initial = () => [
-    { x: layer.width * 0.12, y: layer.height * 0.12 },
-    { x: layer.width * 0.88, y: layer.height * 0.12 },
-    { x: layer.width * 0.88, y: layer.height * 0.88 },
-    { x: layer.width * 0.12, y: layer.height * 0.88 },
-  ];
+  const initial = () => initialCubeFace(layer.width, layer.height);
   const [points, setPoints] = useState<Point[]>(initial);
-  const [depth, setDepth] = useState(0.55);
+  const [depth, setDepth] = useState(1);
   const [step, setStep] = useState(0);
   const [angles, setAngles] = useState<Angles>(zero);
   const [result, setResult] = useState<Partial<Layer> | null>(null);
@@ -420,7 +416,10 @@ export default function PerspectiveWorkbench({
           className="button secondary"
           disabled={busy || turning}
           onClick={() => {
-            if (step === 0) setPoints(initial());
+            if (step === 0) {
+              setPoints(initial());
+              setDepth(1);
+            }
             else setStep(step - 1);
           }}
         >

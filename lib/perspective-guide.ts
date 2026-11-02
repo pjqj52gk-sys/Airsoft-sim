@@ -2,6 +2,31 @@ import { quadHomography } from "./image-edit.ts";
 import type { Point } from "./image-edit";
 export type Vec = { x: number; y: number; z: number };
 export type Angles = { yaw: number; pitch: number; roll: number };
+export function initialCubeFace(width: number, height: number): Point[] {
+  // Project an actual cube, rather than opening with two nested rectangles.
+  const corners = [
+    [-0.5, -0.5],
+    [0.5, -0.5],
+    [0.5, 0.5],
+    [-0.5, 0.5],
+  ];
+  const projected = [-0.5, 0.5].flatMap((z) =>
+    corners.map(([x, y]) => {
+      const p = rotate({ x, y, z }, { yaw: 32, pitch: 24, roll: 0 });
+      return { x: p.x / (3 + p.z), y: p.y / (3 + p.z) };
+    }),
+  );
+  const scale =
+    0.4 *
+    Math.min(
+      width / Math.max(...projected.map((p) => Math.abs(p.x))),
+      height / Math.max(...projected.map((p) => Math.abs(p.y))),
+    );
+  return projected.slice(0, 4).map((p) => ({
+    x: width / 2 + p.x * scale,
+    y: height / 2 + p.y * scale,
+  }));
+}
 const sub = (a: Vec, b: Vec): Vec => ({
   x: a.x - b.x,
   y: a.y - b.y,
