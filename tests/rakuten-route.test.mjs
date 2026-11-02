@@ -60,6 +60,7 @@ test("server uses the current fixed API and keeps access keys out of the query a
       assert.equal(url.searchParams.has("accessKey"), false);
       assert.equal(options.headers.accessKey, "test-private-access");
       assert.equal(options.headers.Origin, "https://registered.example");
+      assert.equal(options.headers.Referer, "https://registered.example/");
       return Response.json({ items: [], count: 0, page: 1, pageCount: 0 });
     },
   );

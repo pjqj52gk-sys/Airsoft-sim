@@ -62,6 +62,7 @@ export async function GET(request: Request) {
       )
         throw new Error();
       headers.Origin = registered.origin;
+      headers.Referer = `${registered.origin}/`;
     } catch {
       return reply(
         { error: "楽天APIの登録サイト設定を確認してください。" },
