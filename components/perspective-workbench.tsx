@@ -10,7 +10,9 @@ import {
   initialCubeFace,
   guidePoint,
   guideFromY,
-  guideFaceAspect,
+  guideFace,
+  guideFaces,
+  type GuideFaceId,
   yControls,
   projectGuide,
   textureTransform,
@@ -50,7 +52,14 @@ export default function PerspectiveWorkbench({
   const [perspective, setPerspective] = useState(0.35);
   const [step, setStep] = useState(0);
   const [angles, setAngles] = useState<Angles>(zero);
-  const [result, setResult] = useState<Partial<Layer> | null>(null);
+  const [results, setResults] = useState<
+    Partial<Record<GuideFaceId, Partial<Layer>>>
+  >({});
+  const [selectedFace, setSelectedFace] = useState<GuideFaceId>("front");
+  const [faceErrors, setFaceErrors] = useState<
+    Partial<Record<GuideFaceId, string>>
+  >({});
+  const result = results[selectedFace];
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [turning, setTurning] = useState(false);
@@ -86,13 +95,26 @@ export default function PerspectiveWorkbench({
     setError("");
     try {
       if (!guide) return;
-      setResult(
-        await rectifyImage(
-          layer,
-          guide.front.map((p) => guidePoint(guide!, p)),
-          guideFaceAspect(guide),
-        ),
+      const model = guide;
+      const images = await Promise.allSettled(
+        guideFaces.map(async ({ id }) => {
+          const surface = guideFace(model, id);
+          return await rectifyImage(layer, surface.imagePoints, surface.aspect);
+        }),
       );
+      const nextResults: Partial<Record<GuideFaceId, Partial<Layer>>> = {};
+      const nextErrors: Partial<Record<GuideFaceId, string>> = {};
+      images.forEach((image, i) => {
+        const id = guideFaces[i].id;
+        if (image.status === "fulfilled") nextResults[id] = image.value;
+        else nextErrors[id] = "この向きでは補正できません";
+      });
+      const first = guideFaces.find(({ id }) => nextResults[id]);
+      if (!first)
+        throw new Error("面を補正できません。Y字の位置を確認してください。");
+      setResults(nextResults);
+      setFaceErrors(nextErrors);
+      setSelectedFace(nextResults[selectedFace] ? selectedFace : first.id);
       setAngles(zero);
       setStep(1);
     } catch (e) {
@@ -106,7 +128,7 @@ export default function PerspectiveWorkbench({
     setTurning(true);
     const start = performance.now(),
       from = angles,
-      to = guide.flat;
+      to = guideFace(guide, selectedFace).flat;
     const reduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
@@ -139,7 +161,13 @@ export default function PerspectiveWorkbench({
     svg.current!.setPointerCapture(event.pointerId);
   };
   let cube: Point[] = [];
-  let texture = "";
+  const textures: {
+    id: GuideFaceId;
+    src: string;
+    width: number;
+    height: number;
+    transform: string;
+  }[] = [];
   if (guide) {
     if (step === 0)
       cube = [...guide.front, ...guide.back].map((p) => guidePoint(guide!, p));
@@ -157,16 +185,26 @@ export default function PerspectiveWorkbench({
         x: 400 + (p.x - (minX + maxX) / 2) * scale,
         y: 220 + (p.y - (minY + maxY) / 2) * scale,
       }));
-      if (result?.width && result?.height)
+      for (const { id } of guideFaces) {
+        const image = results[id];
+        if (!image?.src || !image.width || !image.height) continue;
         try {
-          texture = textureTransform(
-            cube.slice(0, 4),
-            result.width,
-            result.height,
-          );
+          const surface = guideFace(guide, id);
+          textures.push({
+            id,
+            src: image.src,
+            width: image.width,
+            height: image.height,
+            transform: textureTransform(
+              surface.corners.map((i) => cube[i]),
+              image.width,
+              image.height,
+            ),
+          });
         } catch {
-          /* The back of the plane has no image. */
+          /* Hide faces turned away from the camera. */
         }
+      }
     }
   }
   const polygon = (indices: number[]) =>
@@ -201,8 +239,36 @@ export default function PerspectiveWorkbench({
           ? "中心を角に、3つの枝先をパーツの辺に合わせる"
           : step === 1
             ? "ドラッグで画像と立方体を回転"
-            : "補正結果を確認"}
+            : "採用する面を選択"}
       </p>
+      {step === 2 && (
+        <div className="face-choice" role="group" aria-label="採用する面">
+          {guideFaces.map(({ id, label }) => (
+            <button
+              key={id}
+              className={`face-choice-card ${selectedFace === id ? "selected" : ""}`}
+              aria-label={`${label}を採用`}
+              aria-pressed={selectedFace === id}
+              disabled={!results[id]?.src}
+              title={faceErrors[id]}
+              onClick={() => {
+                setSelectedFace(id);
+                if (guide) setAngles(guideFace(guide, id).flat);
+              }}
+            >
+              {results[id]?.src ? (
+                <img
+                  src={results[id]!.src}
+                  alt={`${label}の平面化プレビュー`}
+                />
+              ) : (
+                <span className="face-unavailable">補正できません</span>
+              )}
+              <span>{label}</span>
+            </button>
+          ))}
+        </div>
+      )}
       <div className="image-edit-surface cube-surface">
         {step === 2 ? (
           <img
@@ -301,7 +367,7 @@ export default function PerspectiveWorkbench({
                 />
               </g>
             )}
-            {step === 1 && result?.src && texture && (
+            {step === 1 && textures.length > 0 && (
               <foreignObject
                 x="0"
                 y="0"
@@ -310,21 +376,24 @@ export default function PerspectiveWorkbench({
                 pointerEvents="none"
               >
                 <div style={{ position: "relative", width: 800, height: 440 }}>
-                  <img
-                    className="cube-texture"
-                    alt=""
-                    src={result.src}
-                    style={{
-                      position: "absolute",
-                      left: 0,
-                      top: 0,
-                      width: result.width,
-                      height: result.height,
-                      maxWidth: "none",
-                      transformOrigin: "0 0",
-                      transform: texture,
-                    }}
-                  />
+                  {textures.map((image) => (
+                    <img
+                      key={image.id}
+                      className={`cube-texture cube-texture-${image.id}`}
+                      alt=""
+                      src={image.src}
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        top: 0,
+                        width: image.width,
+                        height: image.height,
+                        maxWidth: "none",
+                        transformOrigin: "0 0",
+                        transform: image.transform,
+                      }}
+                    />
+                  ))}
                 </div>
               </foreignObject>
             )}
@@ -487,6 +556,7 @@ export default function PerspectiveWorkbench({
             if (step === 0) {
               setControls(initial());
               setPerspective(0.35);
+              setSelectedFace("front");
             } else setStep(step - 1);
           }}
         >
@@ -515,7 +585,7 @@ export default function PerspectiveWorkbench({
               if (result) apply(result);
             }}
           >
-            適用
+            この面を適用
           </button>
         )}
       </div>

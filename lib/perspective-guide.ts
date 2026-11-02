@@ -12,6 +12,12 @@ type Guide = {
   flat: Angles;
   projection: "perspective" | "orthographic";
 };
+export const guideFaces = [
+  { id: "front", label: "正面", corners: [0, 1, 2, 3] },
+  { id: "top", label: "上面", corners: [4, 5, 1, 0] },
+  { id: "side", label: "側面", corners: [1, 5, 6, 2] },
+] as const;
+export type GuideFaceId = (typeof guideFaces)[number]["id"];
 export function initialCubeFace(width: number, height: number): Point[] {
   // Project an actual cube, rather than opening with two nested rectangles.
   const corners = [
@@ -221,11 +227,37 @@ function edgeDepths(axes: Point[]) {
   return [a, k[0] / a, k[1] / a];
 }
 
-export function guideFaceAspect(guide: Guide) {
-  return (
-    length(sub(guide.front[1], guide.front[0])) /
-    length(sub(guide.front[3], guide.front[0]))
-  );
+export function guideFace(guide: Guide, id: GuideFaceId = "front") {
+  const vertices = [...guide.front, ...guide.back];
+  let corners: number[] = [
+    ...guideFaces.find((face) => face.id === id)!.corners,
+  ];
+  const projected = corners.map((i) => guidePoint(guide, vertices[i]));
+  const area = projected.reduce((sum, p, i) => {
+    const q = projected[(i + 1) % 4];
+    return sum + p.x * q.y - q.x * p.y;
+  }, 0);
+  if (area < 0) corners = [corners[1], corners[0], corners[3], corners[2]];
+  const points = corners.map((i) => vertices[i]);
+  const imagePoints = points.map((p) => guidePoint(guide, p));
+  quadHomography(imagePoints);
+  const u = sub(points[1], points[0]),
+    v = sub(points[3], points[0]);
+  const normal = unit(cross(u, v));
+  const yaw = (-Math.atan2(normal.x, normal.z) * 180) / Math.PI;
+  const n = rotate(normal, { yaw, pitch: 0, roll: 0 });
+  const pitch = (Math.atan2(n.y, n.z) * 180) / Math.PI;
+  const edge = rotate(u, { yaw, pitch, roll: 0 });
+  return {
+    corners,
+    imagePoints,
+    points,
+    aspect: length(u) / length(v),
+    flat: { yaw, pitch, roll: (-Math.atan2(edge.y, edge.x) * 180) / Math.PI },
+  };
+}
+export function guideFaceAspect(guide: Guide, id: GuideFaceId = "front") {
+  return guideFace(guide, id).aspect;
 }
 
 export function guideFromY(
@@ -260,12 +292,10 @@ export function guideFromY(
   } as Guide;
   let origin: Vec, left: Vec, back: Vec, down: Vec;
   if (strength === 0) {
-    const axes = controls
-      .slice(1)
-      .map((p) => ({
-        x: (p.x - controls[0].x) / focal,
-        y: (p.y - controls[0].y) / focal,
-      }));
+    const axes = controls.slice(1).map((p) => ({
+      x: (p.x - controls[0].x) / focal,
+      y: (p.y - controls[0].y) / focal,
+    }));
     const depths = edgeDepths(axes);
     origin = { x: 0, y: 0, z: 1 };
     [left, back, down] = axes.map((p, i) =>
@@ -281,12 +311,10 @@ export function guideFromY(
     const forward = unit(origin);
     const right = unit(sub({ x: 1, y: 0, z: 0 }, multiply(forward, forward.x)));
     const up = cross(forward, right);
-    const axes = rays
-      .slice(1)
-      .map((ray) => ({
-        x: dot(ray, right) / dot(ray, forward),
-        y: dot(ray, up) / dot(ray, forward),
-      }));
+    const axes = rays.slice(1).map((ray) => ({
+      x: dot(ray, right) / dot(ray, forward),
+      y: dot(ray, up) / dot(ray, forward),
+    }));
     const depths = edgeDepths(axes),
       originDepth = length(origin);
     if (depths.some((z) => z >= 0.95))

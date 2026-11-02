@@ -8,6 +8,7 @@ import {
   yControls,
   guideFromY,
   guidePoint,
+  guideFace,
 } from "../lib/perspective-guide.ts";
 import { matchesPart } from "../lib/part-search.ts";
 const close = (a, b) => assert.ok(Math.abs(a - b) < 1e-6, `${a} != ${b}`);
@@ -143,6 +144,38 @@ test("perspective reconstructs a known rectangular box from its Y instead of the
     close(p.y, expected[i].y);
     close(p.z, expected[i].z);
   });
+  for (const [id, aspect] of [
+    ["front", 0.45 / 0.16],
+    ["top", 0.45 / 0.7],
+    ["side", 0.7 / 0.16],
+  ]) {
+    const face = guideFace(guide, id);
+    close(face.aspect, aspect);
+    const aligned = face.points.map((p) => rotate(p, face.flat));
+    aligned.forEach((p) => close(p.z, aligned[0].z));
+    close(aligned[0].y, aligned[1].y);
+    close(aligned[0].x, aligned[3].x);
+    const matrix = textureTransform(face.imagePoints, 400, 200)
+      .slice(9, -1)
+      .split(",")
+      .map(Number);
+    [
+      [0, 0],
+      [400, 0],
+      [400, 200],
+      [0, 200],
+    ].forEach(([x, y], i) => {
+      const k = matrix[3] * x + matrix[7] * y + matrix[15];
+      close(
+        (matrix[0] * x + matrix[4] * y + matrix[12]) / k,
+        face.imagePoints[i].x,
+      );
+      close(
+        (matrix[1] * x + matrix[5] * y + matrix[13]) / k,
+        face.imagePoints[i].y,
+      );
+    });
+  }
 });
 test("a wide shallow Y like the reported photo stays pinned as perspective changes", () => {
   const template = makeGuide(initialCubeFace(510, 210), 510, 210, 1);

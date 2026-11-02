@@ -99,3 +99,5 @@ npm test
 - `app/api/part-image/route.ts`: カタログ写真の取得
 - `components/perspective-workbench.tsx` / `lib/perspective-guide.ts`: 立方体と画像の射影プレビュー
 - `lib/attachments.ts`: 本体への固定と追従する座標変換
+
+平面化後は「正面・上面・側面」のプレビューから採用する面を選び、「この面を適用」で確定します。各面は元の写真の対応する範囲から補正します。写真にない裏面は生成しません。

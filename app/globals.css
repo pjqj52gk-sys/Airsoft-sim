@@ -1878,6 +1878,54 @@ p {
   user-select: none;
   -webkit-user-drag: none;
 }
+.face-choice {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+.face-choice-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+}
+.face-choice-card.selected {
+  border-color: #0ea5e9;
+  background: #e0f2fe;
+  box-shadow: inset 0 0 0 1px #0ea5e9;
+  color: #0369a1;
+}
+.face-choice-card img {
+  width: 100%;
+  height: 65px;
+  object-fit: contain;
+}
+.face-unavailable {
+  display: grid;
+  place-items: center;
+  height: 65px;
+  font-size: 10px;
+}
+@media (max-width: 600px) {
+  .face-choice {
+    gap: 6px;
+  }
+  .face-choice-card {
+    padding: 7px;
+    font-size: 11px;
+  }
+  .face-choice-card img,
+  .face-unavailable {
+    height: 45px;
+  }
+}
 .empty-state h1 {
   font-size: 27px;
   line-height: 1.5;
