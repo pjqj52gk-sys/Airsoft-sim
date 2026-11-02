@@ -1,0 +1,99 @@
+import { loadImage } from "./project";
+import type { Layer } from "./project";
+import { croppedPlacement, quadMap, distance } from "./image-edit";
+import type { Rect, Point } from "./image-edit";
+export async function cropImage(
+  layer: Layer,
+  rect: Rect,
+): Promise<Partial<Layer>> {
+  const placement = croppedPlacement(layer, rect);
+  if (placement.mm < 1)
+    throw new Error(
+      "切り出した画像の実寸が1mm未満です。実寸合わせか範囲を調整してください。",
+    );
+  const image = await loadImage(layer.src);
+  const c = document.createElement("canvas");
+  c.width = rect.w;
+  c.height = rect.h;
+  c.getContext("2d")!.drawImage(
+    image,
+    rect.x,
+    rect.y,
+    rect.w,
+    rect.h,
+    0,
+    0,
+    rect.w,
+    rect.h,
+  );
+  return {
+    src: c.toDataURL("image/png"),
+    width: rect.w,
+    height: rect.h,
+    ...placement,
+    originalSrc: undefined,
+  };
+}
+export async function rectifyImage(
+  layer: Layer,
+  points: Point[],
+): Promise<Partial<Layer>> {
+  const map = quadMap(points);
+  const image = await loadImage(layer.src);
+  const source = document.createElement("canvas");
+  source.width = image.naturalWidth;
+  source.height = image.naturalHeight;
+  const sourceCtx = source.getContext("2d")!;
+  sourceCtx.drawImage(image, 0, 0);
+  const src = sourceCtx.getImageData(0, 0, source.width, source.height).data;
+  let w = (distance(points[0], points[1]) + distance(points[3], points[2])) / 2;
+  let h = (distance(points[0], points[3]) + distance(points[1], points[2])) / 2;
+  const scale = Math.min(1, 2000 / Math.max(w, h));
+  w = Math.max(2, Math.round(w * scale));
+  h = Math.max(2, Math.round(h * scale));
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext("2d")!;
+  const output = ctx.createImageData(w, h);
+  // Bilinear interpolation in premultiplied-alpha space avoids dark fringes around transparent edges.
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      const p = map(x / (w - 1), y / (h - 1));
+      const px = Math.max(0, Math.min(source.width - 1, p.x)),
+        py = Math.max(0, Math.min(source.height - 1, p.y));
+      const x0 = Math.floor(px),
+        y0 = Math.floor(py),
+        x1 = Math.min(source.width - 1, x0 + 1),
+        y1 = Math.min(source.height - 1, y0 + 1),
+        fx = px - x0,
+        fy = py - y0;
+      const i00 = (y0 * source.width + x0) * 4,
+        i10 = (y0 * source.width + x1) * 4;
+      const i01 = (y1 * source.width + x0) * 4,
+        i11 = (y1 * source.width + x1) * 4;
+      const a00 = src[i00 + 3] * (1 - fx) * (1 - fy),
+        a10 = src[i10 + 3] * fx * (1 - fy);
+      const a01 = src[i01 + 3] * (1 - fx) * fy,
+        a11 = src[i11 + 3] * fx * fy;
+      const alpha = a00 + a10 + a01 + a11;
+      const i = (y * w + x) * 4;
+      output.data[i + 3] = alpha;
+      for (let k = 0; k < 3; k++)
+        output.data[i + k] = alpha
+          ? (src[i00 + k] * a00 +
+              src[i10 + k] * a10 +
+              src[i01 + k] * a01 +
+              src[i11 + k] * a11) /
+            alpha
+          : 0;
+    }
+  ctx.putImageData(output, 0, 0);
+  return {
+    src: c.toDataURL("image/png"),
+    width: w,
+    height: h,
+    mm: layer.mm,
+    originalSrc: undefined,
+  };
+}

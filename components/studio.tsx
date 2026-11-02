@@ -3,6 +3,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Icon from "./icon";
 import Stage from "./stage";
 import Dialog from "./dialog";
+import ImageEditor from "./image-editor";
+import type { EditMode } from "./image-editor";
+import Shelf from "./shelf";
 import {
   download,
   emptyProject,
@@ -36,12 +39,15 @@ export default function Studio() {
     future: Project[];
   }>({ past: [], future: [] });
   const [ready, setReady] = useState(false);
+  const [draftRecoveryFailed, setDraftRecoveryFailed] = useState(false);
   const [saved, setSaved] = useState("準備中");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [help, setHelp] = useState(false);
   const [clearDialog, setClearDialog] = useState(false);
   const [tolerance, setTolerance] = useState(28);
+  const [editor, setEditor] = useState<EditMode | null>(null);
+  const [shelf, setShelf] = useState<"builds" | "parts" | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const projectInput = useRef<HTMLInputElement>(null);
   const dragStart = useRef<Project | null>(null);
@@ -61,10 +67,13 @@ export default function Studio() {
         }
       })
       .catch(() => {
-        if (!cancelled)
+        if (!cancelled) {
+          setDraftRecoveryFailed(true);
+          setSaved("復元できません");
           setMessage(
             "自動保存データを復元できません。JSONファイルから読み込めます。",
           );
+        }
       })
       .finally(() => {
         if (!cancelled) setReady(true);
@@ -74,7 +83,7 @@ export default function Studio() {
     };
   }, []);
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || (draftRecoveryFailed && project === emptyProject)) return;
     const t = setTimeout(() => {
       setSaved("保存中…");
       writeDraft(project)
@@ -87,7 +96,7 @@ export default function Studio() {
         });
     }, 700);
     return () => clearTimeout(t);
-  }, [project, ready]);
+  }, [project, ready, draftRecoveryFailed]);
   useEffect(() => {
     if (!message) return;
     const t = setTimeout(() => setMessage(""), 6000);
@@ -135,6 +144,8 @@ export default function Studio() {
         target.closest("input, textarea, select, [contenteditable]") ||
         help ||
         clearDialog ||
+        editor ||
+        shelf ||
         busy
       )
         return;
@@ -344,6 +355,81 @@ export default function Studio() {
     );
     notify("画像を含むJSONを保存しました。");
   }
+  function applyImage(updates: Partial<Layer>, extract: boolean) {
+    if (!layer) return;
+    if (extract) {
+      if (project.layers.length >= 60) {
+        notify("レイヤーは60件まで追加できます。");
+        return;
+      }
+      const part = {
+        ...layer,
+        ...updates,
+        id: uid(),
+        name: `${layer.name} / 切り出し`,
+        category: "その他",
+        locked: false,
+        visible: true,
+      };
+      commit({ ...project, layers: [...project.layers, part] });
+      setSelected(part.id);
+    } else update(layer.id, updates);
+    setEditor(null);
+    notify("画像の編集を適用しました。");
+  }
+  async function openBuild(savedProject: Project) {
+    setBusy(true);
+    try {
+      const restored = await parseProject(savedProject);
+      commit(restored);
+      setSelected(restored.layers[0]?.id ?? null);
+      setZoom(1);
+      setShelf(null);
+      notify("保存ビルドを開きました。前の状態は「元に戻す」で復元できます。");
+    } catch {
+      notify("保存ビルドを開けませんでした。");
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function addStoredPart(stored: Layer) {
+    if (project.layers.length >= 60) {
+      notify("レイヤーは60件まで追加できます。");
+      return;
+    }
+    setBusy(true);
+    try {
+      const validated = await parseProject({
+        version: 2,
+        name: "part",
+        layers: [stored],
+      });
+      const isBase = project.layers.length === 0;
+      const part = {
+        ...validated.layers[0],
+        id: uid(),
+        x: isBase ? 120 : 430,
+        y: isBase ? 190 : 160,
+        rotation: 0,
+        visible: true,
+        locked: isBase,
+        category: isBase
+          ? "本体"
+          : stored.category === "本体"
+            ? "その他"
+            : stored.category,
+      };
+      commit({ ...project, layers: [...project.layers, part] });
+      setSelected(part.id);
+      setShelf(null);
+      setTab("layers");
+      notify("登録パーツを追加しました。");
+    } catch {
+      notify("登録パーツを読み込めませんでした。");
+    } finally {
+      setBusy(false);
+    }
+  }
   const total = project.layers.slice(1).reduce((sum, l) => sum + l.price, 0);
   const button = (
     name: string,
@@ -404,6 +490,14 @@ export default function Studio() {
           />
         </div>
         <div className="header-actions">
+          <button
+            className="button secondary"
+            onClick={() => setShelf("builds")}
+            disabled={!ready || busy}
+          >
+            <Icon name="layers" />
+            ライブラリ
+          </button>
           <span className="save-state">
             <span className="status-dot" />
             {saved}
@@ -774,6 +868,12 @@ export default function Studio() {
                   unit="mm"
                   onChange={(mm) => update(layer.id, { mm })}
                 />
+                <button
+                  className="mini-button full-width"
+                  onClick={() => setEditor("measure")}
+                >
+                  2点で実寸合わせ
+                </button>
                 <p className="hint">
                   余白を除いた画像を使うと、実寸に近い比率で比較できます。
                 </p>
@@ -818,6 +918,26 @@ export default function Studio() {
               </div>
               <div className="inspector-section">
                 <div className="section-label">画像を整える</div>
+                <div className="edit-tool-grid">
+                  <button
+                    className="mini-button"
+                    onClick={() => setEditor("crop")}
+                  >
+                    切り出し
+                  </button>
+                  <button
+                    className="mini-button"
+                    onClick={() => setEditor("perspective")}
+                  >
+                    パース補正
+                  </button>
+                </div>
+                <button
+                  className="mini-button full-width"
+                  onClick={() => setEditor("background")}
+                >
+                  背景透過をプレビュー
+                </button>
                 <label className="range-label">
                   背景色の許容差 <span>{tolerance}</span>
                   <input
@@ -855,6 +975,12 @@ export default function Studio() {
               </div>
               <div className="inspector-section">
                 <div className="section-label">購入メモ</div>
+                <button
+                  className="mini-button full-width"
+                  onClick={() => setShelf("parts")}
+                >
+                  パーツライブラリに登録
+                </button>
                 <NumberField
                   label="参考価格"
                   value={layer.price}
@@ -934,7 +1060,14 @@ export default function Studio() {
             </div>
           )}
           <div className="inspector-bottom">
-            <a href="/legacy">旧エディター / パース補正・切り出し ↗</a>
+            <button
+              className="text-button"
+              onClick={() => setShelf("builds")}
+              disabled={!ready || busy}
+            >
+              保存ビルドを開く・比較
+            </button>
+            <a href="/legacy">旧エディターを開く ↗</a>
             <button
               className="text-button"
               onClick={() => setClearDialog(true)}
@@ -947,10 +1080,29 @@ export default function Studio() {
       </div>
       <footer className="footer">
         <span>
-          AIRSOFT CUSTOM STUDIO <small>V0.2</small>
+          AIRSOFT CUSTOM STUDIO <small>V0.3</small>
         </span>
         <span>想像を、組み立てる。</span>
       </footer>
+      {editor && layer && (
+        <ImageEditor
+          key={`${layer.id}-${editor}`}
+          layer={layer}
+          mode={editor}
+          close={() => setEditor(null)}
+          apply={applyImage}
+        />
+      )}
+      {shelf && (
+        <Shelf
+          project={project}
+          layer={layer}
+          initialTab={shelf}
+          close={() => setShelf(null)}
+          load={openBuild}
+          add={addStoredPart}
+        />
+      )}
       {busy && (
         <div className="processing-overlay" role="status">
           画像を処理しています…
@@ -992,7 +1144,7 @@ export default function Studio() {
                 <li>
                   <strong>本体の横向き画像を追加</strong>
                   <p>
-                    写真の余白を切り、実際の全長を入力します。本体は最初に固定されます。
+                    「切り出し」で余白を除き、「2点で実寸合わせ」で長さの分かる区間を指定します。本体は最初に固定されます。
                   </p>
                 </li>
                 <li>
@@ -1010,7 +1162,7 @@ export default function Studio() {
                 <li>
                   <strong>ビルドを保存</strong>
                   <p>
-                    ブラウザーへ自動保存。JSONでバックアップ、透過PNGで画像を書き出せます。従来のV1
+                    自動保存に加え、ライブラリへ複数ビルド・パーツを保存し、同じ縮尺で比較できます。JSONでバックアップ、透過PNGで画像を書き出せます。従来のV1
                     JSONも読み込めます。
                   </p>
                 </li>

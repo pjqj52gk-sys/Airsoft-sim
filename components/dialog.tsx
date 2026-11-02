@@ -4,10 +4,12 @@ export default function Dialog({
   label,
   close,
   children,
+  wide = false,
 }: {
   label: string;
   close: () => void;
   children: ReactNode;
+  wide?: boolean;
 }) {
   const element = useRef<HTMLElement>(null);
   const closeRef = useRef(close);
@@ -48,7 +50,7 @@ export default function Dialog({
     <div className="modal-backdrop" onClick={close}>
       <section
         ref={element}
-        className="modal"
+        className={`modal ${wide ? "modal-wide" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-label={label}
