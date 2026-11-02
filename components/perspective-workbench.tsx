@@ -8,6 +8,9 @@ import { rectifyImage } from "@/lib/image-processing";
 import {
   makeGuide,
   initialCubeFace,
+  guidePoint,
+  guideFromY,
+  yControls,
   projectGuide,
   textureTransform,
   type Angles,
@@ -21,7 +24,9 @@ const faces = [
   { corners: [2, 3, 7, 6], name: "下", fill: "#33415580", stroke: "#334155" },
   { corners: [3, 0, 4, 7], name: "左", fill: "#14b8a650", stroke: "#0f766e" },
 ];
-const names = ["左上", "右上", "右下", "左下"];
+const names = ["Y字の中心", "幅の点", "奥行きの点", "高さの点"];
+const labels = ["＋", "幅", "奥", "高"];
+const axisColors = ["#0369a1", "#0891b2", "#1d4ed8", "#0f766e"];
 export default function PerspectiveWorkbench({
   layer,
   close,
@@ -31,9 +36,16 @@ export default function PerspectiveWorkbench({
   close: () => void;
   apply: (patch: Partial<Layer>) => void;
 }) {
-  const initial = () => initialCubeFace(layer.width, layer.height);
-  const [points, setPoints] = useState<Point[]>(initial);
-  const [depth, setDepth] = useState(1);
+  const [template] = useState(() =>
+    makeGuide(
+      initialCubeFace(layer.width, layer.height),
+      layer.width,
+      layer.height,
+      1,
+    ),
+  );
+  const initial = () => yControls(template);
+  const [controls, setControls] = useState<Point[]>(initial);
   const [step, setStep] = useState(0);
   const [angles, setAngles] = useState<Angles>(zero);
   const [result, setResult] = useState<Partial<Layer> | null>(null);
@@ -52,7 +64,7 @@ export default function PerspectiveWorkbench({
   let guide: ReturnType<typeof makeGuide> | null = null;
   let geometryError = "";
   try {
-    guide = makeGuide(points, layer.width, layer.height, depth);
+    guide = guideFromY(controls, template);
   } catch (e) {
     geometryError = e instanceof Error ? e.message : "角を合わせてください。";
   }
@@ -71,7 +83,13 @@ export default function PerspectiveWorkbench({
     setBusy(true);
     setError("");
     try {
-      setResult(await rectifyImage(layer, points));
+      if (!guide) return;
+      setResult(
+        await rectifyImage(
+          layer,
+          guide.front.map((p) => guidePoint(guide!, p)),
+        ),
+      );
       setAngles(zero);
       setStep(1);
     } catch (e) {
@@ -112,7 +130,7 @@ export default function PerspectiveWorkbench({
     drag.current = {
       index,
       point: screenPoint(event.clientX, event.clientY),
-      corners: points,
+      corners: controls,
       angles,
     };
     svg.current!.setPointerCapture(event.pointerId);
@@ -180,7 +198,7 @@ export default function PerspectiveWorkbench({
       </ol>
       <p className="editor-instructions">
         {step === 0
-          ? "4つの角を、パーツの同じ平面に合わせる"
+          ? "中心を角に、3つの枝先をパーツの辺に合わせる"
           : step === 1
             ? "ドラッグで画像と立方体を回転"
             : "補正結果を確認"}
@@ -224,7 +242,7 @@ export default function PerspectiveWorkbench({
                     Math.min(150, d.angles.pitch - dy * 0.35),
                   ),
                 });
-              else if (d.index === -1) {
+              else if (d.index === -1 || d.index === 0) {
                 const tx = Math.min(
                   layer.width - Math.max(...d.corners.map((v) => v.x)),
                   Math.max(-Math.min(...d.corners.map((v) => v.x)), dx),
@@ -233,9 +251,11 @@ export default function PerspectiveWorkbench({
                   layer.height - Math.max(...d.corners.map((v) => v.y)),
                   Math.max(-Math.min(...d.corners.map((v) => v.y)), dy),
                 );
-                setPoints(d.corners.map((v) => ({ x: v.x + tx, y: v.y + ty })));
+                setControls(
+                  d.corners.map((v) => ({ x: v.x + tx, y: v.y + ty })),
+                );
               } else
-                setPoints(
+                setControls(
                   d.corners.map((v, i) =>
                     i === d.index ? clamp({ x: v.x + dx, y: v.y + dy }) : v,
                   ),
@@ -318,19 +338,45 @@ export default function PerspectiveWorkbench({
                 onPointerDown={(e) => begin(e, step === 0 ? -1 : -2)}
               />
             )}
+            {step === 0 && (
+              <g pointerEvents="none">
+                {controls.slice(1).map((p, i) => (
+                  <g key={i}>
+                    <line
+                      x1={controls[0].x}
+                      y1={controls[0].y}
+                      x2={p.x}
+                      y2={p.y}
+                      stroke="white"
+                      strokeWidth={handle * 0.55}
+                      strokeLinecap="round"
+                    />
+                    <line
+                      x1={controls[0].x}
+                      y1={controls[0].y}
+                      x2={p.x}
+                      y2={p.y}
+                      stroke={axisColors[i + 1]}
+                      strokeWidth={handle * 0.3}
+                      strokeLinecap="round"
+                    />
+                  </g>
+                ))}
+              </g>
+            )}
             {step === 0 &&
-              points.map((p, i) => (
+              controls.map((p, i) => (
                 <g key={i}>
                   <circle
                     cx={p.x}
                     cy={p.y}
-                    r={handle}
-                    fill="white"
-                    stroke="#0284c7"
+                    r={i === 0 ? handle * 1.2 : handle}
+                    fill={i === 0 ? "#0369a1" : "white"}
+                    stroke={axisColors[i]}
                     strokeWidth={handle / 6}
                     tabIndex={0}
                     role="button"
-                    aria-label={`${names[i]}の角`}
+                    aria-label={names[i]}
                     style={{ cursor: "grab" }}
                     onPointerDown={(e) => begin(e, i)}
                     onKeyDown={(e) => {
@@ -344,16 +390,36 @@ export default function PerspectiveWorkbench({
                         e.preventDefault();
                         const v = delta[e.key],
                           speed = e.shiftKey ? 10 : 1;
-                        setPoints(
-                          points.map((q, n) =>
-                            n === i
-                              ? clamp({
-                                  x: q.x + v.x * speed,
-                                  y: q.y + v.y * speed,
-                                })
-                              : q,
-                          ),
-                        );
+                        if (i === 0) {
+                          const dx = Math.min(
+                            layer.width - Math.max(...controls.map((p) => p.x)),
+                            Math.max(
+                              -Math.min(...controls.map((p) => p.x)),
+                              v.x * speed,
+                            ),
+                          );
+                          const dy = Math.min(
+                            layer.height -
+                              Math.max(...controls.map((p) => p.y)),
+                            Math.max(
+                              -Math.min(...controls.map((p) => p.y)),
+                              v.y * speed,
+                            ),
+                          );
+                          setControls(
+                            controls.map((q) => ({ x: q.x + dx, y: q.y + dy })),
+                          );
+                        } else
+                          setControls(
+                            controls.map((q, n) =>
+                              n === i
+                                ? clamp({
+                                    x: q.x + v.x * speed,
+                                    y: q.y + v.y * speed,
+                                  })
+                                : q,
+                            ),
+                          );
                       }
                     }}
                   />
@@ -362,29 +428,17 @@ export default function PerspectiveWorkbench({
                     y={p.y + handle * 0.35}
                     textAnchor="middle"
                     fontSize={handle}
-                    fill="#0369a1"
+                    fill={i === 0 ? "white" : axisColors[i]}
                     pointerEvents="none"
                   >
-                    {i + 1}
+                    {labels[i]}
                   </text>
                 </g>
               ))}
           </svg>
         )}
       </div>
-      {step === 0 ? (
-        <label className="range-label">
-          立方体の奥行き
-          <input
-            type="range"
-            min="0.1"
-            max="1.5"
-            step="0.05"
-            value={depth}
-            onChange={(e) => setDepth(Number(e.target.value))}
-          />
-        </label>
-      ) : step === 1 ? (
+      {step === 1 ? (
         <div className="cube-angle-controls">
           {(["yaw", "pitch", "roll"] as const).map((key, i) => (
             <label key={key}>
@@ -403,9 +457,9 @@ export default function PerspectiveWorkbench({
             </label>
           ))}
         </div>
-      ) : (
+      ) : step === 2 ? (
         <p className="hint">平面部分を補正 · 適用後に実寸を確認</p>
-      )}
+      ) : null}
       {(error || geometryError) && (
         <p className="editor-error" role="alert">
           {error || geometryError}
@@ -417,10 +471,8 @@ export default function PerspectiveWorkbench({
           disabled={busy || turning}
           onClick={() => {
             if (step === 0) {
-              setPoints(initial());
-              setDepth(1);
-            }
-            else setStep(step - 1);
+              setControls(initial());
+            } else setStep(step - 1);
           }}
         >
           {step === 0 ? "リセット" : "戻る"}

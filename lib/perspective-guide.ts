@@ -140,3 +140,74 @@ export function textureTransform(
   const { a, b, c, d, e, f, g, h } = quadHomography(points);
   return `matrix3d(${a / width},${d / width},0,${g / width},${b / height},${e / height},0,${h / height},0,0,1,0,${c},${f},0,1)`;
 }
+
+type Guide = ReturnType<typeof makeGuide>;
+export const guidePoint = (guide: Guide, p: Vec): Point => ({
+  x: guide.cx + (guide.focal * p.x) / p.z,
+  y: guide.cy + (guide.focal * p.y) / p.z,
+});
+
+// Three adjoining edges meet at front[1]: width, depth, and height form a Y.
+export function yControls(guide: Guide): Point[] {
+  return [guide.front[1], guide.front[0], guide.back[1], guide.front[2]].map(
+    (p) => guidePoint(guide, p),
+  );
+}
+
+export function guideFromY(controls: Point[], template: Guide): Guide {
+  if (
+    controls.length !== 4 ||
+    controls.some((p) => !Number.isFinite(p.x) || !Number.isFinite(p.y))
+  )
+    throw new Error("中心と3つの枝先を合わせてください。");
+  if (
+    controls
+      .slice(1)
+      .some((p) => Math.hypot(p.x - controls[0].x, p.y - controls[0].y) < 2)
+  )
+    throw new Error("枝先を中心から離してください。");
+  // Keep the initial camera depths while moving the projected endpoints.
+  // Complete the other corners in 3D so each drag updates the whole box.
+  const depths = [
+    template.front[1].z,
+    template.front[0].z,
+    template.back[1].z,
+    template.front[2].z,
+  ];
+  const [origin, left, back, down] = controls.map((p, i): Vec => ({
+    x: ((p.x - template.cx) * depths[i]) / template.focal,
+    y: ((p.y - template.cy) * depths[i]) / template.focal,
+    z: depths[i],
+  }));
+  const opposite = {
+    x: left.x + down.x - origin.x,
+    y: left.y + down.y - origin.y,
+    z: left.z + down.z - origin.z,
+  };
+  const front = [left, origin, down, opposite];
+  quadHomography(front.map((p) => guidePoint(template, p)));
+  const offset = sub(back, origin);
+  const rear = front.map((p) => ({
+    x: p.x + offset.x,
+    y: p.y + offset.y,
+    z: p.z + offset.z,
+  }));
+  const u = sub(front[1], front[0]),
+    v = sub(front[3], front[0]);
+  const normal = unit(cross(u, v));
+  const center = front.reduce(
+    (s, p) => ({ x: s.x + p.x / 4, y: s.y + p.y / 4, z: s.z + p.z / 4 }),
+    { x: 0, y: 0, z: 0 },
+  );
+  const yaw = (-Math.atan2(normal.x, normal.z) * 180) / Math.PI;
+  const n = rotate(normal, { yaw, pitch: 0, roll: 0 });
+  const pitch = (Math.atan2(n.y, n.z) * 180) / Math.PI;
+  const edge = rotate(u, { yaw, pitch, roll: 0 });
+  return {
+    ...template,
+    front,
+    back: rear,
+    center,
+    flat: { yaw, pitch, roll: (-Math.atan2(edge.y, edge.x) * 180) / Math.PI },
+  };
+}
