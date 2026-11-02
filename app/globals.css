@@ -2155,3 +2155,10 @@ p {
 .rakuten-card strong { font-size:18px; }
 .rakuten-pages { display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0; }
 .rakuten-credit { font-size:11px;margin-top:18px; }
+
+.rakuten-card > button { flex:0 0 auto; }
+.rakuten-photo-picker { display:flex;flex-direction:column;gap:12px; }
+.rakuten-photo-picker > .mini-button { flex:0 0 auto;align-self:flex-start; }
+.rakuten-photo-picker h3 { font-size:15px;line-height:1.7; }
+.rakuten-photo-picker .shop-photo-preview { min-height:220px; }
+.rakuten-photo-picker > a { font-size:13px;color:#167ba8; }

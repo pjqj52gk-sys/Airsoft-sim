@@ -4,6 +4,8 @@ export type RakutenItem = {
   shop: string;
   price: number;
   image: string;
+  images: string[];
+  productUrl: string;
   url: string;
   sponsored: boolean;
 };
@@ -44,6 +46,28 @@ function rakutenUrl(input: unknown, image = false) {
     return "";
   }
 }
+export function rakutenProductUrl(input: unknown): string {
+  const safe = rakutenUrl(input);
+  if (!safe) return "";
+  const url = new URL(safe);
+  if (
+    url.hostname === "item.rakuten.co.jp" &&
+    /^\/[^/]+\/[^/]+\/?$/.test(url.pathname)
+  )
+    return url.href;
+  if (url.hostname === "hb.afl.rakuten.co.jp") {
+    const target = rakutenUrl(url.searchParams.get("pc"));
+    if (target) {
+      const product = new URL(target);
+      if (
+        product.hostname === "item.rakuten.co.jp" &&
+        /^\/[^/]+\/[^/]+\/?$/.test(product.pathname)
+      )
+        return product.href;
+    }
+  }
+  return "";
+}
 export function normalizeRakuten(data: unknown): RakutenResults {
   if (!data || typeof data !== "object") throw new Error("Invalid response");
   const root = data as Record<string, unknown>;
@@ -53,11 +77,24 @@ export function normalizeRakuten(data: unknown): RakutenResults {
     if (!row || typeof row !== "object") return [];
     const item = row.item ?? row.Item ?? row;
     const url = rakutenUrl(item.affiliateUrl) || rakutenUrl(item.itemUrl);
-    const imageEntry = item.mediumImageUrls?.[0];
-    const image = rakutenUrl(
-      typeof imageEntry === "string" ? imageEntry : imageEntry?.imageUrl,
-      true,
-    );
+    const images = Array.isArray(item.mediumImageUrls)
+      ? [
+          ...new Set<string>(
+            item.mediumImageUrls
+              .slice(0, 3)
+              .map((entry: unknown) =>
+                rakutenUrl(
+                  typeof entry === "string"
+                    ? entry
+                    : (entry as { imageUrl?: unknown } | null)?.imageUrl,
+                  true,
+                ),
+              )
+              .filter(Boolean),
+          ),
+        ]
+      : [];
+    const image = images[0];
     if (
       !url ||
       !image ||
@@ -73,6 +110,10 @@ export function normalizeRakuten(data: unknown): RakutenResults {
         shop: String(item.shopName || "").slice(0, 100),
         price: item.itemPrice,
         image,
+        images,
+        productUrl:
+          rakutenProductUrl(item.itemUrl) ||
+          rakutenProductUrl(item.affiliateUrl),
         url,
         sponsored: /(^|\.)(afl\.rakuten\.co\.jp|r10\.to)$/.test(
           new URL(url).hostname,

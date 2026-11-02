@@ -155,7 +155,11 @@ export default function PartSearch({
         </button>
       </div>
       {source === "rakuten" ? (
-        <RakutenSearch attachLink={attachLink} />
+        <RakutenSearch
+          add={add}
+          attachLink={attachLink}
+          onBusy={(value) => setBusy(value ? "rakuten" : null)}
+        />
       ) : source === "shop" ? (
         <ShopImport
           add={add}

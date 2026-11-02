@@ -1,6 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { normalizeRakuten, searchParams } from "../lib/rakuten.ts";
+import {
+  normalizeRakuten,
+  searchParams,
+  rakutenProductUrl,
+} from "../lib/rakuten.ts";
 import { purchaseLink } from "../lib/commerce.ts";
 
 const product = {
@@ -16,7 +20,7 @@ const product = {
     },
   ],
 };
-test("Rakuten thumbnails keep their supplied URL and are separate from editable images", () => {
+test("Rakuten thumbnails keep their supplied URL and preserve all photo choices", () => {
   const data = normalizeRakuten({
     items: [product],
     count: 1,
@@ -24,6 +28,8 @@ test("Rakuten thumbnails keep their supplied URL and are separate from editable 
     pageCount: 1,
   });
   assert.equal(data.items[0].image, product.mediumImageUrls[0].imageUrl);
+  assert.deepEqual(data.items[0].images, [product.mediumImageUrls[0].imageUrl]);
+  assert.equal(data.items[0].productUrl, product.itemUrl);
   assert.equal(data.items[0].price, 9800);
   assert.equal(data.items[0].sponsored, false);
   assert.equal("src" in data.items[0], false);
@@ -31,6 +37,40 @@ test("Rakuten thumbnails keep their supplied URL and are separate from editable 
     normalizeRakuten({ Items: [{ Item: product }] }).items.length,
     1,
   );
+});
+test("only actual Rakuten product destinations are used for gallery lookup", () => {
+  const target = "https://item.rakuten.co.jp/shop/item/";
+  assert.equal(
+    rakutenProductUrl(
+      `https://hb.afl.rakuten.co.jp/hgc/test/?pc=${encodeURIComponent(target)}`,
+    ),
+    target,
+  );
+  for (const url of [
+    "https://hb.afl.rakuten.co.jp/hgc/test/?pc=https%3A%2F%2Flocalhost%2F",
+    "https://item.rakuten.co.jp.evil.example/shop/item/",
+    "https://hb.afl.rakuten.co.jp/hgc/test/?pc=https%3A%2F%2Fexample.com%2F",
+    "https://item.rakuten.co.jp/",
+    "javascript:alert(1)",
+  ])
+    assert.equal(rakutenProductUrl(url), "");
+  const images = [
+    product.mediumImageUrls[0].imageUrl,
+    "https://image.rakuten.co.jp/shop/cabinet/second.jpg",
+    "https://image.rakuten.co.jp/shop/cabinet/third.jpg",
+  ];
+  const item = normalizeRakuten({
+    items: [
+      {
+        ...product,
+        mediumImageUrls: [
+          ...images,
+          "https://image.rakuten.co.jp/shop/cabinet/fourth.jpg",
+        ],
+      },
+    ],
+  }).items[0];
+  assert.deepEqual(item.images, images);
 });
 test("API-issued affiliate URLs stay intact and have advertising attribution", () => {
   const affiliateUrl =

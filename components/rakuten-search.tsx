@@ -1,11 +1,17 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import type { RakutenResults } from "@/lib/rakuten";
+import type { RakutenItem, RakutenResults } from "@/lib/rakuten";
+import { readImage, uid, type Layer } from "@/lib/project";
+import type { ShopProduct } from "@/lib/shop-product";
 
 export default function RakutenSearch({
   attachLink,
+  add,
+  onBusy,
 }: {
   attachLink?: (url: string) => void;
+  add: (layer: Layer) => Promise<void>;
+  onBusy: (busy: boolean) => void;
 }) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("standard");
@@ -13,8 +19,98 @@ export default function RakutenSearch({
   const [submitted, setSubmitted] = useState({ query: "", sort: "standard" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [selected, setSelected] = useState<RakutenItem | null>(null);
+  const [images, setImages] = useState<string[]>([]);
+  const [photo, setPhoto] = useState(0);
+  const [imageBusy, setImageBusy] = useState(false);
+  const [notice, setNotice] = useState("");
+  const [resolution, setResolution] = useState("");
+  const [referenceMm, setReferenceMm] = useState<number | undefined>();
   const controller = useRef<AbortController | null>(null);
   useEffect(() => () => controller.current?.abort(), []);
+  function loadingImage(value: boolean) {
+    setImageBusy(value);
+    onBusy(value);
+  }
+  async function chooseImages(item: RakutenItem) {
+    setSelected(item);
+    setImages(item.images?.length ? item.images : [item.image]);
+    setPhoto(0);
+    setResolution("");
+    setReferenceMm(undefined);
+    setError("");
+    setNotice("検索画像（小）");
+    if (!item.productUrl) return;
+    loadingImage(true);
+    const current = new AbortController();
+    controller.current = current;
+    try {
+      const response = await fetch("/api/shop-product", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: item.productUrl }),
+        signal: current.signal,
+      });
+      if (!response.ok) throw new Error();
+      const product: ShopProduct = await response.json();
+      if (!product.images.length) throw new Error();
+      setImages(product.images);
+      setNotice("商品ページの写真");
+      setResolution("");
+      setReferenceMm(product.referenceMm);
+    } catch {
+      if (!current.signal.aborted)
+        setNotice(
+          "商品ページの写真は取得できません。検索画像（小）を選べます。",
+        );
+    } finally {
+      if (!current.signal.aborted) loadingImage(false);
+    }
+  }
+  async function importImage() {
+    if (!selected || !images[photo] || imageBusy) return;
+    loadingImage(true);
+    setError("");
+    const current = new AbortController();
+    controller.current = current;
+    try {
+      const response = await fetch("/api/shop-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: images[photo] }),
+        signal: current.signal,
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.error || "画像を取得できません。");
+      }
+      const blob = await response.blob();
+      const image = await readImage(
+        new File([blob], "rakuten-part", { type: blob.type }),
+      );
+      await add({
+        ...image,
+        id: uid(),
+        name: selected.name,
+        mm: 150,
+        referenceMm,
+        x: 430,
+        y: 160,
+        rotation: 0,
+        flip: false,
+        visible: true,
+        attachedToBase: false,
+        price: selected.price,
+        url: selected.url,
+        category: "その他",
+      });
+    } catch (e) {
+      if (!current.signal.aborted)
+        setError(e instanceof Error ? e.message : "画像を追加できません。");
+    } finally {
+      if (!current.signal.aborted) loadingImage(false);
+    }
+  }
   async function search(page = 1, keyword = query, order = sort) {
     controller.current?.abort();
     const current = new AbortController();
@@ -40,117 +136,205 @@ export default function RakutenSearch({
   }
   return (
     <div className="rakuten-search">
-      <form
-        className="part-search-controls"
-        onSubmit={(e) => {
-          e.preventDefault();
-          void search();
-        }}
-      >
-        <input
-          type="search"
-          aria-label="楽天の商品名"
-          placeholder="商品名・メーカー"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          required
-          maxLength={128}
-        />
-        <select
-          aria-label="楽天の並び順"
-          value={sort}
-          onChange={(e) => setSort(e.target.value)}
+      {selected ? (
+        <section
+          className="rakuten-photo-picker"
+          aria-label="楽天の商品画像を選択"
         >
-          <option value="standard">標準</option>
-          <option value="+itemPrice">価格が安い順</option>
-          <option value="-itemPrice">価格が高い順</option>
-        </select>
-        <button className="button primary" disabled={busy || !query.trim()}>
-          {busy ? "検索中…" : "検索"}
-        </button>
-      </form>
-      {error && <p role="alert">{error}</p>}
-      <div aria-live="polite">
-        {result && (
-          <p>
-            {result.count.toLocaleString()}件
-            {result.items.length === 0 && "：商品が見つかりません。"}
+          <button
+            className="mini-button"
+            disabled={imageBusy}
+            onClick={() => {
+              setSelected(null);
+              setError("");
+            }}
+          >
+            ← 検索結果に戻る
+          </button>
+          <h3>{selected.name}</h3>
+          {imageBusy && <p role="status">画像を取得中…</p>}
+          {error && (
+            <p className="editor-error" role="alert">
+              {error}
+            </p>
+          )}
+          <div className="shop-photo-preview">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              key={images[photo]}
+              src={images[photo]}
+              alt={`${selected.name}の選択中の写真`}
+              onLoad={(e) =>
+                setResolution(
+                  `${e.currentTarget.naturalWidth} × ${e.currentTarget.naturalHeight} px`,
+                )
+              }
+              onError={() => setResolution("プレビューを読み込めません")}
+            />
+          </div>
+          <p className="hint">
+            {notice}
+            {resolution && ` · ${resolution}`}
           </p>
-        )}
-      </div>
-      {result && (
-        <div className="rakuten-grid">
-          {result.items.map((item) => (
-            <article className="rakuten-card" key={item.id}>
-              <a
-                href={item.url}
-                target="_blank"
-                rel={
-                  item.sponsored
-                    ? "sponsored noopener noreferrer"
-                    : "noopener noreferrer"
-                }
-              >
-                {/* API thumbnails are displayed as supplied and never imported into the editor. */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  width={128}
-                  height={128}
-                  loading="lazy"
-                />
-                <span>{item.name}</span>
-              </a>
-              <small>{item.shop}</small>
-              <strong>¥{item.price.toLocaleString()}</strong>
-              <a
-                href={item.url}
-                target="_blank"
-                rel={
-                  item.sponsored
-                    ? "sponsored noopener noreferrer"
-                    : "noopener noreferrer"
-                }
-              >
-                楽天市場で見る ↗{item.sponsored && "（広告）"}
-              </a>
-              {attachLink && (
+          {images.length > 1 && (
+            <div className="shop-photo-list">
+              {images.map((image, index) => (
                 <button
-                  className="mini-button"
-                  onClick={() => attachLink(item.url)}
+                  key={image}
+                  className={index === photo ? "toggled" : ""}
+                  aria-label={`写真 ${index + 1}`}
+                  aria-pressed={index === photo}
+                  disabled={imageBusy}
+                  onClick={() => {
+                    setPhoto(index);
+                    setResolution("");
+                  }}
                 >
-                  購入リンクを設定
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={image} alt={`写真 ${index + 1}`} />
                 </button>
-              )}
-            </article>
-          ))}
-        </div>
-      )}
-      {result && result.pageCount > 1 && (
-        <div className="rakuten-pages">
+              ))}
+            </div>
+          )}
           <button
-            className="mini-button"
-            disabled={busy || result.page <= 1}
-            onClick={() =>
-              void search(result.page - 1, submitted.query, submitted.sort)
+            className="button primary"
+            disabled={imageBusy}
+            onClick={() => void importImage()}
+          >
+            この画像を追加
+          </button>
+          <a
+            href={selected.url}
+            target="_blank"
+            rel={
+              selected.sponsored
+                ? "sponsored noopener noreferrer"
+                : "noopener noreferrer"
             }
           >
-            前へ
-          </button>
-          <span>
-            {result.page} / {result.pageCount}
-          </span>
-          <button
-            className="mini-button"
-            disabled={busy || result.page >= result.pageCount}
-            onClick={() =>
-              void search(result.page + 1, submitted.query, submitted.sort)
-            }
+            楽天市場で見る ↗{selected.sponsored && "（広告）"}
+          </a>
+        </section>
+      ) : (
+        <>
+          <form
+            className="part-search-controls"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void search();
+            }}
           >
-            次へ
-          </button>
-        </div>
+            <input
+              type="search"
+              aria-label="楽天の商品名"
+              placeholder="商品名・メーカー"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              required
+              maxLength={128}
+            />
+            <select
+              aria-label="楽天の並び順"
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+            >
+              <option value="standard">標準</option>
+              <option value="+itemPrice">価格が安い順</option>
+              <option value="-itemPrice">価格が高い順</option>
+            </select>
+            <button className="button primary" disabled={busy || !query.trim()}>
+              {busy ? "検索中…" : "検索"}
+            </button>
+          </form>
+          {error && <p role="alert">{error}</p>}
+          <div aria-live="polite">
+            {result && (
+              <p>
+                {result.count.toLocaleString()}件
+                {result.items.length === 0 && "：商品が見つかりません。"}
+              </p>
+            )}
+          </div>
+          {result && (
+            <div className="rakuten-grid">
+              {result.items.map((item) => (
+                <article className="rakuten-card" key={item.id}>
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel={
+                      item.sponsored
+                        ? "sponsored noopener noreferrer"
+                        : "noopener noreferrer"
+                    }
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      width={128}
+                      height={128}
+                      loading="lazy"
+                    />
+                    <span>{item.name}</span>
+                  </a>
+                  <button
+                    className="button primary"
+                    onClick={() => void chooseImages(item)}
+                  >
+                    画像を選んで追加
+                  </button>
+                  <small>{item.shop}</small>
+                  <strong>¥{item.price.toLocaleString()}</strong>
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel={
+                      item.sponsored
+                        ? "sponsored noopener noreferrer"
+                        : "noopener noreferrer"
+                    }
+                  >
+                    楽天市場で見る ↗{item.sponsored && "（広告）"}
+                  </a>
+                  {attachLink && (
+                    <button
+                      className="mini-button"
+                      onClick={() => attachLink(item.url)}
+                    >
+                      選択中のパーツにリンクのみ設定
+                    </button>
+                  )}
+                </article>
+              ))}
+            </div>
+          )}
+          {result && result.pageCount > 1 && (
+            <div className="rakuten-pages">
+              <button
+                className="mini-button"
+                disabled={busy || result.page <= 1}
+                onClick={() =>
+                  void search(result.page - 1, submitted.query, submitted.sort)
+                }
+              >
+                前へ
+              </button>
+              <span>
+                {result.page} / {result.pageCount}
+              </span>
+              <button
+                className="mini-button"
+                disabled={busy || result.page >= result.pageCount}
+                onClick={() =>
+                  void search(result.page + 1, submitted.query, submitted.sort)
+                }
+              >
+                次へ
+              </button>
+            </div>
+          )}
+        </>
       )}
       <p className="rakuten-credit">
         <a href="https://developers.rakuten.com/" target="_blank">
