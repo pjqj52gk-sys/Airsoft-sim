@@ -231,7 +231,7 @@ export default function RakutenSearch({
             <input
               type="search"
               aria-label="楽天の商品名"
-              placeholder="商品名・メーカー"
+              placeholder="エアガン用品の商品名・メーカー"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               required
@@ -250,6 +250,7 @@ export default function RakutenSearch({
               {busy ? "検索中…" : "検索"}
             </button>
           </form>
+          <p className="hint">検索対象：サバゲー・トイガン</p>
           {error && <p role="alert">{error}</p>}
           <div aria-live="polite">
             {result && (

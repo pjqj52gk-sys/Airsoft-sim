@@ -1,4 +1,4 @@
-import { normalizeRakuten, searchParams } from "@/lib/rakuten";
+import { airsoftGenreId, normalizeRakuten, searchParams } from "@/lib/rakuten";
 export const runtime = "nodejs";
 export const maxDuration = 15;
 export async function GET(request: Request) {
@@ -35,6 +35,7 @@ export async function GET(request: Request) {
   url.search = new URLSearchParams({
     applicationId,
     keyword: query.keyword,
+    genreId: airsoftGenreId,
     page: String(query.page),
     sort: query.sort,
     hits: "12",
@@ -83,6 +84,8 @@ export async function GET(request: Request) {
         },
         429,
       );
+    if (response.status === 404)
+      return reply({ items: [], count: 0, page: query.page, pageCount: 0 });
     if ([401, 403].includes(response.status))
       return reply(
         { error: "楽天APIのキーと許可サイトの設定を確認してください。" },

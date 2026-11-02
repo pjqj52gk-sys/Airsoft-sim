@@ -1,3 +1,5 @@
+// Rakuten Genre API: サバイバルゲーム・トイガン (verified 2026-11-03).
+export const airsoftGenreId = "213684";
 export type RakutenItem = {
   id: string;
   name: string;
