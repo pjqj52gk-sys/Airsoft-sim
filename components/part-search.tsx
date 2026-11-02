@@ -22,7 +22,7 @@ export default function PartSearch({
 }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
-  const [source, setSource] = useState("catalog");
+  const [source, setSource] = useState("rakuten");
   const [dimensionOnly, setDimensionOnly] = useState(false);
   const [saved, setSaved] = useState<StoredPart[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
@@ -117,6 +117,15 @@ export default function PartSearch({
       <div className="shelf-tabs" role="tablist" aria-label="検索対象">
         <button
           role="tab"
+          aria-selected={source === "rakuten"}
+          className={`mini-button ${source === "rakuten" ? "toggled" : ""}`}
+          disabled={!!busy}
+          onClick={() => setSource("rakuten")}
+        >
+          楽天市場
+        </button>
+        <button
+          role="tab"
           disabled={!!busy}
           aria-selected={source === "catalog"}
           className={`mini-button ${source === "catalog" ? "toggled" : ""}`}
@@ -144,15 +153,6 @@ export default function PartSearch({
           }}
         >
           ショップURL
-        </button>
-        <button
-          role="tab"
-          aria-selected={source === "rakuten"}
-          className={`mini-button ${source === "rakuten" ? "toggled" : ""}`}
-          disabled={!!busy}
-          onClick={() => setSource("rakuten")}
-        >
-          楽天市場
         </button>
       </div>
       {source === "rakuten" ? (

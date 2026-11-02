@@ -2173,3 +2173,12 @@ p {
 .perspective-viewport-tools { display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0; }
 .perspective-viewport-tools .mini-button { flex:0 0 auto; }
 .perspective-viewport-tools span { font-size:11px;color:#64748b; }
+
+.category-browser { margin:18px 0;border:1px solid #dcebf4;border-radius:12px;padding:12px;background:#f7fcff; }
+.category-groups { display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px; }
+.category-group { padding:12px 8px;border:1px solid #d5e5ee;border-radius:8px;background:white;color:#52677d;font-size:12px;cursor:pointer; }
+.category-group.selected { border-color:#38bdf8;background:#e0f5ff;color:#0369a1; }
+.category-group:hover { border-color:#38bdf8; }
+.category-group:disabled { opacity:.55;cursor:wait; }
+.category-children { display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid #e0edf4; }
+.category-children .mini-button { flex:0 1 auto;min-height:36px; }

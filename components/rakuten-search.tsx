@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import type { RakutenItem, RakutenResults } from "@/lib/rakuten";
 import { readImage, uid, type Layer } from "@/lib/project";
 import type { ShopProduct } from "@/lib/shop-product";
+import CategoryBrowser from "./category-browser";
+import { partCategory } from "@/lib/part-categories";
 
 export default function RakutenSearch({
   attachLink,
@@ -16,10 +18,12 @@ export default function RakutenSearch({
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("standard");
   const [result, setResult] = useState<RakutenResults | null>(null);
-  const [submitted, setSubmitted] = useState({ query: "", sort: "standard" });
+  const [activeCategory, setActiveCategory] = useState("");
+  const [submitted, setSubmitted] = useState({ query: "", sort: "standard", category: "" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<RakutenItem | null>(null);
+  const [selectedLayerCategory, setSelectedLayerCategory] = useState("その他");
   const [images, setImages] = useState<string[]>([]);
   const [photo, setPhoto] = useState(0);
   const [imageBusy, setImageBusy] = useState(false);
@@ -34,6 +38,7 @@ export default function RakutenSearch({
   }
   async function chooseImages(item: RakutenItem) {
     setSelected(item);
+    setSelectedLayerCategory(partCategory(submitted.category)?.layerCategory || "その他");
     setImages(item.images?.length ? item.images : [item.image]);
     setPhoto(0);
     setResolution("");
@@ -102,7 +107,7 @@ export default function RakutenSearch({
         attachedToBase: false,
         price: selected.price,
         url: selected.url,
-        category: "その他",
+        category: selectedLayerCategory,
       });
     } catch (e) {
       if (!current.signal.aborted)
@@ -111,7 +116,7 @@ export default function RakutenSearch({
       if (!current.signal.aborted) loadingImage(false);
     }
   }
-  async function search(page = 1, keyword = query, order = sort) {
+  async function search(page = 1, keyword = query, order = sort, category = activeCategory) {
     controller.current?.abort();
     const current = new AbortController();
     controller.current = current;
@@ -127,7 +132,7 @@ export default function RakutenSearch({
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "検索できませんでした。");
       setResult(data);
-      setSubmitted({ query: keyword, sort: order });
+      setSubmitted({ query: keyword, sort: order, category });
     } catch (e) {
       if (!current.signal.aborted)
         setError(e instanceof Error ? e.message : "検索できませんでした。");
@@ -221,6 +226,11 @@ export default function RakutenSearch({
         </section>
       ) : (
         <>
+          <CategoryBrowser active={activeCategory} disabled={busy} choose={category => {
+            setActiveCategory(category.id);
+            setQuery(category.keyword);
+            void search(1, category.keyword, sort, category.id);
+          }} />
           <form
             className="part-search-controls"
             onSubmit={(e) => {
@@ -233,7 +243,7 @@ export default function RakutenSearch({
               aria-label="楽天の商品名"
               placeholder="エアガン用品の商品名・メーカー"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => { setQuery(e.target.value); setActiveCategory(""); }}
               required
               maxLength={128}
             />
@@ -255,7 +265,7 @@ export default function RakutenSearch({
           <div aria-live="polite">
             {result && (
               <p>
-                {result.count.toLocaleString()}件
+                {partCategory(submitted.category) && `${partCategory(submitted.category)!.group} › ${partCategory(submitted.category)!.label} · `}{result.count.toLocaleString()}件
                 {result.items.length === 0 && "：商品が見つかりません。"}
               </p>
             )}
@@ -320,7 +330,7 @@ export default function RakutenSearch({
                 className="mini-button"
                 disabled={busy || result.page <= 1}
                 onClick={() =>
-                  void search(result.page - 1, submitted.query, submitted.sort)
+                  void search(result.page - 1, submitted.query, submitted.sort, submitted.category)
                 }
               >
                 前へ
@@ -332,7 +342,7 @@ export default function RakutenSearch({
                 className="mini-button"
                 disabled={busy || result.page >= result.pageCount}
                 onClick={() =>
-                  void search(result.page + 1, submitted.query, submitted.sort)
+                  void search(result.page + 1, submitted.query, submitted.sort, submitted.category)
                 }
               >
                 次へ
