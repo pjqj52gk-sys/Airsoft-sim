@@ -1,5 +1,6 @@
 // Update metadata only. Product images are fetched from the manufacturer at runtime.
 import fs from "node:fs/promises";
+import { productPhotos } from "../lib/catalog-photos.mjs";
 const origin = "https://www.tokyo-marui.co.jp";
 const decode = (text) =>
   text
@@ -58,16 +59,7 @@ for (const path of [...paths].sort()) {
   const length = dimensions
     .find((d) => d.label === "全長")
     ?.value.match(/^([\d.]+)\s*mm/);
-  const images = [
-    ...new Set([
-      decode(image[1]).replace("http:", "https:"),
-      ...[
-        ...text.matchAll(
-          /<img src="(https:\/\/www.tokyo-marui.co.jp\/appimg\/option\/p_option_sub[^"]+)"/g,
-        ),
-      ].map((m) => decode(m[1])),
-    ]),
-  ];
+  const images = productPhotos(text);
   const category = name.includes("グリップ")
     ? "グリップ"
     : name.includes("ストック")
@@ -80,7 +72,7 @@ for (const path of [...paths].sort()) {
     name,
     manufacturer: "東京マルイ",
     category,
-    image: images[0],
+    image: decode(image[1]).replace("http:", "https:"),
     images,
     url: origin + path,
     dimensions,

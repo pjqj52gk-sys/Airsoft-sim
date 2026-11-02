@@ -10,6 +10,12 @@ export async function GET(request: Request) {
   if (!Number.isInteger(index) || index < 0 || index >= item.images.length)
     return Response.json({ error: "画像が見つかりません。" }, { status: 404 });
   const url = new URL(item.images[index]);
+  const revision = params.get("v");
+  if (revision && revision !== url.pathname.split("/").pop())
+    return Response.json(
+      { error: "写真が更新されました。画面を再読み込みしてください。" },
+      { status: 409 },
+    );
   if (
     url.protocol !== "https:" ||
     url.hostname !== "www.tokyo-marui.co.jp" ||

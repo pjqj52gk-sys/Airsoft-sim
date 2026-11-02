@@ -4,6 +4,7 @@ import Dialog from "./dialog";
 import Icon from "./icon";
 import catalog from "@/lib/parts-catalog.json";
 import { matchesPart } from "@/lib/part-search";
+import { catalogImageUrl } from "@/lib/catalog-image";
 import { listParts, type StoredPart } from "@/lib/storage";
 import { readImage, uid, type Layer } from "@/lib/project";
 
@@ -21,6 +22,8 @@ export default function PartSearch({
   const [saved, setSaved] = useState<StoredPart[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [photos, setPhotos] = useState<Record<string, number>>({});
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [imageSizes, setImageSizes] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
   useEffect(() => {
     let cancelled = false;
@@ -55,13 +58,14 @@ export default function PartSearch({
     setBusy(item.id);
     setError("");
     try {
-      const response = await fetch(
-        `/api/part-image?id=${encodeURIComponent(item.id)}&photo=${photos[item.id] || 0}`,
-      );
-      if (!response.ok)
+      const response = await fetch(catalogImageUrl(item, photos[item.id] || 0));
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
         throw new Error(
-          "画像を取得できません。公式ページから保存して追加してください。",
+          data?.error ||
+            "画像を取得できません。公式ページから保存して追加してください。",
         );
+      }
       const blob = await response.blob();
       const image = await readImage(
         new File([blob], `${item.id}.jpg`, { type: blob.type }),
@@ -166,18 +170,31 @@ export default function PartSearch({
       <div className="shelf-grid search-results">
         {source === "catalog"
           ? results.map((p) => (
-              <article className="shelf-card" key={p.id}>
-                <div className="shelf-part-image">
+              <article
+                className={`shelf-card ${expanded === p.id ? "photo-expanded-card" : ""}`}
+                key={p.id}
+              >
+                <button
+                  className={`shelf-part-image catalog-photo ${expanded === p.id ? "expanded" : ""}`}
+                  disabled={!!busy || !p.images.length}
+                  aria-label={`${p.name}の写真を${expanded === p.id ? "縮小" : "拡大"}`}
+                  aria-expanded={expanded === p.id}
+                  onClick={() => setExpanded(expanded === p.id ? null : p.id)}
+                >
                   <img
                     key={photos[p.id] || 0}
                     loading="lazy"
-                    src={`/api/part-image?id=${encodeURIComponent(p.id)}&photo=${photos[p.id] || 0}`}
+                    src={catalogImageUrl(p, photos[p.id] || 0)}
                     alt={p.name}
-                    onLoad={(e) =>
-                      e.currentTarget.parentElement!.removeAttribute(
-                        "data-error",
-                      )
-                    }
+                    onLoad={(e) => {
+                      const img = e.currentTarget;
+                      img.parentElement!.removeAttribute("data-error");
+                      const key = catalogImageUrl(p, photos[p.id] || 0),
+                        size = `${img.naturalWidth} × ${img.naturalHeight} px`;
+                      setImageSizes((prev) =>
+                        prev[key] === size ? prev : { ...prev, [key]: size },
+                      );
+                    }}
                     onError={(e) => {
                       e.currentTarget.parentElement!.setAttribute(
                         "data-error",
@@ -185,7 +202,13 @@ export default function PartSearch({
                       );
                     }}
                   />
-                </div>
+                  <span className="photo-expand-label">
+                    {expanded === p.id ? "縮小" : "拡大"}
+                  </span>
+                </button>
+                <p className="photo-resolution">
+                  {imageSizes[catalogImageUrl(p, photos[p.id] || 0)] || ""}
+                </p>
                 {p.images.length > 1 && (
                   <div className="photo-controls">
                     <button
@@ -249,14 +272,10 @@ export default function PartSearch({
                   </a>
                   <button
                     className="mini-button toggled"
-                    disabled={!!busy}
+                    disabled={!!busy || !p.images.length}
                     onClick={() => void importPart(p)}
                   >
-                    {busy === p.id
-                      ? "読み込み中…"
-                      : p.lengthMm
-                        ? "追加・実寸合わせ"
-                        : "画像を追加"}
+                    {busy === p.id ? "読み込み中…" : "この写真を追加"}
                   </button>
                 </div>
               </article>

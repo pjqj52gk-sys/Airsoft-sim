@@ -1818,6 +1818,42 @@ p {
   font-size: 18px;
   color: #0369a1;
 }
+.catalog-photo {
+  position: relative;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid transparent;
+  cursor: zoom-in;
+}
+.catalog-photo:hover {
+  border-color: #7dd3fc;
+}
+.catalog-photo.expanded {
+  height: min(390px, 45dvh);
+  cursor: zoom-out;
+}
+.catalog-photo.expanded img {
+  max-height: 100%;
+}
+.photo-expanded-card {
+  grid-column: 1 / -1;
+}
+.photo-expand-label {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: #ffffffed;
+  color: #0369a1;
+  font-size: 10px;
+}
+.search-results .shelf-card > .photo-resolution {
+  min-height: 14px;
+  margin: -7px 0 12px;
+  text-align: right;
+  font-size: 10px;
+}
 .perspective-steps {
   list-style: none;
   display: flex;
