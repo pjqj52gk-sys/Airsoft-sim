@@ -12,7 +12,7 @@ export type EditMode =
   "crop" | "erase" | "perspective" | "measure" | "background";
 const titles = {
   crop: "画像を切り出す",
-  erase: "選択範囲を消す",
+  erase: "フリーハンドで消す",
   perspective: "パースを補正",
   measure: "2点で実寸合わせ",
   background: "背景を透過",
@@ -38,7 +38,8 @@ export default function ImageEditor({
   const [eraseHistory, setEraseHistory] = useState<string[]>([]);
   const svg = useRef<SVGSVGElement>(null);
   const drag = useRef<number | null>(null);
-  const selectionStart = useRef<Point | null>(null);
+  const drawing = useRef(false);
+  const strokePoints = useRef<Point[]>([]);
   const max = mode === "perspective" ? 4 : 2;
   const actualPoint = (x: number, y: number) => {
     const m = svg.current!.getScreenCTM()!;
@@ -54,11 +55,7 @@ export default function ImageEditor({
     setBusy(true);
     setError("");
     try {
-      const updates = await eraseImage(
-        layer,
-        cropRect(points, layer.width, layer.height),
-        preview,
-      );
+      const updates = await eraseImage(layer, points, preview);
       setEraseHistory((history) => [...history, preview].slice(-20));
       setPreview(updates.src!);
       setPoints([]);
@@ -94,12 +91,8 @@ export default function ImageEditor({
       else if (mode === "perspective")
         updates = await rectifyImage(layer, points);
       else if (mode === "erase") {
-        if (points.length === 2)
-          updates = await eraseImage(
-            layer,
-            cropRect(points, layer.width, layer.height),
-            preview,
-          );
+        if (points.length >= 3)
+          updates = await eraseImage(layer, points, preview);
         else if (changed)
           updates = {
             src: preview,
@@ -119,7 +112,7 @@ export default function ImageEditor({
     }
   }
   const crop =
-    (mode === "crop" || mode === "erase") && points.length === 2
+    mode === "crop" && points.length === 2
       ? {
           x: Math.min(points[0].x, points[1].x),
           y: Math.min(points[0].y, points[1].y),
@@ -150,7 +143,7 @@ export default function ImageEditor({
           {mode === "crop"
             ? "残したい範囲の対角2点をクリック。丸い点をドラッグして調整できます。"
             : mode === "erase"
-              ? "消したい範囲をドラッグ。選んだ範囲が透明になります。"
+              ? "ドラッグで消したい部分を囲んでください。"
               : mode === "perspective"
                 ? "画像を平面の長方形に補正します。左上 → 右上 → 右下 → 左下の順に4点を選択。"
                 : mode === "measure"
@@ -169,8 +162,9 @@ export default function ImageEditor({
                 return;
               const p = actualPoint(e.clientX, e.clientY);
               if (mode === "erase") {
-                selectionStart.current = p;
-                setPoints([p, p]);
+                drawing.current = true;
+                strokePoints.current = [p];
+                setPoints([p]);
                 e.currentTarget.setPointerCapture(e.pointerId);
                 setError("");
                 return;
@@ -180,11 +174,22 @@ export default function ImageEditor({
             }}
             onPointerMove={(e) => {
               if (busy) return;
-              if (selectionStart.current) {
-                setPoints([
-                  selectionStart.current,
-                  actualPoint(e.clientX, e.clientY),
-                ]);
+              if (drawing.current) {
+                const samples = e.nativeEvent.getCoalescedEvents?.() || [];
+                const events = samples.length ? samples : [e];
+                const path = strokePoints.current;
+                for (const event of events) {
+                  const p = actualPoint(event.clientX, event.clientY);
+                  const last = path[path.length - 1];
+                  if (
+                    distance(p, last) >=
+                    Math.max(0.5, Math.max(layer.width, layer.height) / 1200)
+                  ) {
+                    if (path.length < 5999) path.push(p);
+                    else path[path.length - 1] = p;
+                  }
+                }
+                setPoints([...path]);
                 return;
               }
               if (drag.current === null) return;
@@ -193,8 +198,12 @@ export default function ImageEditor({
               setPoints((prev) => prev.map((v, i) => (i === index ? p : v)));
             }}
             onPointerUp={(e) => {
-              if (selectionStart.current) {
-                selectionStart.current = null;
+              if (drawing.current) {
+                drawing.current = false;
+                setPoints([
+                  ...strokePoints.current,
+                  actualPoint(e.clientX, e.clientY),
+                ]);
                 if (e.currentTarget.hasPointerCapture(e.pointerId))
                   e.currentTarget.releasePointerCapture(e.pointerId);
               }
@@ -205,7 +214,8 @@ export default function ImageEditor({
             }}
             onPointerCancel={() => {
               drag.current = null;
-              selectionStart.current = null;
+              if (drawing.current) setPoints([]);
+              drawing.current = false;
             }}
           >
             <image href={preview} width={layer.width} height={layer.height} />
@@ -218,6 +228,17 @@ export default function ImageEditor({
                 fill={mode === "erase" ? "#fb718544" : "#38bdf833"}
                 stroke={mode === "erase" ? "#e11d48" : "#0284c7"}
                 strokeWidth={handleSize / 5}
+              />
+            )}
+            {mode === "erase" && points.length > 1 && (
+              <polygon
+                points={points.map((p) => `${p.x},${p.y}`).join(" ")}
+                fill="#fb718544"
+                fillRule="evenodd"
+                stroke="#e11d48"
+                strokeWidth={handleSize / 5}
+                strokeLinejoin="round"
+                pointerEvents="none"
               />
             )}
             {mode === "perspective" && points.length > 1 && (
@@ -238,35 +259,36 @@ export default function ImageEditor({
                 strokeWidth={handleSize / 4}
               />
             )}
-            {points.map((p, index) => (
-              <g key={index}>
-                <circle
-                  cx={p.x}
-                  cy={p.y}
-                  r={handleSize}
-                  fill="#fff"
-                  stroke="#0284c7"
-                  strokeWidth={handleSize / 5}
-                  style={{ cursor: "grab" }}
-                  onPointerDown={(e) => {
-                    e.stopPropagation();
-                    if (busy) return;
-                    drag.current = index;
-                    svg.current!.setPointerCapture(e.pointerId);
-                  }}
-                />
-                <text
-                  x={p.x}
-                  y={p.y + handleSize / 3}
-                  textAnchor="middle"
-                  fill="#0369a1"
-                  fontSize={handleSize}
-                  pointerEvents="none"
-                >
-                  {index + 1}
-                </text>
-              </g>
-            ))}
+            {mode !== "erase" &&
+              points.map((p, index) => (
+                <g key={index}>
+                  <circle
+                    cx={p.x}
+                    cy={p.y}
+                    r={handleSize}
+                    fill="#fff"
+                    stroke="#0284c7"
+                    strokeWidth={handleSize / 5}
+                    style={{ cursor: "grab" }}
+                    onPointerDown={(e) => {
+                      e.stopPropagation();
+                      if (busy) return;
+                      drag.current = index;
+                      svg.current!.setPointerCapture(e.pointerId);
+                    }}
+                  />
+                  <text
+                    x={p.x}
+                    y={p.y + handleSize / 3}
+                    textAnchor="middle"
+                    fill="#0369a1"
+                    fontSize={handleSize}
+                    pointerEvents="none"
+                  >
+                    {index + 1}
+                  </text>
+                </g>
+              ))}
           </svg>
         </div>
         {mode === "measure" && (
@@ -330,7 +352,7 @@ export default function ImageEditor({
           <div className="erase-actions">
             <button
               className="button secondary"
-              disabled={busy || points.length !== 2}
+              disabled={busy || points.length < 3}
               onClick={eraseSelection}
             >
               選択範囲を消す
@@ -379,7 +401,7 @@ export default function ImageEditor({
               (mode === "background"
                 ? !changed
                 : mode === "erase"
-                  ? !changed && points.length !== 2
+                  ? !changed && points.length < 3
                   : points.length !== max)
             }
             onClick={submit}

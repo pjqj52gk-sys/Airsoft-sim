@@ -3,7 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import Dialog from "./dialog";
 import Icon from "./icon";
 import type { Layer } from "@/lib/project";
-import type { Point } from "@/lib/image-edit";
+import type { Point, Rect } from "@/lib/image-edit";
+import {
+  fitImageViewport,
+  zoomViewport,
+  moveGuideControls,
+} from "@/lib/edit-viewport";
 import { rectifyImage } from "@/lib/image-processing";
 import {
   makeGuide,
@@ -49,6 +54,9 @@ export default function PerspectiveWorkbench({
   );
   const initial = () => yControls(template);
   const [controls, setControls] = useState<Point[]>(initial);
+  const [view, setView] = useState(() =>
+    fitImageViewport(layer.width, layer.height),
+  );
   const [perspective, setPerspective] = useState(0.35);
   const [step, setStep] = useState(0);
   const [angles, setAngles] = useState<Angles>(zero);
@@ -70,6 +78,9 @@ export default function PerspectiveWorkbench({
     point: Point;
     corners: Point[];
     angles: Angles;
+    view: Rect;
+    client: Point;
+    unit: number;
   } | null>(null);
   useEffect(() => () => cancelAnimationFrame(frame.current), []);
   let guide: ReturnType<typeof makeGuide> | null = null;
@@ -79,17 +90,55 @@ export default function PerspectiveWorkbench({
   } catch (e) {
     geometryError = e instanceof Error ? e.message : "角を合わせてください。";
   }
-  const handle = Math.max(layer.width, layer.height) / 65;
+  useEffect(() => {
+    const root = svg.current;
+    if (!root || step !== 0) return;
+    const wheel = (event: WheelEvent) => {
+      event.preventDefault();
+      if (drag.current) return;
+      const matrix = root.getScreenCTM();
+      if (!matrix) return;
+      const p = new DOMPoint(event.clientX, event.clientY).matrixTransform(
+        matrix.inverse(),
+      );
+      const delta = Math.max(
+        -120,
+        Math.min(
+          120,
+          event.deltaY *
+            (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? 400 : 1),
+        ),
+      );
+      setView((current) =>
+        zoomViewport(
+          current,
+          Math.exp(delta * 0.002),
+          p,
+          layer.width / 8,
+          layer.width * 32,
+        ),
+      );
+    };
+    root.addEventListener("wheel", wheel, { passive: false });
+    return () => root.removeEventListener("wheel", wheel);
+  }, [step, layer.width]);
+  const zoom = (factor: number) =>
+    setView((current) =>
+      zoomViewport(
+        current,
+        factor,
+        { x: current.x + current.w / 2, y: current.y + current.h / 2 },
+        layer.width / 8,
+        layer.width * 32,
+      ),
+    );
+  const handle = Math.max(view.w, view.h) / 65;
   const screenPoint = (x: number, y: number) => {
     const p = new DOMPoint(x, y).matrixTransform(
       svg.current!.getScreenCTM()!.inverse(),
     );
     return { x: p.x, y: p.y };
   };
-  const clamp = (p: Point) => ({
-    x: Math.min(layer.width, Math.max(0, p.x)),
-    y: Math.min(layer.height, Math.max(0, p.y)),
-  });
   async function next() {
     setBusy(true);
     setError("");
@@ -157,6 +206,9 @@ export default function PerspectiveWorkbench({
       point: screenPoint(event.clientX, event.clientY),
       corners: controls,
       angles,
+      view,
+      client: { x: event.clientX, y: event.clientY },
+      unit: 1 / svg.current!.getScreenCTM()!.a,
     };
     svg.current!.setPointerCapture(event.pointerId);
   };
@@ -269,6 +321,42 @@ export default function PerspectiveWorkbench({
           ))}
         </div>
       )}
+      {step === 0 && (
+        <div
+          className="perspective-viewport-tools"
+          role="group"
+          aria-label="作業範囲の表示"
+        >
+          <button
+            className="mini-button"
+            aria-label="ズームアウト"
+            onClick={() => zoom(1.25)}
+          >
+            −
+          </button>
+          <button
+            className="mini-button"
+            aria-label="ズームイン"
+            onClick={() => zoom(0.8)}
+          >
+            ＋
+          </button>
+          <button
+            className="mini-button"
+            onClick={() =>
+              setView(
+                fitImageViewport(layer.width, layer.height, [
+                  ...cube,
+                  ...controls,
+                ]),
+              )
+            }
+          >
+            全体を表示
+          </button>
+          <span>余白をドラッグで移動 · ホイールでズーム</span>
+        </div>
+      )}
       <div className="image-edit-surface cube-surface">
         {step === 2 ? (
           <img
@@ -280,7 +368,9 @@ export default function PerspectiveWorkbench({
           <svg
             ref={svg}
             viewBox={
-              step === 0 ? `0 0 ${layer.width} ${layer.height}` : "0 0 800 440"
+              step === 0
+                ? `${view.x} ${view.y} ${view.w} ${view.h}`
+                : "0 0 800 440"
             }
             role="img"
             aria-label={
@@ -288,10 +378,10 @@ export default function PerspectiveWorkbench({
             }
             style={{
               touchAction: "none",
-              cursor: step === 1 ? "grab" : undefined,
+              cursor: "grab",
             }}
             onPointerDown={(e) => {
-              if (step === 1) begin(e, -2);
+              begin(e, step === 1 ? -2 : -3);
             }}
             onPointerMove={(e) => {
               const d = drag.current;
@@ -299,7 +389,13 @@ export default function PerspectiveWorkbench({
               const p = screenPoint(e.clientX, e.clientY),
                 dx = p.x - d.point.x,
                 dy = p.y - d.point.y;
-              if (step === 1)
+              if (d.index === -3) {
+                setView({
+                  ...d.view,
+                  x: d.view.x - (e.clientX - d.client.x) * d.unit,
+                  y: d.view.y - (e.clientY - d.client.y) * d.unit,
+                });
+              } else if (step === 1)
                 setAngles({
                   ...d.angles,
                   yaw: Math.max(-150, Math.min(150, d.angles.yaw + dx * 0.35)),
@@ -308,39 +404,35 @@ export default function PerspectiveWorkbench({
                     Math.min(150, d.angles.pitch - dy * 0.35),
                   ),
                 });
-              else if (d.index === -1 || d.index === 0) {
-                const tx = Math.min(
-                  layer.width - Math.max(...d.corners.map((v) => v.x)),
-                  Math.max(-Math.min(...d.corners.map((v) => v.x)), dx),
-                );
-                const ty = Math.min(
-                  layer.height - Math.max(...d.corners.map((v) => v.y)),
-                  Math.max(-Math.min(...d.corners.map((v) => v.y)), dy),
-                );
-                setControls(
-                  d.corners.map((v) => ({ x: v.x + tx, y: v.y + ty })),
-                );
-              } else
-                setControls(
-                  d.corners.map((v, i) =>
-                    i === d.index ? clamp({ x: v.x + dx, y: v.y + dy }) : v,
-                  ),
-                );
+              else setControls(moveGuideControls(d.corners, d.index, dx, dy));
             }}
             onPointerUp={(e) => {
               drag.current = null;
-              e.currentTarget.releasePointerCapture(e.pointerId);
+              if (e.currentTarget.hasPointerCapture(e.pointerId))
+                e.currentTarget.releasePointerCapture(e.pointerId);
             }}
             onPointerCancel={() => {
               drag.current = null;
             }}
           >
             {step === 0 && (
-              <image
-                href={layer.src}
-                width={layer.width}
-                height={layer.height}
-              />
+              <g>
+                <rect
+                  x="0"
+                  y="0"
+                  width={layer.width}
+                  height={layer.height}
+                  fill="white"
+                  stroke="#94a3b8"
+                  strokeWidth="1"
+                  vectorEffect="non-scaling-stroke"
+                />
+                <image
+                  href={layer.src}
+                  width={layer.width}
+                  height={layer.height}
+                />
+              </g>
             )}
             {cube.length > 0 && (
               <g
@@ -459,36 +551,15 @@ export default function PerspectiveWorkbench({
                         e.preventDefault();
                         const v = delta[e.key],
                           speed = e.shiftKey ? 10 : 1;
-                        if (i === 0) {
-                          const dx = Math.min(
-                            layer.width - Math.max(...controls.map((p) => p.x)),
-                            Math.max(
-                              -Math.min(...controls.map((p) => p.x)),
-                              v.x * speed,
-                            ),
-                          );
-                          const dy = Math.min(
-                            layer.height -
-                              Math.max(...controls.map((p) => p.y)),
-                            Math.max(
-                              -Math.min(...controls.map((p) => p.y)),
-                              v.y * speed,
-                            ),
-                          );
-                          setControls(
-                            controls.map((q) => ({ x: q.x + dx, y: q.y + dy })),
-                          );
-                        } else
-                          setControls(
-                            controls.map((q, n) =>
-                              n === i
-                                ? clamp({
-                                    x: q.x + v.x * speed,
-                                    y: q.y + v.y * speed,
-                                  })
-                                : q,
-                            ),
-                          );
+                        e.stopPropagation();
+                        setControls((current) =>
+                          moveGuideControls(
+                            current,
+                            i,
+                            v.x * speed,
+                            v.y * speed,
+                          ),
+                        );
                       }
                     }}
                   />
@@ -555,6 +626,8 @@ export default function PerspectiveWorkbench({
           onClick={() => {
             if (step === 0) {
               setControls(initial());
+              setView(fitImageViewport(layer.width, layer.height));
+              setError("");
               setPerspective(0.35);
               setSelectedFace("front");
             } else setStep(step - 1);

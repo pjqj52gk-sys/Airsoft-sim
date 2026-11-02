@@ -1,19 +1,30 @@
 import { loadImage } from "./project";
 import type { Layer } from "./project";
-import { croppedPlacement, quadMap, distance } from "./image-edit";
+import {
+  croppedPlacement,
+  quadMap,
+  distance,
+  lassoPolygon,
+} from "./image-edit";
 import type { Rect, Point } from "./image-edit";
 export async function eraseImage(
   layer: Layer,
-  rect: Rect,
+  points: Point[],
   source = layer.src,
 ): Promise<Partial<Layer>> {
+  const polygon = lassoPolygon(points);
   const image = await loadImage(source);
   const canvas = document.createElement("canvas");
   canvas.width = layer.width;
   canvas.height = layer.height;
   const ctx = canvas.getContext("2d")!;
   ctx.drawImage(image, 0, 0);
-  ctx.clearRect(rect.x, rect.y, rect.w, rect.h);
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.beginPath();
+  ctx.moveTo(polygon[0].x, polygon[0].y);
+  polygon.slice(1).forEach((p) => ctx.lineTo(p.x, p.y));
+  ctx.closePath();
+  ctx.fill("evenodd");
   return {
     src: canvas.toDataURL("image/png"),
     originalSrc: layer.originalSrc || layer.src,
@@ -85,6 +96,8 @@ export async function rectifyImage(
   for (let y = 0; y < h; y++)
     for (let x = 0; x < w; x++) {
       const p = map(x / (w - 1), y / (h - 1));
+      if (p.x < 0 || p.y < 0 || p.x > source.width || p.y > source.height)
+        continue;
       const px = Math.max(0, Math.min(source.width - 1, p.x)),
         py = Math.max(0, Math.min(source.height - 1, p.y));
       const x0 = Math.floor(px),

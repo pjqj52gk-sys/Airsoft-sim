@@ -1,6 +1,30 @@
 import type { Layer } from "./project";
 export type Point = { x: number; y: number };
 export type Rect = { x: number; y: number; w: number; h: number };
+export function lassoPolygon(points: Point[]) {
+  if (
+    points.length < 3 ||
+    points.length > 6000 ||
+    points.some((p) => !Number.isFinite(p.x) || !Number.isFinite(p.y))
+  )
+    throw new Error("消したい部分をフリーハンドで囲んでください。");
+  const start = points[0];
+  const next = points.find(
+    (p) => Math.hypot(p.x - start.x, p.y - start.y) >= 1,
+  );
+  if (
+    !next ||
+    !points.some(
+      (p) =>
+        Math.abs(
+          (next.x - start.x) * (p.y - start.y) -
+            (next.y - start.y) * (p.x - start.x),
+        ) >= 2,
+    )
+  )
+    throw new Error("線ではなく、消したい範囲を囲んでください。");
+  return points;
+}
 export const distance = (a: Point, b: Point) =>
   Math.hypot(b.x - a.x, b.y - a.y);
 export function measuredWidth(pixelWidth: number, points: Point[], mm: number) {

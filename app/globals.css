@@ -2169,3 +2169,7 @@ p {
 .erase-actions { display:flex;gap:10px;flex-wrap:wrap;align-items:center; }
 .erase-actions .mini-button { flex:0 0 auto; }
 @media (prefers-reduced-motion:reduce) { .loading-spinner { animation:none; } }
+
+.perspective-viewport-tools { display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0; }
+.perspective-viewport-tools .mini-button { flex:0 0 auto; }
+.perspective-viewport-tools span { font-size:11px;color:#64748b; }
