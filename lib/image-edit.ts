@@ -3,18 +3,6 @@ export type Point = { x: number; y: number };
 export type Rect = { x: number; y: number; w: number; h: number };
 export const distance = (a: Point, b: Point) =>
   Math.hypot(b.x - a.x, b.y - a.y);
-export function resizeAroundCenter(layer: Layer, factor: number) {
-  const mm =
-    Number.isFinite(factor) && factor > 0
-      ? Math.min(5000, Math.max(1, layer.mm * factor))
-      : layer.mm;
-  const ratio = mm / layer.mm;
-  return {
-    mm,
-    x: layer.x + (layer.mm - mm) / 2,
-    y: layer.y + (((layer.mm * layer.height) / layer.width) * (1 - ratio)) / 2,
-  };
-}
 export function measuredWidth(pixelWidth: number, points: Point[], mm: number) {
   if (
     points.length !== 2 ||
@@ -72,7 +60,7 @@ export function croppedPlacement(layer: Layer, rect: Rect) {
   };
 }
 // Unit-square -> convex image quadrilateral, in TL, TR, BR, BL order.
-export function quadMap(points: Point[]) {
+export function quadHomography(points: Point[]) {
   if (points.length !== 4)
     throw new Error("左上・右上・右下・左下の4点を選んでください。");
   const crosses = points.map((p, i) => {
@@ -98,9 +86,13 @@ export function quadMap(points: Point[]) {
     b = p3.x - p0.x + h * p3.x;
   const d = p1.y - p0.y + g * p1.y,
     e = p3.y - p0.y + h * p3.y;
+  return { a, b, c: p0.x, d, e, f: p0.y, g, h };
+}
+export function quadMap(points: Point[]) {
+  const { a, b, c, d, e, f, g, h } = quadHomography(points);
   return (u: number, v: number): Point => {
     const k = g * u + h * v + 1;
     if (Math.abs(k) < 1e-8) throw new Error("補正できない形状です。");
-    return { x: (a * u + b * v + p0.x) / k, y: (d * u + e * v + p0.y) / k };
+    return { x: (a * u + b * v + c) / k, y: (d * u + e * v + f) / k };
   };
 }

@@ -1,6 +1,5 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { resizeAroundCenter } from "../lib/image-edit.ts";
 import {
   cropRect,
   croppedPlacement,
@@ -195,17 +194,4 @@ test("comparison bounds contain rotated visible items from both builds", () => {
     comparisonBounds([{ layers: [{ ...layer, visible: false }] }]),
     "0 0 1120 620",
   );
-});
-test("wheel resizing preserves the image centre and clamps actual dimensions", () => {
-  const layer = { mm: 150, width: 300, height: 100, x: 430, y: 160 };
-  const result = resizeAroundCenter(layer, 2);
-  assert.equal(result.mm, 300);
-  assert.equal(result.x + result.mm / 2, layer.x + layer.mm / 2);
-  assert.equal(
-    result.y + (result.mm * layer.height) / layer.width / 2,
-    layer.y + (layer.mm * layer.height) / layer.width / 2,
-  );
-  assert.equal(resizeAroundCenter(layer, 1e10).mm, 5000);
-  assert.equal(resizeAroundCenter(layer, 1e-10).mm, 1);
-  assert.equal(resizeAroundCenter(layer, NaN).mm, 150);
 });

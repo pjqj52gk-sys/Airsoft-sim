@@ -8,7 +8,9 @@ import type { EditMode } from "./image-editor";
 import Shelf from "./shelf";
 import useFileDrop from "./use-file-drop";
 import type { DropTarget } from "./use-file-drop";
-import { resizeAroundCenter } from "@/lib/image-edit";
+import { updateLayer } from "@/lib/attachments";
+import PartSearch from "./part-search";
+import PerspectiveWorkbench from "./perspective-workbench";
 import {
   download,
   emptyProject,
@@ -34,8 +36,7 @@ export default function Studio() {
   current.current = project;
   const [selected, setSelected] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
-  const [wheelMode, setWheelMode] = useState<"view" | "image">("view");
-  const wheelStart = useRef<Project | null>(null);
+  const [search, setSearch] = useState(false);
   const [grid, setGrid] = useState(true);
   const [compare, setCompare] = useState(false);
   const [tab, setTab] = useState("layers");
@@ -60,7 +61,8 @@ export default function Studio() {
   const layer = project.layers.find((l) => l.id === selected);
   const notify = (text: string) => setMessage(text);
   const fileDrop = useFileDrop({
-    enabled: ready && !busy && !editor && !shelf && !help && !clearDialog,
+    enabled:
+      ready && !busy && !editor && !shelf && !search && !help && !clearDialog,
     add: (files, target) => {
       void addFiles(files, target);
     },
@@ -120,19 +122,15 @@ export default function Studio() {
     return () => clearTimeout(t);
   }, [message]);
   const commit = useCallback((next: Project, previous = current.current) => {
-    wheelStart.current = null;
     setHistory((h) => ({ past: [...h.past.slice(-19), previous], future: [] }));
     setProject(next);
   }, []);
   const update = (id: string, updates: Partial<Layer>) =>
     commit({
       ...project,
-      layers: project.layers.map((l) =>
-        l.id === id ? { ...l, ...updates } : l,
-      ),
+      layers: updateLayer(project.layers, id, updates),
     });
   const undo = () => {
-    wheelStart.current = null;
     if (!history.past.length) return;
     setProject(history.past[history.past.length - 1]);
     setHistory({
@@ -141,7 +139,6 @@ export default function Studio() {
     });
   };
   const redo = () => {
-    wheelStart.current = null;
     if (!history.future.length) return;
     setProject(history.future[0]);
     setHistory({
@@ -153,7 +150,13 @@ export default function Studio() {
     if (!layer) return;
     commit({
       ...project,
-      layers: project.layers.filter((l) => l.id !== layer.id),
+      layers: project.layers
+        .filter((l) => l.id !== layer.id)
+        .map((l) =>
+          project.layers[0]?.id === layer.id
+            ? { ...l, attachedToBase: false }
+            : l,
+        ),
     });
     setSelected(null);
   };
@@ -166,6 +169,7 @@ export default function Studio() {
         clearDialog ||
         editor ||
         shelf ||
+        search ||
         busy
       )
         return;
@@ -181,7 +185,7 @@ export default function Studio() {
         return;
       }
       if (e.key === "Escape") setSelected(null);
-      if (!layer || layer.locked || compare) return;
+      if (!layer || compare) return;
       if (e.key === "Delete" || e.key === "Backspace") {
         e.preventDefault();
         remove();
@@ -235,7 +239,7 @@ export default function Studio() {
             rotation: 0,
             flip: false,
             visible: true,
-            locked: false,
+            attachedToBase: false,
             price: 0,
             url: "",
             category: base ? "本体" : "その他",
@@ -292,7 +296,7 @@ export default function Studio() {
         });
         const part = {
           ...imported.layers[0],
-          locked: project.layers.length === 0,
+          attachedToBase: false,
           category: project.layers.length ? "その他" : "本体",
           x: project.layers.length ? 430 : 120,
           y: project.layers.length ? 160 : 190,
@@ -332,7 +336,7 @@ export default function Studio() {
       name: `${layer.name} のコピー`,
       x: layer.x + 20,
       y: layer.y + 20,
-      locked: false,
+      attachedToBase: false,
     };
     commit({ ...project, layers: [...project.layers, copy] });
     setSelected(copy.id);
@@ -398,7 +402,7 @@ export default function Studio() {
         id: uid(),
         name: `${layer.name} / 切り出し`,
         category: "その他",
-        locked: false,
+        attachedToBase: false,
         visible: true,
       };
       commit({ ...project, layers: [...project.layers, part] });
@@ -425,7 +429,7 @@ export default function Studio() {
   async function addStoredPart(stored: Layer) {
     if (project.layers.length >= 60) {
       notify("レイヤーは60件まで追加できます。");
-      return;
+      return false;
     }
     setBusy(true);
     try {
@@ -442,7 +446,7 @@ export default function Studio() {
         y: isBase ? 190 : 160,
         rotation: 0,
         visible: true,
-        locked: false,
+        attachedToBase: false,
         category: isBase
           ? "本体"
           : stored.category === "本体"
@@ -453,9 +457,11 @@ export default function Studio() {
       setSelected(part.id);
       setShelf(null);
       setTab("layers");
-      notify("登録パーツを追加しました。");
+      notify("パーツを追加しました。");
+      return true;
     } catch {
       notify("登録パーツを読み込めませんでした。");
+      return false;
     } finally {
       setBusy(false);
     }
@@ -511,7 +517,6 @@ export default function Studio() {
         </a>
         <div className="header-divider" />
         <div className="project-heading">
-          <span className="eyebrow">WORKSPACE / 01</span>
           <input
             aria-label="プロジェクト名"
             value={project.name}
@@ -562,8 +567,7 @@ export default function Studio() {
         <aside className="library panel">
           <div className="panel-title">
             <div>
-              <span className="eyebrow">YOUR BUILD</span>
-              <h2>ビルドを構成</h2>
+              <h2>レイヤー</h2>
             </div>
             <span className="count">
               {project.layers.length.toString().padStart(2, "0")}
@@ -643,7 +647,7 @@ export default function Studio() {
                           <span>
                             <strong>{l.name}</strong>
                             <small>
-                              {l.category} · {l.mm} mm
+                              {l.category} · {Math.round(l.mm * 10) / 10} mm
                             </small>
                           </span>
                         </button>
@@ -664,11 +668,13 @@ export default function Studio() {
                   <Icon name="plus" />
                   パーツ画像を追加
                 </button>
-                <p className="hint">
-                  商品画像を保存して追加できます。
-                  <br />
-                  複数の画像をまとめてドロップできます。
-                </p>
+                <button
+                  className="button secondary full-width"
+                  onClick={() => setSearch(true)}
+                  disabled={!ready || busy}
+                >
+                  パーツを検索
+                </button>
               </>
             ) : (
               <div className="shopping-list">
@@ -699,16 +705,6 @@ export default function Studio() {
                 </p>
               </div>
             )}
-          </div>
-          <div className="library-bottom">
-            <div className="tip-mark">
-              <Icon name="info" size={16} />
-            </div>
-            <p>
-              まずは見た目を、自由に。
-              <br />
-              <span>実寸をそろえると、比較がもっと簡単に。</span>
-            </p>
           </div>
         </aside>
         <section className="workspace">
@@ -743,20 +739,6 @@ export default function Studio() {
               <Icon name="info" size={16} />
               使い方
             </button>
-            <label className="wheel-control">
-              ホイール
-              <select
-                aria-label="ホイールの操作"
-                value={wheelMode}
-                onChange={(e) =>
-                  setWheelMode(e.target.value as "view" | "image")
-                }
-                title="画像サイズを選ぶと、選択画像の実寸(mm)も変わります"
-              >
-                <option value="view">表示を拡大縮小</option>
-                <option value="image">画像を拡大縮小</option>
-              </select>
-            </label>
           </div>
           <div className="canvas-wrap">
             <Stage
@@ -766,60 +748,16 @@ export default function Studio() {
               grid={grid}
               compare={compare}
               select={setSelected}
-              locked={() =>
-                notify(
-                  "固定中の画像です。右側の「固定中」ボタンで解除すると移動できます。",
-                )
+              wheel={(factor) =>
+                setZoom((z) => Math.min(2.5, Math.max(0.4, z * factor)))
               }
-              wheel={(factor, done) => {
-                if (done) {
-                  wheelStart.current = null;
-                  return;
-                }
-                if (wheelMode === "view") {
-                  setZoom((z) => Math.min(2.5, Math.max(0.4, z * factor)));
-                  return;
-                }
-                const active = current.current.layers.find(
-                  (l) => l.id === selected,
-                );
-                if (!active) {
-                  notify("拡大縮小する画像を選んでください。");
-                  return;
-                }
-                if (active.locked || compare) {
-                  notify(
-                    "カスタム表示で画像の固定を解除してからサイズを変更してください。",
-                  );
-                  return;
-                }
-                const resized = resizeAroundCenter(active, factor);
-                if (resized.mm === active.mm) return;
-                if (!wheelStart.current) {
-                  const before = current.current;
-                  wheelStart.current = before;
-                  setHistory((h) => ({
-                    past: [...h.past.slice(-19), before],
-                    future: [],
-                  }));
-                }
-                const next = {
-                  ...current.current,
-                  layers: current.current.layers.map((l) =>
-                    l.id === active.id ? { ...l, ...resized } : l,
-                  ),
-                };
-                current.current = next;
-                setProject(next);
-              }}
               move={(id, x, y, done) => {
                 if (!dragStart.current) dragStart.current = current.current;
                 const next = {
                   ...current.current,
-                  layers: current.current.layers.map((l) =>
-                    l.id === id ? { ...l, x, y } : l,
-                  ),
+                  layers: updateLayer(current.current.layers, id, { x, y }),
                 };
+                current.current = next;
                 if (done) {
                   commit(next, dragStart.current);
                   dragStart.current = null;
@@ -828,24 +766,15 @@ export default function Studio() {
             />
             {!project.layers.length && (
               <div className="empty-state">
-                <span className="empty-kicker">BUILD YOUR OWN.</span>
-                <h1>
-                  理想の一挺を、
-                  <br />
-                  ここで組み合わせよう。
-                </h1>
-                <p>
-                  ここに画像をドラッグ＆ドロップ。
-                  <br />
-                  自分のエアガンとパーツの組み合わせを比較できます。
-                </p>
+                <h1>本体画像を追加</h1>
+                <p>画像をドロップ、またはファイルを選択</p>
                 <button
                   className="button primary"
                   onClick={() => choose("base")}
                   disabled={!ready || busy}
                 >
                   <Icon name="plus" />
-                  本体画像からはじめる
+                  画像を選択
                 </button>
                 <button
                   className="demo-button"
@@ -885,7 +814,7 @@ export default function Studio() {
                 onClick={() =>
                   setZoom((z) => Math.max(0.4, +(z - 0.1).toFixed(1)))
                 }
-                aria-label="縮小"
+                aria-label="ズームアウト"
               >
                 −
               </button>
@@ -894,40 +823,16 @@ export default function Studio() {
                 onClick={() =>
                   setZoom((z) => Math.min(2.5, +(z + 0.1).toFixed(1)))
                 }
-                aria-label="拡大"
+                aria-label="ズームイン"
               >
                 +
               </button>
             </div>
           </div>
-          <div className="workspace-status">
-            <span>
-              <span className="status-dot" />
-              LOCAL WORKSPACE{" "}
-              <span className="status-note">
-                画像はこのブラウザー内で処理されます
-              </span>
-            </span>
-            <span>
-              {project.layers.filter((l) => l.visible).length} layers visible
-            </span>
-          </div>
-          <div className="under-canvas">
-            <div>
-              <span className="eyebrow">MAKE IT YOURS</span>
-              <h3>イメージしてから、カスタムする。</h3>
-            </div>
-            <p>
-              このツールは画像による外観の比較用です。
-              <br />
-              取付可否・干渉・性能を判定するものではありません。
-            </p>
-          </div>
         </section>
         <aside className="inspector panel">
           <div className="panel-title">
             <div>
-              <span className="eyebrow">INSPECTOR</span>
               <h2>選択アイテム</h2>
             </div>
             <Icon name="layers" />
@@ -984,9 +889,7 @@ export default function Studio() {
                 >
                   2点で実寸合わせ
                 </button>
-                <p className="hint">
-                  余白を除いた画像を使うと、実寸に近い比率で比較できます。
-                </p>
+
                 <div className="field-grid">
                   <NumberField
                     label="X"
@@ -1017,13 +920,21 @@ export default function Studio() {
                     <Icon name="flip" size={15} />
                     左右反転
                   </button>
-                  <button
-                    className={`mini-button ${layer.locked ? "toggled" : ""}`}
-                    onClick={() => update(layer.id, { locked: !layer.locked })}
-                  >
-                    <Icon name="lock" size={15} />
-                    {layer.locked ? "固定中" : "固定する"}
-                  </button>
+                  {layer.id !== project.layers[0]?.id && (
+                    <button
+                      className={`mini-button ${layer.attachedToBase ? "toggled" : ""}`}
+                      aria-pressed={!!layer.attachedToBase}
+                      onClick={() =>
+                        update(layer.id, {
+                          attachedToBase: !layer.attachedToBase,
+                        })
+                      }
+                      title="本体の移動・回転・反転に追従"
+                    >
+                      <Icon name="lock" size={15} />
+                      {layer.attachedToBase ? "本体から外す" : "本体に固定"}
+                    </button>
+                  )}
                 </div>
               </div>
               <div className="inspector-section">
@@ -1079,9 +990,6 @@ export default function Studio() {
                     元の画像に戻す
                   </button>
                 )}
-                <p className="hint">
-                  左上の色を基準に、外周とつながる部分を処理します。
-                </p>
               </div>
               <div className="inspector-section">
                 <div className="section-label">購入メモ</div>
@@ -1152,13 +1060,7 @@ export default function Studio() {
                 <Icon name="layers" size={28} />
               </div>
               <h3>アイテムを選択</h3>
-              <p>
-                キャンバス上の画像、または
-                <br />
-                左のレイヤーをクリックすると
-                <br />
-                サイズや配置を調整できます。
-              </p>
+
               <div className="shortcut-note">
                 <span>移動</span>
                 <kbd>↑ ↓ ← →</kbd>
@@ -1190,11 +1092,30 @@ export default function Studio() {
       </div>
       <footer className="footer">
         <span>
-          AIRSOFT CUSTOM STUDIO <small>V0.3</small>
+          AIRSOFT CUSTOM STUDIO <small>V0.4</small>
         </span>
-        <span>想像を、組み立てる。</span>
       </footer>
-      {editor && layer && (
+      {search && (
+        <PartSearch
+          close={() => setSearch(false)}
+          add={async (part) => {
+            if (!(await addStoredPart(part)))
+              throw new Error(
+                "追加できません。レイヤー数と画像を確認してください。",
+              );
+            setSearch(false);
+            if (part.referenceMm) setEditor("measure");
+          }}
+        />
+      )}
+      {editor === "perspective" && layer && (
+        <PerspectiveWorkbench
+          layer={layer}
+          close={() => setEditor(null)}
+          apply={(updates) => applyImage(updates, false)}
+        />
+      )}
+      {editor && editor !== "perspective" && layer && (
         <ImageEditor
           key={`${layer.id}-${editor}`}
           layer={layer}
@@ -1249,24 +1170,20 @@ export default function Studio() {
           {help ? (
             <>
               <span className="eyebrow">QUICK START</span>
-              <h2>カスタムを試す、4つのステップ。</h2>
+              <h2>使い方</h2>
               <ol className="help-steps">
                 <li>
                   <strong>本体の横向き画像を追加</strong>
-                  <p>
-                    「切り出し」で余白を除き、「2点で実寸合わせ」で長さの分かる区間を指定します。画像はドラッグで動かせます。必要に応じて固定できます。
-                  </p>
+                  <p>画像を追加し、「2点で実寸合わせ」で長さを指定します。</p>
                 </li>
                 <li>
                   <strong>気になるパーツを追加</strong>
-                  <p>
-                    保存した商品画像をアップロードし、画像の横幅に対応する実寸を入力します。
-                  </p>
+                  <p>「パーツを検索」または画像のドロップで追加します。</p>
                 </li>
                 <li>
                   <strong>位置と見た目を比較</strong>
                   <p>
-                    パーツをドラッグして配置。回転・反転・重なり順・背景透過を調整できます。
+                    ドラッグで移動、ホイールでズーム。「本体に固定」で本体の移動・回転・反転に追従します。
                   </p>
                 </li>
                 <li>
@@ -1334,6 +1251,7 @@ function NumberField({
       <span className="number-input">
         <input
           type="number"
+          aria-label={label}
           value={draft}
           min={min}
           max={max}

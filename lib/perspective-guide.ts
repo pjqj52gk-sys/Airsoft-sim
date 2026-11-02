@@ -1,0 +1,117 @@
+import { quadHomography } from "./image-edit.ts";
+import type { Point } from "./image-edit";
+export type Vec = { x: number; y: number; z: number };
+export type Angles = { yaw: number; pitch: number; roll: number };
+const sub = (a: Vec, b: Vec): Vec => ({
+  x: a.x - b.x,
+  y: a.y - b.y,
+  z: a.z - b.z,
+});
+const cross = (a: Vec, b: Vec): Vec => ({
+  x: a.y * b.z - a.z * b.y,
+  y: a.z * b.x - a.x * b.z,
+  z: a.x * b.y - a.y * b.x,
+});
+const length = (a: Vec) => Math.hypot(a.x, a.y, a.z);
+const unit = (a: Vec): Vec => {
+  const n = length(a);
+  return { x: a.x / n, y: a.y / n, z: a.z / n };
+};
+export function rotate(p: Vec, a: Angles): Vec {
+  const y = (a.yaw * Math.PI) / 180,
+    x = (a.pitch * Math.PI) / 180,
+    z = (a.roll * Math.PI) / 180;
+  const u = {
+    x: Math.cos(y) * p.x + Math.sin(y) * p.z,
+    y: p.y,
+    z: -Math.sin(y) * p.x + Math.cos(y) * p.z,
+  };
+  const v = {
+    x: u.x,
+    y: Math.cos(x) * u.y - Math.sin(x) * u.z,
+    z: Math.sin(x) * u.y + Math.cos(x) * u.z,
+  };
+  return {
+    x: Math.cos(z) * v.x - Math.sin(z) * v.y,
+    y: Math.sin(z) * v.x + Math.cos(z) * v.y,
+    z: v.z,
+  };
+}
+export function makeGuide(
+  points: Point[],
+  width: number,
+  height: number,
+  depth: number,
+) {
+  const { a, b, c, d, e, f, g, h } = quadHomography(points);
+  const cx = width / 2,
+    cy = height / 2;
+  // Focal length is only a visual guide: a single photo cannot recover a unique 3D object.
+  const f2 =
+    -((a - cx * g) * (b - cx * h) + (d - cy * g) * (e - cy * h)) / (g * h);
+  const focal =
+    Number.isFinite(f2) &&
+    f2 > width * height * 0.1 &&
+    f2 < (width + height) ** 2 * 16
+      ? Math.sqrt(f2)
+      : Math.max(width, height) * 1.5;
+  const front = [
+    [0, 0],
+    [1, 0],
+    [1, 1],
+    [0, 1],
+  ].map(([u, v]): Vec => {
+    const z = g * u + h * v + 1;
+    if (z <= 0.02) throw new Error("角を交差させずに合わせてください。");
+    return {
+      x: (a * u + b * v + c - cx * z) / focal,
+      y: (d * u + e * v + f - cy * z) / focal,
+      z,
+    };
+  });
+  const u = sub(front[1], front[0]),
+    v = sub(front[3], front[0]);
+  const normal = unit(cross(u, v));
+  const center = front.reduce(
+    (s, p) => ({ x: s.x + p.x / 4, y: s.y + p.y / 4, z: s.z + p.z / 4 }),
+    { x: 0, y: 0, z: 0 },
+  );
+  const extrusion = Math.min(length(u), length(v)) * depth;
+  const back = front.map((p) => ({
+    x: p.x + normal.x * extrusion,
+    y: p.y + normal.y * extrusion,
+    z: p.z + normal.z * extrusion,
+  }));
+  const yaw = (-Math.atan2(normal.x, normal.z) * 180) / Math.PI;
+  const n = rotate(normal, { yaw, pitch: 0, roll: 0 });
+  const pitch = (Math.atan2(n.y, n.z) * 180) / Math.PI;
+  const edge = rotate(u, { yaw, pitch, roll: 0 });
+  const flat = {
+    yaw,
+    pitch,
+    roll: (-Math.atan2(edge.y, edge.x) * 180) / Math.PI,
+  };
+  return { front, back, center, focal, cx, cy, flat };
+}
+export function projectGuide(
+  guide: ReturnType<typeof makeGuide>,
+  angles: Angles,
+) {
+  return [...guide.front, ...guide.back].map((p): Point => {
+    const v = rotate(sub(p, guide.center), angles);
+    // Recenter during orbit so the model stays under the pointer.
+    const z = Math.max(0.08, guide.center.z + v.z);
+    return {
+      x: guide.cx + (guide.focal * v.x) / z,
+      y: guide.cy + (guide.focal * v.y) / z,
+    };
+  });
+}
+export function textureTransform(
+  points: Point[],
+  width: number,
+  height: number,
+) {
+  const { a, b, c, d, e, f, g, h } = quadHomography(points);
+  return `matrix3d(${a / width},${d / width},0,${g / width},${b / height},${e / height},0,${h / height},0,0,1,0,${c},${f},0,1)`;
+}

@@ -6,12 +6,13 @@ export type Layer = {
   width: number;
   height: number;
   mm: number;
+  referenceMm?: number;
   x: number;
   y: number;
   rotation: number;
   flip: boolean;
   visible: boolean;
-  locked: boolean;
+  attachedToBase?: boolean;
   price: number;
   url: string;
   category: string;
@@ -48,7 +49,7 @@ export function sampleProject(): Project {
     rotation: 0,
     flip: false,
     visible: true,
-    locked: false,
+    attachedToBase: false,
     price: 0,
     url: "",
     category: "本体",
@@ -68,7 +69,7 @@ export function sampleProject(): Project {
         mm: 150,
         x: 430,
         y: 188,
-        locked: false,
+        attachedToBase: false,
         category: "光学機器",
       },
     ],
@@ -140,12 +141,18 @@ export async function parseProject(value: unknown): Promise<Project> {
           legacy && row.metricType === "height"
             ? (mm * image.naturalWidth) / image.naturalHeight
             : mm,
+        referenceMm:
+          typeof row.referenceMm === "number" &&
+          row.referenceMm > 0 &&
+          row.referenceMm <= 5000
+            ? row.referenceMm
+            : undefined,
         x: legacy ? 120 + number(pos.x, 0) * scale : number(row.x, 120),
         y: legacy ? 190 + number(pos.y, 0) * scale : number(row.y, 190),
         rotation: number(row.rotation, 0, -360, 360),
         flip: row.flip === true,
         visible: row.visible !== false,
-        locked: legacy ? index === 0 : row.locked === true,
+        attachedToBase: index > 0 && row.attachedToBase === true,
         price: number(row.price, 0, 0, 10000000),
         url: typeof row.url === "string" ? row.url.slice(0, 2000) : "",
         category:

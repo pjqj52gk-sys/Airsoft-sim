@@ -26,7 +26,7 @@ export default function ImageEditor({
   apply: (updates: Partial<Layer>, extract: boolean) => void;
 }) {
   const [points, setPoints] = useState<Point[]>([]);
-  const [length, setLength] = useState("100");
+  const [length, setLength] = useState(String(layer.referenceMm || 100));
   const [tolerance, setTolerance] = useState(28);
   const [preview, setPreview] = useState(layer.src);
   const [extract, setExtract] = useState(false);

@@ -9,8 +9,7 @@ type Props = {
   compare: boolean;
   select: (id: string | null) => void;
   move: (id: string, x: number, y: number, done: boolean) => void;
-  wheel: (factor: number, done: boolean) => void;
-  locked: () => void;
+  wheel: (factor: number) => void;
 };
 export default function Stage({
   layers,
@@ -21,7 +20,6 @@ export default function Stage({
   select,
   move,
   wheel,
-  locked,
 }: Props) {
   const svg = useRef<SVGSVGElement>(null);
   const wheelHandler = useRef(wheel);
@@ -36,7 +34,6 @@ export default function Stage({
   useEffect(() => {
     const surface = svg.current?.closest(".canvas-wrap");
     if (!surface) return;
-    let timer: ReturnType<typeof setTimeout> | undefined;
     const handler = (event: Event) => {
       const e = event as WheelEvent;
       e.preventDefault();
@@ -46,15 +43,11 @@ export default function Stage({
         (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? surface.clientHeight : 1);
       wheelHandler.current(
         Math.exp(-Math.min(100, Math.max(-100, delta)) * 0.002),
-        false,
       );
-      clearTimeout(timer);
-      timer = setTimeout(() => wheelHandler.current(1, true), 400);
     };
     surface.addEventListener("wheel", handler, { passive: false });
     return () => {
       surface.removeEventListener("wheel", handler);
-      clearTimeout(timer);
     };
   }, []);
   const point = (x: number, y: number) => {
@@ -65,10 +58,6 @@ export default function Stage({
   };
   return (
     <div className="stage">
-      <div className="stage-caption">
-        <span className="status-dot" /> SIDE VIEW{" "}
-        <span className="muted">/</span> 2D WORKSPACE
-      </div>
       <svg
         ref={svg}
         className="canvas"
@@ -76,7 +65,6 @@ export default function Stage({
         role="img"
         aria-label="カスタム外観の編集キャンバス"
         onPointerDown={(e) => {
-          wheelHandler.current(1, true);
           if (e.target === e.currentTarget) select(null);
         }}
         onPointerMove={(e) => {
@@ -130,15 +118,10 @@ export default function Stage({
               <g
                 key={l.id}
                 transform={`translate(${l.x + w / 2} ${l.y + h / 2}) rotate(${l.rotation})`}
-                className={l.locked ? "locked-object" : "canvas-object"}
+                className="canvas-object"
                 onPointerDown={(e) => {
                   e.stopPropagation();
-                  wheelHandler.current(1, true);
                   select(l.id);
-                  if (l.locked) {
-                    locked();
-                    return;
-                  }
                   if (compare) return;
                   const p = point(e.clientX, e.clientY);
                   drag.current = { id: l.id, x: l.x, y: l.y, sx: p.x, sy: p.y };
@@ -209,7 +192,7 @@ export default function Stage({
       </svg>
       <div className="stage-foot">
         <span>
-          {compare ? "本体のみを表示中" : "ドラッグで移動 · ホイールで拡大縮小"}
+          {compare ? "本体のみを表示中" : "ドラッグで移動 · ホイールでズーム"}
         </span>
         <span>外観プレビュー</span>
       </div>

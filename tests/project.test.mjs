@@ -33,6 +33,8 @@ test("V2 round-trip preserves coordinates, visibility, rotation and purchase not
     visible: false,
     price: 12000,
     url: "https://example.com/part",
+    attachedToBase: true,
+    referenceMm: 67,
   };
   const result = await parseProject(JSON.parse(JSON.stringify(source)));
   const part = result.layers[1];
@@ -43,6 +45,8 @@ test("V2 round-trip preserves coordinates, visibility, rotation and purchase not
   assert.equal(part.visible, false);
   assert.equal(part.price, 12000);
   assert.equal(part.url, source.layers[1].url);
+  assert.equal(part.attachedToBase, true);
+  assert.equal(part.referenceMm, 67);
   assert.notEqual(part.id, source.layers[1].id);
 });
 test("legacy pixel offsets and height-based dimensions migrate to millimetres", async () => {
@@ -63,7 +67,7 @@ test("legacy pixel offsets and height-based dimensions migrate to millimetres", 
   assert.equal(result.layers[1].x, 145);
   assert.equal(result.layers[1].y, 240);
   assert.equal(result.layers[1].flip, true);
-  assert.equal(result.layers[0].locked, true);
+  assert.equal(result.layers[0].attachedToBase, false);
 });
 test("untrusted image URLs, arbitrary SVG and unsupported project versions are rejected", async () => {
   for (const src of [
