@@ -2,6 +2,23 @@ import { loadImage } from "./project";
 import type { Layer } from "./project";
 import { croppedPlacement, quadMap, distance } from "./image-edit";
 import type { Rect, Point } from "./image-edit";
+export async function eraseImage(
+  layer: Layer,
+  rect: Rect,
+  source = layer.src,
+): Promise<Partial<Layer>> {
+  const image = await loadImage(source);
+  const canvas = document.createElement("canvas");
+  canvas.width = layer.width;
+  canvas.height = layer.height;
+  const ctx = canvas.getContext("2d")!;
+  ctx.drawImage(image, 0, 0);
+  ctx.clearRect(rect.x, rect.y, rect.w, rect.h);
+  return {
+    src: canvas.toDataURL("image/png"),
+    originalSrc: layer.originalSrc || layer.src,
+  };
+}
 export async function cropImage(
   layer: Layer,
   rect: Rect,

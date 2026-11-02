@@ -2,14 +2,17 @@
 import { useRef, useState } from "react";
 import Dialog from "./dialog";
 import Icon from "./icon";
+import LoadingOverlay from "./loading-overlay";
 import type { Layer } from "@/lib/project";
 import { removeBackground } from "@/lib/project";
 import { cropRect, measuredWidth, distance } from "@/lib/image-edit";
-import { cropImage, rectifyImage } from "@/lib/image-processing";
+import { cropImage, rectifyImage, eraseImage } from "@/lib/image-processing";
 import type { Point } from "@/lib/image-edit";
-export type EditMode = "crop" | "perspective" | "measure" | "background";
+export type EditMode =
+  "crop" | "erase" | "perspective" | "measure" | "background";
 const titles = {
   crop: "画像を切り出す",
+  erase: "選択範囲を消す",
   perspective: "パースを補正",
   measure: "2点で実寸合わせ",
   background: "背景を透過",
@@ -32,8 +35,10 @@ export default function ImageEditor({
   const [extract, setExtract] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [eraseHistory, setEraseHistory] = useState<string[]>([]);
   const svg = useRef<SVGSVGElement>(null);
   const drag = useRef<number | null>(null);
+  const selectionStart = useRef<Point | null>(null);
   const max = mode === "perspective" ? 4 : 2;
   const actualPoint = (x: number, y: number) => {
     const m = svg.current!.getScreenCTM()!;
@@ -45,6 +50,24 @@ export default function ImageEditor({
   };
   const handleSize = Math.max(layer.width, layer.height) / 70;
   const changed = preview !== layer.src;
+  async function eraseSelection() {
+    setBusy(true);
+    setError("");
+    try {
+      const updates = await eraseImage(
+        layer,
+        cropRect(points, layer.width, layer.height),
+        preview,
+      );
+      setEraseHistory((history) => [...history, preview].slice(-20));
+      setPreview(updates.src!);
+      setPoints([]);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "範囲を消せませんでした。");
+    } finally {
+      setBusy(false);
+    }
+  }
   async function backgroundPreview() {
     setBusy(true);
     setError("");
@@ -70,7 +93,20 @@ export default function ImageEditor({
         );
       else if (mode === "perspective")
         updates = await rectifyImage(layer, points);
-      else {
+      else if (mode === "erase") {
+        if (points.length === 2)
+          updates = await eraseImage(
+            layer,
+            cropRect(points, layer.width, layer.height),
+            preview,
+          );
+        else if (changed)
+          updates = {
+            src: preview,
+            originalSrc: layer.originalSrc || layer.src,
+          };
+        else throw new Error("消したい範囲をドラッグしてください。");
+      } else {
         if (!changed)
           throw new Error("「透過をプレビュー」で結果を確認してください。");
         updates = { src: preview, originalSrc: layer.originalSrc || layer.src };
@@ -83,7 +119,7 @@ export default function ImageEditor({
     }
   }
   const crop =
-    mode === "crop" && points.length === 2
+    (mode === "crop" || mode === "erase") && points.length === 2
       ? {
           x: Math.min(points[0].x, points[1].x),
           y: Math.min(points[0].y, points[1].y),
@@ -113,11 +149,13 @@ export default function ImageEditor({
         <p className="editor-instructions">
           {mode === "crop"
             ? "残したい範囲の対角2点をクリック。丸い点をドラッグして調整できます。"
-            : mode === "perspective"
-              ? "画像を平面の長方形に補正します。左上 → 右上 → 右下 → 左下の順に4点を選択。"
-              : mode === "measure"
-                ? "長さが分かる区間の両端を選び、その区間の実寸を入力してください。"
-                : "左上の色を基準に外周の背景を透過します。許容差を変えて確認できます。"}
+            : mode === "erase"
+              ? "消したい範囲をドラッグ。選んだ範囲が透明になります。"
+              : mode === "perspective"
+                ? "画像を平面の長方形に補正します。左上 → 右上 → 右下 → 左下の順に4点を選択。"
+                : mode === "measure"
+                  ? "長さが分かる区間の両端を選び、その区間の実寸を入力してください。"
+                  : "左上の色を基準に外周の背景を透過します。許容差を変えて確認できます。"}
         </p>
         <div className="image-edit-surface">
           <svg
@@ -130,16 +168,36 @@ export default function ImageEditor({
               if (busy || mode === "background" || drag.current !== null)
                 return;
               const p = actualPoint(e.clientX, e.clientY);
+              if (mode === "erase") {
+                selectionStart.current = p;
+                setPoints([p, p]);
+                e.currentTarget.setPointerCapture(e.pointerId);
+                setError("");
+                return;
+              }
               setPoints((prev) => (prev.length >= max ? [p] : [...prev, p]));
               setError("");
             }}
             onPointerMove={(e) => {
+              if (busy) return;
+              if (selectionStart.current) {
+                setPoints([
+                  selectionStart.current,
+                  actualPoint(e.clientX, e.clientY),
+                ]);
+                return;
+              }
               if (drag.current === null) return;
               const index = drag.current,
                 p = actualPoint(e.clientX, e.clientY);
               setPoints((prev) => prev.map((v, i) => (i === index ? p : v)));
             }}
             onPointerUp={(e) => {
+              if (selectionStart.current) {
+                selectionStart.current = null;
+                if (e.currentTarget.hasPointerCapture(e.pointerId))
+                  e.currentTarget.releasePointerCapture(e.pointerId);
+              }
               if (drag.current !== null) {
                 drag.current = null;
                 e.currentTarget.releasePointerCapture(e.pointerId);
@@ -147,6 +205,7 @@ export default function ImageEditor({
             }}
             onPointerCancel={() => {
               drag.current = null;
+              selectionStart.current = null;
             }}
           >
             <image href={preview} width={layer.width} height={layer.height} />
@@ -156,8 +215,8 @@ export default function ImageEditor({
                 y={crop.y}
                 width={crop.w}
                 height={crop.h}
-                fill="#38bdf833"
-                stroke="#0284c7"
+                fill={mode === "erase" ? "#fb718544" : "#38bdf833"}
+                stroke={mode === "erase" ? "#e11d48" : "#0284c7"}
                 strokeWidth={handleSize / 5}
               />
             )}
@@ -191,6 +250,7 @@ export default function ImageEditor({
                   style={{ cursor: "grab" }}
                   onPointerDown={(e) => {
                     e.stopPropagation();
+                    if (busy) return;
                     drag.current = index;
                     svg.current!.setPointerCapture(e.pointerId);
                   }}
@@ -266,6 +326,29 @@ export default function ImageEditor({
             元画像を残し、新しいパーツとして切り出す
           </label>
         )}
+        {mode === "erase" && (
+          <div className="erase-actions">
+            <button
+              className="button secondary"
+              disabled={busy || points.length !== 2}
+              onClick={eraseSelection}
+            >
+              選択範囲を消す
+            </button>
+            <button
+              className="mini-button"
+              disabled={busy || !eraseHistory.length}
+              onClick={() => {
+                setPreview(eraseHistory[eraseHistory.length - 1]);
+                setEraseHistory((history) => history.slice(0, -1));
+                setPoints([]);
+                setError("");
+              }}
+            >
+              ひとつ戻す
+            </button>
+          </div>
+        )}
         {mode === "perspective" && (
           <p className="hint">
             補正後は「2点で実寸合わせ」で縮尺を確認してください。立体の見えない面は復元できません。
@@ -283,6 +366,7 @@ export default function ImageEditor({
             onClick={() => {
               setPoints([]);
               setPreview(layer.src);
+              setEraseHistory([]);
               setError("");
             }}
           >
@@ -291,7 +375,12 @@ export default function ImageEditor({
           <button
             className="button primary"
             disabled={
-              busy || (mode === "background" ? !changed : points.length !== max)
+              busy ||
+              (mode === "background"
+                ? !changed
+                : mode === "erase"
+                  ? !changed && points.length !== 2
+                  : points.length !== max)
             }
             onClick={submit}
           >
@@ -302,6 +391,7 @@ export default function ImageEditor({
           適用後も「元に戻す」で編集前に戻せます。キャンセルでは変更されません。
         </p>
       </div>
+      {busy && <LoadingOverlay label="画像を処理中…" />}
     </Dialog>
   );
 }

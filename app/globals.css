@@ -2162,3 +2162,10 @@ p {
 .rakuten-photo-picker h3 { font-size:15px;line-height:1.7; }
 .rakuten-photo-picker .shop-photo-preview { min-height:220px; }
 .rakuten-photo-picker > a { font-size:13px;color:#167ba8; }
+
+.loading-indicator { display:flex;flex-direction:column;align-items:center;gap:18px;padding:28px 36px;border:1px solid #dceaf2;border-radius:16px;background:#fff;box-shadow:0 12px 48px #0c4a6e12; }
+.loading-spinner { display:block;width:44px;height:44px;border:4px solid #dff3fd;border-top-color:#38bdf8;border-radius:50%;animation:loading-spin .8s linear infinite; }
+@keyframes loading-spin { to { transform:rotate(360deg); } }
+.erase-actions { display:flex;gap:10px;flex-wrap:wrap;align-items:center; }
+.erase-actions .mini-button { flex:0 0 auto; }
+@media (prefers-reduced-motion:reduce) { .loading-spinner { animation:none; } }

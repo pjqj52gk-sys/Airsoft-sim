@@ -4,6 +4,7 @@ import Icon from "./icon";
 import Stage from "./stage";
 import Dialog from "./dialog";
 import ImageEditor from "./image-editor";
+import LoadingOverlay from "./loading-overlay";
 import type { EditMode } from "./image-editor";
 import Shelf from "./shelf";
 import PurchaseLink from "./purchase-link";
@@ -952,6 +953,12 @@ export default function Studio() {
                   </button>
                   <button
                     className="mini-button"
+                    onClick={() => setEditor("erase")}
+                  >
+                    範囲を消す
+                  </button>
+                  <button
+                    className="mini-button"
                     onClick={() => setEditor("perspective")}
                   >
                     パース補正
@@ -1145,11 +1152,7 @@ export default function Studio() {
           add={addStoredPart}
         />
       )}
-      {busy && (
-        <div className="processing-overlay" role="status">
-          画像を処理しています…
-        </div>
-      )}
+      {busy && <LoadingOverlay label="画像を処理中…" />}
       {message && (
         <div role="status" className="toast">
           <Icon name="info" />

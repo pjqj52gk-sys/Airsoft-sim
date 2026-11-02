@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Dialog from "./dialog";
 import ShopImport from "./shop-import";
 import RakutenSearch from "./rakuten-search";
+import LoadingOverlay from "./loading-overlay";
 import Icon from "./icon";
 import catalog from "@/lib/parts-catalog.json";
 import { matchesPart } from "@/lib/part-search";
@@ -388,6 +389,7 @@ export default function PartSearch({
           )}{" "}
         </>
       )}
+      {busy && <LoadingOverlay label="画像・商品情報を読み込み中…" />}
     </Dialog>
   );
 }

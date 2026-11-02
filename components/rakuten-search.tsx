@@ -116,6 +116,7 @@ export default function RakutenSearch({
     const current = new AbortController();
     controller.current = current;
     setBusy(true);
+    onBusy(true);
     setError("");
     setResult(null);
     try {
@@ -131,7 +132,10 @@ export default function RakutenSearch({
       if (!current.signal.aborted)
         setError(e instanceof Error ? e.message : "検索できませんでした。");
     } finally {
-      if (!current.signal.aborted) setBusy(false);
+      if (!current.signal.aborted) {
+        setBusy(false);
+        onBusy(false);
+      }
     }
   }
   return (
