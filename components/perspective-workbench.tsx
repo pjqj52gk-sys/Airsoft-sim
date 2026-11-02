@@ -14,11 +14,11 @@ import {
 
 const zero: Angles = { yaw: 0, pitch: 0, roll: 0 };
 const faces = [
-  [4, 5, 6, 7],
-  [0, 1, 5, 4],
-  [1, 2, 6, 5],
-  [2, 3, 7, 6],
-  [3, 0, 4, 7],
+  { corners: [4, 5, 6, 7], name: "奥", fill: "#64748b24", stroke: "#64748b" },
+  { corners: [0, 1, 5, 4], name: "上", fill: "#67e8f96b", stroke: "#0891b2" },
+  { corners: [1, 2, 6, 5], name: "右", fill: "#2563eb70", stroke: "#1d4ed8" },
+  { corners: [2, 3, 7, 6], name: "下", fill: "#33415580", stroke: "#334155" },
+  { corners: [3, 0, 4, 7], name: "左", fill: "#14b8a650", stroke: "#0f766e" },
 ];
 const names = ["左上", "右上", "右下", "左下"];
 export default function PerspectiveWorkbench({
@@ -262,14 +262,27 @@ export default function PerspectiveWorkbench({
             )}
             {cube.length > 0 && (
               <g
-                fill="#38bdf817"
-                stroke="#0284c7"
                 strokeWidth={step === 0 ? handle / 7 : 1.2}
                 pointerEvents="none"
               >
                 {faces.map((face, i) => (
-                  <polygon points={polygon(face)} key={i} />
+                  <polygon
+                    points={polygon(face.corners)}
+                    fill={face.fill}
+                    stroke={face.stroke}
+                    key={i}
+                  >
+                    <title>{face.name}の面</title>
+                  </polygon>
                 ))}
+                <polygon
+                  points={polygon([4, 5, 6, 7])}
+                  fill="none"
+                  stroke="#64748b"
+                  strokeDasharray={
+                    step === 0 ? `${handle / 2} ${handle / 3}` : "5 4"
+                  }
+                />
               </g>
             )}
             {step === 1 && result?.src && texture && (
@@ -302,9 +315,9 @@ export default function PerspectiveWorkbench({
             {cube.length > 0 && (
               <polygon
                 points={polygon([0, 1, 2, 3])}
-                fill={step === 0 ? "#38bdf82b" : "#38bdf811"}
-                stroke="#0284c7"
-                strokeWidth={step === 0 ? handle / 6 : 1.5}
+                fill={step === 0 ? "#38bdf81f" : "#38bdf808"}
+                stroke="#0369a1"
+                strokeWidth={step === 0 ? handle / 4 : 2}
                 style={{ cursor: "move" }}
                 onPointerDown={(e) => begin(e, step === 0 ? -1 : -2)}
               />
