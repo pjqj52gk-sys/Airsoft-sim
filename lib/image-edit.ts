@@ -3,6 +3,18 @@ export type Point = { x: number; y: number };
 export type Rect = { x: number; y: number; w: number; h: number };
 export const distance = (a: Point, b: Point) =>
   Math.hypot(b.x - a.x, b.y - a.y);
+export function resizeAroundCenter(layer: Layer, factor: number) {
+  const mm =
+    Number.isFinite(factor) && factor > 0
+      ? Math.min(5000, Math.max(1, layer.mm * factor))
+      : layer.mm;
+  const ratio = mm / layer.mm;
+  return {
+    mm,
+    x: layer.x + (layer.mm - mm) / 2,
+    y: layer.y + (((layer.mm * layer.height) / layer.width) * (1 - ratio)) / 2,
+  };
+}
 export function measuredWidth(pixelWidth: number, points: Point[], mm: number) {
   if (
     points.length !== 2 ||

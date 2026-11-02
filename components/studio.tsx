@@ -6,6 +6,9 @@ import Dialog from "./dialog";
 import ImageEditor from "./image-editor";
 import type { EditMode } from "./image-editor";
 import Shelf from "./shelf";
+import useFileDrop from "./use-file-drop";
+import type { DropTarget } from "./use-file-drop";
+import { resizeAroundCenter } from "@/lib/image-edit";
 import {
   download,
   emptyProject,
@@ -31,6 +34,8 @@ export default function Studio() {
   current.current = project;
   const [selected, setSelected] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
+  const [wheelMode, setWheelMode] = useState<"view" | "image">("view");
+  const wheelStart = useRef<Project | null>(null);
   const [grid, setGrid] = useState(true);
   const [compare, setCompare] = useState(false);
   const [tab, setTab] = useState("layers");
@@ -54,6 +59,18 @@ export default function Studio() {
   const addTarget = useRef<"base" | "part">("part");
   const layer = project.layers.find((l) => l.id === selected);
   const notify = (text: string) => setMessage(text);
+  const fileDrop = useFileDrop({
+    enabled: ready && !busy && !editor && !shelf && !help && !clearDialog,
+    add: (files, target) => {
+      void addFiles(files, target);
+    },
+    unavailable: () =>
+      notify(
+        busy || !ready
+          ? "読み込みが終わってから画像をドロップしてください。"
+          : "開いているダイアログを閉じてから画像をドロップしてください。",
+      ),
+  });
   useEffect(() => {
     let cancelled = false;
     readDraft()
@@ -103,6 +120,7 @@ export default function Studio() {
     return () => clearTimeout(t);
   }, [message]);
   const commit = useCallback((next: Project, previous = current.current) => {
+    wheelStart.current = null;
     setHistory((h) => ({ past: [...h.past.slice(-19), previous], future: [] }));
     setProject(next);
   }, []);
@@ -114,6 +132,7 @@ export default function Studio() {
       ),
     });
   const undo = () => {
+    wheelStart.current = null;
     if (!history.past.length) return;
     setProject(history.past[history.past.length - 1]);
     setHistory({
@@ -122,6 +141,7 @@ export default function Studio() {
     });
   };
   const redo = () => {
+    wheelStart.current = null;
     if (!history.future.length) return;
     setProject(history.future[0]);
     setHistory({
@@ -184,7 +204,10 @@ export default function Studio() {
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
   });
-  async function addFiles(files: FileList | File[]) {
+  async function addFiles(
+    files: FileList | File[],
+    target: DropTarget = addTarget.current,
+  ) {
     if (busy || !ready || !files.length) return;
     setBusy(true);
     try {
@@ -193,7 +216,10 @@ export default function Studio() {
         await importProject(list[0]);
         return;
       }
-      if (project.layers.length + list.length > 60)
+      if (target === "base" && list.length !== 1)
+        throw new Error("本体エリアには画像を1枚ずつドロップしてください。");
+      const replacingBase = target === "base" && project.layers.length > 0;
+      if (project.layers.length + (replacingBase ? 0 : list.length) > 60)
         throw new Error("レイヤーは60件まで追加できます。");
       const images = await Promise.all(
         list.map(async (file, i): Promise<Layer> => {
@@ -209,14 +235,14 @@ export default function Studio() {
             rotation: 0,
             flip: false,
             visible: true,
-            locked: base,
+            locked: false,
             price: 0,
             url: "",
             category: base ? "本体" : "その他",
           };
         }),
       );
-      if (addTarget.current === "base" && project.layers.length) {
+      if (replacingBase) {
         const base = project.layers[0];
         const replacement = {
           ...base,
@@ -236,7 +262,11 @@ export default function Studio() {
         setSelected(images[images.length - 1].id);
       }
       setTab("layers");
-      notify("画像を追加しました。実寸を入力してサイズを合わせてください。");
+      notify(
+        replacingBase
+          ? "本体画像を入れ替えました。実寸を確認してください。"
+          : `${images.length}枚の画像を追加しました。実寸を入力してサイズを合わせてください。`,
+      );
     } catch (error) {
       notify(
         error instanceof Error ? error.message : "画像の追加に失敗しました。",
@@ -412,7 +442,7 @@ export default function Studio() {
         y: isBase ? 190 : 160,
         rotation: 0,
         visible: true,
-        locked: isBase,
+        locked: false,
         category: isBase
           ? "本体"
           : stored.category === "本体"
@@ -448,7 +478,7 @@ export default function Studio() {
     </button>
   );
   return (
-    <main className="studio" aria-busy={busy || !ready}>
+    <main className="studio" aria-busy={busy || !ready} {...fileDrop.handlers}>
       <input
         ref={fileInput}
         type="file"
@@ -562,7 +592,8 @@ export default function Studio() {
                 </div>
                 {project.layers[0] ? (
                   <button
-                    className={`base-card ${selected === project.layers[0].id ? "chosen" : ""}`}
+                    className={`base-card ${selected === project.layers[0].id ? "chosen" : ""} ${fileDrop.target === "base" ? "drop-active" : ""}`}
+                    data-drop-target="base"
                     onClick={() => setSelected(project.layers[0].id)}
                   >
                     <div className="base-preview">
@@ -575,13 +606,14 @@ export default function Studio() {
                   </button>
                 ) : (
                   <button
-                    className="upload-card"
+                    className={`upload-card ${fileDrop.target === "base" ? "drop-active" : ""}`}
+                    data-drop-target="base"
                     onClick={() => choose("base")}
                     disabled={!ready || busy}
                   >
                     <Icon name="upload" />
                     <strong>本体の画像を追加</strong>
-                    <small>横から撮った画像がおすすめ</small>
+                    <small>ここに画像をドロップしても追加できます</small>
                   </button>
                 )}
                 <div className="section-label parts-label">
@@ -624,7 +656,8 @@ export default function Studio() {
                     ))}
                 </div>
                 <button
-                  className="add-part"
+                  className={`add-part ${fileDrop.target === "part" ? "drop-active" : ""}`}
+                  data-drop-target="part"
                   onClick={() => choose("part")}
                   disabled={!ready || busy}
                 >
@@ -634,7 +667,7 @@ export default function Studio() {
                 <p className="hint">
                   商品画像を保存して追加できます。
                   <br />
-                  画像をキャンバスへドロップしてもOK。
+                  複数の画像をまとめてドロップできます。
                 </p>
               </>
             ) : (
@@ -710,6 +743,20 @@ export default function Studio() {
               <Icon name="info" size={16} />
               使い方
             </button>
+            <label className="wheel-control">
+              ホイール
+              <select
+                aria-label="ホイールの操作"
+                value={wheelMode}
+                onChange={(e) =>
+                  setWheelMode(e.target.value as "view" | "image")
+                }
+                title="画像サイズを選ぶと、選択画像の実寸(mm)も変わります"
+              >
+                <option value="view">表示を拡大縮小</option>
+                <option value="image">画像を拡大縮小</option>
+              </select>
+            </label>
           </div>
           <div className="canvas-wrap">
             <Stage
@@ -719,9 +766,51 @@ export default function Studio() {
               grid={grid}
               compare={compare}
               select={setSelected}
-              upload={(files) => {
-                addTarget.current = "part";
-                void addFiles(files);
+              locked={() =>
+                notify(
+                  "固定中の画像です。右側の「固定中」ボタンで解除すると移動できます。",
+                )
+              }
+              wheel={(factor, done) => {
+                if (done) {
+                  wheelStart.current = null;
+                  return;
+                }
+                if (wheelMode === "view") {
+                  setZoom((z) => Math.min(2.5, Math.max(0.4, z * factor)));
+                  return;
+                }
+                const active = current.current.layers.find(
+                  (l) => l.id === selected,
+                );
+                if (!active) {
+                  notify("拡大縮小する画像を選んでください。");
+                  return;
+                }
+                if (active.locked || compare) {
+                  notify(
+                    "カスタム表示で画像の固定を解除してからサイズを変更してください。",
+                  );
+                  return;
+                }
+                const resized = resizeAroundCenter(active, factor);
+                if (resized.mm === active.mm) return;
+                if (!wheelStart.current) {
+                  const before = current.current;
+                  wheelStart.current = before;
+                  setHistory((h) => ({
+                    past: [...h.past.slice(-19), before],
+                    future: [],
+                  }));
+                }
+                const next = {
+                  ...current.current,
+                  layers: current.current.layers.map((l) =>
+                    l.id === active.id ? { ...l, ...resized } : l,
+                  ),
+                };
+                current.current = next;
+                setProject(next);
               }}
               move={(id, x, y, done) => {
                 if (!dragStart.current) dragStart.current = current.current;
@@ -746,9 +835,9 @@ export default function Studio() {
                   ここで組み合わせよう。
                 </h1>
                 <p>
-                  自分のエアガンと気になるパーツの画像で、
+                  ここに画像をドラッグ＆ドロップ。
                   <br />
-                  購入する前にカスタムのイメージを。
+                  自分のエアガンとパーツの組み合わせを比較できます。
                 </p>
                 <button
                   className="button primary"
@@ -768,6 +857,27 @@ export default function Studio() {
                 <span className="file-types">
                   PNG, JPG, WEBP, GIF · 15MBまで
                 </span>
+              </div>
+            )}
+            {fileDrop.target && (
+              <div className="file-drop-feedback" role="status">
+                <Icon name="upload" size={38} />
+                <strong>
+                  {fileDrop.target === "base"
+                    ? project.layers.length
+                      ? "本体画像を入れ替える"
+                      : "本体画像を追加する"
+                    : project.layers.length
+                      ? "パーツ画像を追加する"
+                      : "画像を離してビルドをはじめる"}
+                </strong>
+                <p>
+                  {fileDrop.target === "base"
+                    ? "本体エリアに画像を1枚ドロップ"
+                    : project.layers.length
+                      ? "複数の画像をまとめてドロップできます"
+                      : "最初の1枚を本体、残りをパーツとして追加します"}
+                </p>
               </div>
             )}
             <div className="zoom-controls">
@@ -1144,7 +1254,7 @@ export default function Studio() {
                 <li>
                   <strong>本体の横向き画像を追加</strong>
                   <p>
-                    「切り出し」で余白を除き、「2点で実寸合わせ」で長さの分かる区間を指定します。本体は最初に固定されます。
+                    「切り出し」で余白を除き、「2点で実寸合わせ」で長さの分かる区間を指定します。画像はドラッグで動かせます。必要に応じて固定できます。
                   </p>
                 </li>
                 <li>

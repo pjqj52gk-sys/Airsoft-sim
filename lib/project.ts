@@ -48,7 +48,7 @@ export function sampleProject(): Project {
     rotation: 0,
     flip: false,
     visible: true,
-    locked: true,
+    locked: false,
     price: 0,
     url: "",
     category: "本体",

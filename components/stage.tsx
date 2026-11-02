@@ -1,5 +1,5 @@
 "use client";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { dimensions, Layer } from "@/lib/project";
 type Props = {
   layers: Layer[];
@@ -9,7 +9,8 @@ type Props = {
   compare: boolean;
   select: (id: string | null) => void;
   move: (id: string, x: number, y: number, done: boolean) => void;
-  upload: (files: FileList) => void;
+  wheel: (factor: number, done: boolean) => void;
+  locked: () => void;
 };
 export default function Stage({
   layers,
@@ -19,9 +20,12 @@ export default function Stage({
   compare,
   select,
   move,
-  upload,
+  wheel,
+  locked,
 }: Props) {
   const svg = useRef<SVGSVGElement>(null);
+  const wheelHandler = useRef(wheel);
+  wheelHandler.current = wheel;
   const drag = useRef<{
     id: string;
     x: number;
@@ -29,6 +33,30 @@ export default function Stage({
     sx: number;
     sy: number;
   } | null>(null);
+  useEffect(() => {
+    const surface = svg.current?.closest(".canvas-wrap");
+    if (!surface) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const handler = (event: Event) => {
+      const e = event as WheelEvent;
+      e.preventDefault();
+      if (drag.current || e.deltaY === 0) return;
+      const delta =
+        e.deltaY *
+        (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? surface.clientHeight : 1);
+      wheelHandler.current(
+        Math.exp(-Math.min(100, Math.max(-100, delta)) * 0.002),
+        false,
+      );
+      clearTimeout(timer);
+      timer = setTimeout(() => wheelHandler.current(1, true), 400);
+    };
+    surface.addEventListener("wheel", handler, { passive: false });
+    return () => {
+      surface.removeEventListener("wheel", handler);
+      clearTimeout(timer);
+    };
+  }, []);
   const point = (x: number, y: number) => {
     const matrix = svg.current?.getScreenCTM();
     return matrix
@@ -36,14 +64,7 @@ export default function Stage({
       : { x: 0, y: 0 };
   };
   return (
-    <div
-      className="stage"
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={(e) => {
-        e.preventDefault();
-        upload(e.dataTransfer.files);
-      }}
-    >
+    <div className="stage">
       <div className="stage-caption">
         <span className="status-dot" /> SIDE VIEW{" "}
         <span className="muted">/</span> 2D WORKSPACE
@@ -55,6 +76,7 @@ export default function Stage({
         role="img"
         aria-label="カスタム外観の編集キャンバス"
         onPointerDown={(e) => {
+          wheelHandler.current(1, true);
           if (e.target === e.currentTarget) select(null);
         }}
         onPointerMove={(e) => {
@@ -111,8 +133,13 @@ export default function Stage({
                 className={l.locked ? "locked-object" : "canvas-object"}
                 onPointerDown={(e) => {
                   e.stopPropagation();
+                  wheelHandler.current(1, true);
                   select(l.id);
-                  if (l.locked || compare) return;
+                  if (l.locked) {
+                    locked();
+                    return;
+                  }
+                  if (compare) return;
                   const p = point(e.clientX, e.clientY);
                   drag.current = { id: l.id, x: l.x, y: l.y, sx: p.x, sy: p.y };
                   svg.current?.setPointerCapture(e.pointerId);
@@ -182,7 +209,7 @@ export default function Stage({
       </svg>
       <div className="stage-foot">
         <span>
-          {compare ? "本体のみを表示中" : "ドラッグで移動 · 矢印キーで微調整"}
+          {compare ? "本体のみを表示中" : "ドラッグで移動 · ホイールで拡大縮小"}
         </span>
         <span>外観プレビュー</span>
       </div>
