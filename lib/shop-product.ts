@@ -10,6 +10,7 @@ export type ShopProduct = {
   name: string;
   site: string;
   images: string[];
+  imageDetails?: { url: string; width: number; height: number }[];
   dimensions: ShopDimension[];
   referenceMm?: number;
   linkOnly?: boolean;
@@ -149,6 +150,26 @@ export function extractShopProduct(html: string, source: string): ShopProduct {
   }
   if (url.hostname === "www.tokyo-marui.co.jp")
     productPhotos(html).forEach(addImage);
+  // Rakuten's share image can be only 300px. Its Product microdata lists the
+  // actual item gallery; never scrape header banners or recommendations.
+  if (url.hostname === "item.rakuten.co.jp") {
+    for (const m of html.matchAll(/<meta\b[^>]*>/gi)) {
+      const a = attrs(m[0]);
+      if (a.itemprop === "image") addImage(a.content);
+    }
+    const stem = (src: string) => {
+      try {
+        return new URL(src, url).pathname.replace(/[-_]\d+(?=\.[^.]+$)/, "");
+      } catch {
+        return "";
+      }
+    };
+    const itemStems = new Set(images.map(stem));
+    for (const m of html.matchAll(/<img\b[^>]*>/gi)) {
+      const a = attrs(m[0]);
+      if (a.src && itemStems.has(stem(a.src))) addImage(a.src);
+    }
+  }
   const color = html.match(/["']colorImages["']\s*:\s*/);
   if (color) {
     const data = jsonValue(html, color.index! + color[0].length);
@@ -177,6 +198,45 @@ export function extractShopProduct(html: string, source: string): ShopProduct {
     for (const key of ["og:image:secure_url", "og:image", "twitter:image"])
       for (const image of meta.get(key) || []) addImage(image);
   }
+  // Use explicit zoom/srcset versions of an already identified product photo.
+  // Only URLs published by the shop are eligible; do not fabricate size URLs.
+  const identity = (src: string) => {
+    try {
+      const u = new URL(src, url);
+      return (
+        u.hostname +
+        u.pathname.replace(/_(?:\d+x\d*|x\d+)(?:@2x)?(?=\.[^.]+$)/, "")
+      );
+    } catch {
+      return "";
+    }
+  };
+  const knownPhotos = new Set(images.map(identity));
+  const originalImages = [...images];
+  images.length = 0;
+  for (const m of html.matchAll(/<img\b[^>]*>/gi)) {
+    const a = attrs(m[0]);
+    if (
+      ![a.src, a["data-src"]].some(
+        (src) => src && knownPhotos.has(identity(src)),
+      )
+    )
+      continue;
+    for (const key of [
+      "data-zoom-image",
+      "data-large-image",
+      "data-original",
+      "data-src",
+    ])
+      addImage(a[key]);
+    const candidates = (a["data-srcset"] || a.srcset || "")
+      .split(",")
+      .map((s) => s.trim().match(/^(\S+)\s+(\d+(?:\.\d+)?)[wx]$/))
+      .filter(Boolean)
+      .sort((a, b) => Number(b![2]) - Number(a![2]));
+    if (candidates[0]) addImage(candidates[0][1]);
+  }
+  originalImages.forEach(addImage);
   const amazonName = html.match(
     /<[^>]+\bid=["']productTitle["'][^>]*>([\s\S]*?)<\//i,
   )?.[1];

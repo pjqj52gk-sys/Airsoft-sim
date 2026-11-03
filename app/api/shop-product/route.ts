@@ -2,6 +2,7 @@ import { readShopFile, decodeShopHtml, ShopReadError } from "@/lib/shop-fetch";
 import { extractShopProduct } from "@/lib/shop-product";
 import { amazonStore } from "@/lib/commerce";
 import { shopUrl } from "@/lib/shop-url";
+import { rankShopImages } from "@/lib/shop-image-quality";
 export const runtime = "nodejs";
 export const maxDuration = 30;
 export async function POST(request: Request) {
@@ -28,9 +29,14 @@ export async function POST(request: Request) {
     if (amazonStore(source.href)) return amazon(source.href);
     const file = await readShopFile(data.url, "page");
     if (amazonStore(file.url)) return amazon(file.url);
-    return Response.json(extractShopProduct(decodeShopHtml(file), file.url), {
-      headers: { "Cache-Control": "no-store" },
-    });
+    const product = extractShopProduct(decodeShopHtml(file), file.url);
+    const images = await rankShopImages(product.images);
+    return Response.json(
+      { ...product, ...images },
+      {
+        headers: { "Cache-Control": "no-store" },
+      },
+    );
   } catch (e) {
     console.error(
       "[shop-product]",

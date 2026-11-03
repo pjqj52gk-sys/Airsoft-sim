@@ -25,6 +25,7 @@ export default function ShopImport({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [resolution, setResolution] = useState("");
+  const [lowResolution, setLowResolution] = useState(false);
   const files = useRef<HTMLInputElement>(null);
   const loading = (value: boolean) => {
     setBusy(value);
@@ -260,11 +261,17 @@ export default function ShopImport({
               src={product.images[photo]}
               referrerPolicy="no-referrer"
               alt="選択したショップの商品写真"
-              onLoad={(e) =>
+              onLoad={(e) => {
+                setLowResolution(
+                  Math.max(
+                    e.currentTarget.naturalWidth,
+                    e.currentTarget.naturalHeight,
+                  ) < 600,
+                );
                 setResolution(
                   `${e.currentTarget.naturalWidth} × ${e.currentTarget.naturalHeight} px`,
-                )
-              }
+                );
+              }}
               onError={() => setResolution("画像を表示できません")}
             />
           </div>
@@ -278,6 +285,11 @@ export default function ShopImport({
               この写真を追加
             </button>
           </div>
+          {lowResolution && (
+            <p className="hint">
+              小さい画像です。別の写真や画像URLから追加できます。
+            </p>
+          )}
           <p className="hint">
             編集・公開には利用許諾のある写真を使ってください。
           </p>
@@ -303,6 +315,12 @@ export default function ShopImport({
                   alt={`商品写真 ${i + 1}`}
                   loading="lazy"
                 />
+                {product.imageDetails?.find((d) => d.url === src) && (
+                  <small>
+                    {product.imageDetails.find((d) => d.url === src)!.width} ×{" "}
+                    {product.imageDetails.find((d) => d.url === src)!.height}
+                  </small>
+                )}
               </button>
             ))}
           </div>

@@ -52,6 +52,10 @@ export default function RakutenSearch({
   const [imageBusy, setImageBusy] = useState(false);
   const [notice, setNotice] = useState("");
   const [resolution, setResolution] = useState("");
+  const [imageDetails, setImageDetails] = useState<
+    NonNullable<ShopProduct["imageDetails"]>
+  >([]);
+  const [lowResolution, setLowResolution] = useState(false);
   const [referenceMm, setReferenceMm] = useState<number | undefined>();
   const controller = useRef<AbortController | null>(null);
   useEffect(() => () => controller.current?.abort(), []);
@@ -85,6 +89,8 @@ export default function RakutenSearch({
     setImages(item.images?.length ? item.images : [item.image]);
     setPhoto(0);
     setResolution("");
+    setImageDetails([]);
+    setLowResolution(false);
     setReferenceMm(
       combinedReferenceLength(
         officialDimensions,
@@ -117,7 +123,12 @@ export default function RakutenSearch({
       const product: ShopProduct = await response.json();
       if (!product.images.length) throw new Error();
       setImages(product.images);
-      setNotice("商品ページの写真");
+      setImageDetails(product.imageDetails || []);
+      setNotice(
+        product.imageDetails?.length
+          ? "商品ページの写真（大きい順）"
+          : "商品ページの写真",
+      );
       setResolution("");
       const allRetail = [...retailDimensions, ...product.dimensions];
       setDimensions(mergeDimensions(officialDimensions, allRetail));
@@ -316,11 +327,17 @@ export default function RakutenSearch({
               key={images[photo]}
               src={images[photo]}
               alt={`${selected.name}の選択中の写真`}
-              onLoad={(e) =>
+              onLoad={(e) => {
+                setLowResolution(
+                  Math.max(
+                    e.currentTarget.naturalWidth,
+                    e.currentTarget.naturalHeight,
+                  ) < 600,
+                );
                 setResolution(
                   `${e.currentTarget.naturalWidth} × ${e.currentTarget.naturalHeight} px`,
-                )
-              }
+                );
+              }}
               onError={() => {
                 setResolution("プレビューを読み込めません");
                 if (photoSource === "official")
@@ -334,6 +351,11 @@ export default function RakutenSearch({
             {notice}
             {resolution && ` · ${resolution}`}
           </p>
+          {lowResolution && (
+            <p className="hint">
+              小さい画像です。別の写真を選ぶと鮮明になる場合があります。
+            </p>
+          )}
           {images.length > 1 && (
             <div className="shop-photo-list">
               {images.map((image, index) => (
@@ -350,6 +372,12 @@ export default function RakutenSearch({
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={image} alt={`写真 ${index + 1}`} />
+                  {imageDetails.find((d) => d.url === image) && (
+                    <small>
+                      {imageDetails.find((d) => d.url === image)!.width} ×{" "}
+                      {imageDetails.find((d) => d.url === image)!.height}
+                    </small>
+                  )}
                 </button>
               ))}
             </div>
