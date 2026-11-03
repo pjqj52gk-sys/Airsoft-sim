@@ -5,7 +5,11 @@ import { readImage, uid, type Layer } from "@/lib/project";
 import type { ShopProduct } from "@/lib/shop-product";
 import CategoryBrowser from "./category-browser";
 import catalogData from "@/lib/parts-catalog.json";
-import { matchCatalog, type CatalogProduct } from "@/lib/catalog-match";
+import {
+  matchCatalog,
+  strongestCatalogMatch,
+  type CatalogProduct,
+} from "@/lib/catalog-match";
 import { catalogImageUrl } from "@/lib/catalog-image";
 import {
   mergeDimensions,
@@ -118,7 +122,6 @@ export default function RakutenSearch({
       );
       setPhotoSource("official");
       setNotice("公式カタログの写真");
-      return;
     }
     if (!item.productUrl) return;
     loadingImage(true);
@@ -134,7 +137,8 @@ export default function RakutenSearch({
       if (!response.ok) throw new Error();
       const product: ShopProduct = await response.json();
       const pageMatch = product.officialMatch;
-      const chosenOfficial = official || pageMatch?.product;
+      const chosenMatch = strongestCatalogMatch(matched, pageMatch || null);
+      const chosenOfficial = chosenMatch?.product;
       const chosenDimensions = (chosenOfficial?.dimensions || []).map((d) => ({
         ...d,
         kind: "product" as const,
@@ -157,7 +161,7 @@ export default function RakutenSearch({
       );
       if (chosenOfficial) {
         setSelectedOfficial(chosenOfficial);
-        setMatchMethod(matched?.method || pageMatch?.method || "name");
+        setMatchMethod(chosenMatch?.method || "name");
         setSelectedLayerCategory(chosenOfficial.category);
         if (preferOfficial && chosenOfficial.images.length) {
           setImages(
@@ -169,6 +173,9 @@ export default function RakutenSearch({
           setNotice("公式カタログの写真");
           return;
         }
+      } else {
+        setSelectedOfficial(null);
+        setPhotoSource("shop");
       }
       if (!product.images.length) throw new Error();
       setImages(product.images);
@@ -182,7 +189,9 @@ export default function RakutenSearch({
     } catch {
       if (!current.signal.aborted)
         setNotice(
-          "商品ページの写真は取得できません。検索画像（小）を選べます。",
+          preferOfficial && official?.images.length
+            ? "公式カタログの写真（販売店の追加情報は未取得）"
+            : "商品ページの写真は取得できません。検索画像（小）を選べます。",
         );
     } finally {
       if (!current.signal.aborted) loadingImage(false);

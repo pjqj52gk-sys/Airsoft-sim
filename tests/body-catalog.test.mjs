@@ -9,11 +9,12 @@ const catalog = JSON.parse(
 test("SOPMOD M4 translated and reordered retailer names match the same official body without matching URG-I or accessories", () => {
   for (const title of [
     "【楽天市場】東京マルイ Colt M4 SOPMOD｜No.03（次世代電動ガン）：HBLT",
-    "東京マルイ SOPMOD M4",
-    "東京マルイ ソップモッドM4",
+    "東京マルイ SOPMOD M4 次世代電動ガン",
+    "東京マルイ ソップモッドM4 次世代電動ガン",
   ])
     assert.equal(matchCatalog(title, catalog)?.product.id, "marui-body-201");
   assert.equal(matchCatalog("東京マルイ M4 SOPMOD用マガジン", catalog), null);
+  assert.equal(matchCatalog("東京マルイ SOPMOD M4", catalog), null); // BOYs and next-generation have different dimensions.
   assert.notEqual(
     matchCatalog("東京マルイ URG-I SOPMOD M4 ブロック3", catalog)?.product.id,
     "marui-body-201",

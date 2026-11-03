@@ -1,3 +1,4 @@
+import { primaryProductMetadata } from "./product-metadata.ts";
 export type ProductDimension = {
   label: string;
   value: string;
@@ -22,11 +23,17 @@ export function productText(input: string) {
     .replace(/&amp;/gi, "&")
     .replace(/&quot;/gi, '"')
     .replace(/&#39;/g, "'")
+    .replace(/&#(x[0-9a-f]+|\d+);/gi, (_, n) => {
+      const code =
+        n[0].toLowerCase() === "x" ? parseInt(n.slice(1), 16) : Number(n);
+      return code <= 0x10ffff ? String.fromCodePoint(code) : "";
+    })
     .normalize("NFKC");
 }
 export function productIdentifiers(
   title: string,
   description = "",
+  source = "",
 ): ProductIdentifiers {
   const text = productText(description),
     name = productText(title);
@@ -45,9 +52,44 @@ export function productIdentifiers(
       /(?:メーカー\s*)?(?:型番|品番|MPN)\s*[:：]?\s*([A-Z0-9][A-Z0-9._\/-]{2,39})/gi,
     ),
   ].map((m) => m[1].toUpperCase());
+  const primary = primaryProductMetadata(description, source);
+  const structuredCodes: string[] = [],
+    structuredModels: string[] = [];
+  if (primary) {
+    for (const key of ["gtin13", "gtin", "ean"]) {
+      const code = String(primary[key] || "").normalize("NFKC");
+      if (validJan(code)) structuredCodes.push(code);
+    }
+    if (
+      typeof primary.mpn === "string" &&
+      /^[A-Z0-9][A-Z0-9._/\s-]{2,39}$/i.test(primary.mpn)
+    )
+      structuredModels.push(primary.mpn.normalize("NFKC").toUpperCase().trim());
+  }
+  // Rakuten exposes the current item's JAN in Product microdata even when its
+  // description has no JAN label. A merchant SKU/itemCode is not a JAN or MPN.
+  for (const m of description.matchAll(/<meta\b[^>]*>/gi)) {
+    const attributes = Object.fromEntries(
+      [...m[0].matchAll(/([\w:-]+)\s*=\s*(["'])(.*?)\2/g)].map((a) => [
+        a[1].toLowerCase(),
+        a[3],
+      ]),
+    );
+    if (
+      /^(?:gtin13|gtin|ean)$/i.test(attributes.itemprop || "") &&
+      validJan(attributes.content || "")
+    )
+      codes.push(attributes.content);
+  }
   return {
-    janCodes: [...new Set(codes.filter(validJan))].slice(0, 12),
-    modelNumbers: [...new Set(models)].slice(0, 12),
+    janCodes: [
+      ...new Set(
+        structuredCodes.length ? structuredCodes : codes.filter(validJan),
+      ),
+    ].slice(0, 12),
+    modelNumbers: [
+      ...new Set(structuredModels.length ? structuredModels : models),
+    ].slice(0, 12),
   };
 }
 export function productDimensions(description: string): ProductDimension[] {
@@ -71,7 +113,7 @@ export function productDimensions(description: string): ProductDimension[] {
     )
       section = "product";
     const regex =
-      /(本体|商品|製品|梱包|パッケージ|外箱)?\s*(全長|全幅|全高|直径|外径|長さ|高さ|幅|寸法|サイズ)(?:\([^)]{1,15}\))?\s*[:：]?\s*(?:約\s*)?((?:\d+(?:\.\d+)?\s*[x×*]\s*)*\d+(?:\.\d+)?\s*(?:mm|cm|ミリ|センチ))/gi;
+      /(本体|商品|製品|梱包|パッケージ|外箱)?\s*(全長|全幅|全高|直径|外径|長さ|高さ|幅|奥行き?|寸法|サイズ)(?:\([^)]{1,15}\))?\s*[:：]?\s*(?:約\s*)?((?:\d+(?:\.\d+)?\s*[x×*]\s*)*\d+(?:\.\d+)?(?:\s*[/~〜～-]\s*\d+(?:\.\d+)?)?\s*(?:mm|cm|ミリ|センチ))/gi;
     for (const match of line.matchAll(regex)) {
       const prefix = line.slice(Math.max(0, match.index! - 25), match.index);
       let kind: ProductDimension["kind"] = /梱包|パッケージ|外箱/.test(
@@ -94,6 +136,7 @@ export function productDimensions(description: string): ProductDimension[] {
         /^\s*(?:~|〜|～|\/|から|-)\s*\d+(?:\.\d+)?\s*(?:mm|cm|ミリ|センチ)(?:\s*\([^)]{0,40}\))?/i,
       );
       if (range) value += range[0];
+      else value += after.match(/^\s*\([^)]{1,40}\)/)?.[0] || "";
       const label = (match[1] || "") + match[2];
       if (
         !dimensions.some(
@@ -103,8 +146,52 @@ export function productDimensions(description: string): ProductDimension[] {
       )
         dimensions.push({ label, value, kind });
     }
+    // Explicit axes are usable. Unlabelled triples (e.g. 46×27×27) stay whole,
+    // because their width/height/length order is not universally defined.
+    for (const axis of explicitAxisDimensions(line)) {
+      const kind = section;
+      if (
+        !dimensions.some(
+          (d) =>
+            d.label === axis.label && d.value === axis.value && d.kind === kind,
+        ) &&
+        dimensions.length < 16
+      )
+        dimensions.push({ ...axis, kind });
+    }
   }
   return dimensions;
+}
+function explicitAxisDimensions(
+  value: string,
+): { label: string; value: string }[] {
+  const plain = value.normalize("NFKC");
+  if (!/[×x*]/i.test(plain)) return [];
+  const axes = [
+    ...plain.matchAll(
+      /(?:^|[\s(×x*,:：])(?:(幅|横|高さ|縦|奥行き?|長さ|W|H|D|L))\s*[):：]?\s*(\d+(?:\.\d+)?)\s*(mm|cm|ミリ|センチ)?/gi,
+    ),
+  ];
+  if (axes.length < 2 || axes.length > 3) return [];
+  const sharedUnit = axes.at(-1)?.[3];
+  if (!sharedUnit) return [];
+  const labels: Record<string, string> = {
+    W: "幅",
+    横: "幅",
+    幅: "幅",
+    H: "高さ",
+    縦: "高さ",
+    高さ: "高さ",
+    D: "奥行き",
+    奥行: "奥行き",
+    奥行き: "奥行き",
+    L: "長さ",
+    長さ: "長さ",
+  };
+  return axes.map((m) => ({
+    label: labels[m[1].toUpperCase()],
+    value: `${m[2]}${m[3] || sharedUnit}`,
+  }));
 }
 export function referenceLengthMm(dimensions: ProductDimension[]) {
   const lengths = dimensions
@@ -154,15 +241,27 @@ export function referenceLengthOptions(
   published?: number | null,
 ): ReferenceLengthOption[] {
   const options: ReferenceLengthOption[] = [];
-  const dimensions = mergeDimensions(official, retail).sort(
-    (a, b) =>
-      Number(/全長|overall length/i.test(b.label)) -
-      Number(/全長|overall length/i.test(a.label)),
-  );
+  const dimensions = mergeDimensions(official, retail)
+    .flatMap((d) =>
+      /サイズ|寸法|dimensions|size/i.test(d.label)
+        ? [
+            d,
+            ...explicitAxisDimensions(d.value).map((axis) => ({
+              ...d,
+              ...axis,
+            })),
+          ]
+        : [d],
+    )
+    .sort(
+      (a, b) =>
+        Number(/全長|overall length/i.test(b.label)) -
+        Number(/全長|overall length/i.test(a.label)),
+    );
   for (const d of dimensions) {
     if (
       d.kind !== "product" ||
-      !/^(?:(?:本体|商品|製品)?(?:全長|全幅|全高|長さ|幅|高さ|直径|外径)|対物レンズ径|チューブ径|length|overall length|width|height)$/i.test(
+      !/^(?:(?:本体|商品|製品)?(?:全長|全幅|全高|長さ|幅|高さ|奥行き?|直径|外径)|対物レンズ径|対物レンズ外径|チューブ径|length|overall length|width|height|depth)$/i.test(
         d.label,
       )
     )
@@ -197,12 +296,22 @@ export function referenceLengthOptions(
     options.unshift({ mm: published, label: `公式 · 全長 ${published} mm` });
   return options.slice(0, 16);
 }
-const dimensionKey = (s: string) =>
-  s.replace(/^(本体|製品|商品)/, "").replace(/\s/g, "");
+const dimensionKey = (s: string) => {
+  const key = s
+    .normalize("NFKC")
+    .replace(/^(本体|製品|商品)/, "")
+    .replace(/\s/g, "")
+    .toLowerCase();
+  return /^(?:全長|長さ|length|overalllength)$/.test(key) ? "全長" : key;
+};
 const dimensionValue = (s: string) =>
   s
+    .normalize("NFKC")
     .replace(/\s/g, "")
-    .replace(/(\d+(?:\.\d+)?)cm/gi, (_, n) => `${Number(n) * 10}mm`);
+    .replace(/センチ/gi, "cm")
+    .replace(/ミリ/gi, "mm")
+    .replace(/(\d+(?:\.\d+)?)cm/gi, (_, n) => `${Number(n) * 10}mm`)
+    .replace(/\d+(?:\.\d+)?/g, (n) => String(Number(n)));
 export function mergeDimensions(
   official: ProductDimension[],
   retail: ProductDimension[],
@@ -240,7 +349,7 @@ export function combinedReferenceLength(
 ) {
   if (
     mergeDimensions(official, retail).some(
-      (d) => d.conflict && /全長$/.test(d.label),
+      (d) => d.conflict && dimensionKey(d.label) === "全長",
     )
   )
     return undefined;

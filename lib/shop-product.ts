@@ -1,5 +1,6 @@
 import { shopUrl } from "./shop-url.ts";
 import { productPhotos } from "./catalog-photos.mjs";
+import { primaryProductMetadata } from "./product-metadata.ts";
 import type { CatalogProduct } from "./catalog-match.ts";
 import {
   productDimensions,
@@ -99,41 +100,7 @@ export function extractShopProduct(html: string, source: string): ShopProduct {
       key = (a.property || a.name || "").toLowerCase();
     if (a.content) meta.set(key, [...(meta.get(key) || []), a.content]);
   }
-  let product: any = null,
-    visited = 0;
-  function walk(value: any, depth = 0) {
-    if (
-      product ||
-      !value ||
-      typeof value !== "object" ||
-      depth > 10 ||
-      visited++ > 3000
-    )
-      return;
-    if (
-      [value["@type"]]
-        .flat()
-        .some(
-          (type) => typeof type === "string" && /(?:^|[/#])Product$/.test(type),
-        )
-    ) {
-      product = value;
-      return;
-    }
-    for (const next of Array.isArray(value) ? value : Object.values(value))
-      walk(next, depth + 1);
-  }
-  for (const match of html.matchAll(
-    /<script\b([^>]*)>([\s\S]*?)<\/script>/gi,
-  )) {
-    if (!/application\/ld\+json/i.test(match[1]) || match[2].length > 800000)
-      continue;
-    try {
-      walk(JSON.parse(match[2].trim()));
-    } catch {
-      /* Ignore scripts that are not valid JSON-LD. */
-    }
-  }
+  const product = primaryProductMetadata(html, source);
   const images: string[] = [];
   function addImage(value: any) {
     if (Array.isArray(value)) {
@@ -315,7 +282,9 @@ export function extractShopProduct(html: string, source: string): ShopProduct {
     );
     if (m) addDimension(m[1], m[2]);
   }
-  for (const d of productDimensions(html)) {
+  for (const d of productDimensions(
+    `${typeof product?.description === "string" ? product.description : ""}\n${html}`,
+  )) {
     if (
       !dimensions.some(
         (x) =>
@@ -333,7 +302,7 @@ export function extractShopProduct(html: string, source: string): ShopProduct {
     name,
     site: url.hostname,
     images,
-    identifiers: productIdentifiers(name, html),
+    identifiers: productIdentifiers(name, html, source),
     dimensions,
     referenceMm:
       reference && reference > 0 && reference <= 5000 ? reference : undefined,
