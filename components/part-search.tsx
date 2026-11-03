@@ -22,6 +22,7 @@ export default function PartSearch({
 }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
+  const [manufacturer, setManufacturer] = useState("");
   const [source, setSource] = useState("rakuten");
   const [dimensionOnly, setDimensionOnly] = useState(false);
   const [saved, setSaved] = useState<StoredPart[]>([]);
@@ -46,6 +47,7 @@ export default function PartSearch({
   const results = catalog.filter(
     (p) =>
       (!category || p.category === category) &&
+      (!manufacturer || p.manufacturer === manufacturer) &&
       (!dimensionOnly || p.dimensions.length > 0) &&
       matchesPart(query, [
         p.name,
@@ -170,6 +172,22 @@ export default function PartSearch({
       ) : (
         <>
           <div className="part-search-controls">
+            {source === "catalog" && (
+              <select
+                aria-label="メーカーで絞り込み"
+                value={manufacturer}
+                onChange={(e) => setManufacturer(e.target.value)}
+              >
+                <option value="">すべてのメーカー</option>
+                {[...new Set(catalog.map((p) => p.manufacturer))].map(
+                  (name) => (
+                    <option key={name} value={name}>
+                      {name}
+                    </option>
+                  ),
+                )}
+              </select>
+            )}
             <input
               type="search"
               aria-label="パーツ名で検索"
@@ -182,13 +200,19 @@ export default function PartSearch({
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
-              {["", "光学機器", "グリップ", "ストック", "外装", "その他"].map(
-                (c) => (
-                  <option key={c} value={c}>
-                    {c || "すべて"}
-                  </option>
-                ),
-              )}
+              {[
+                "",
+                "本体",
+                "光学機器",
+                "グリップ",
+                "ストック",
+                "外装",
+                "その他",
+              ].map((c) => (
+                <option key={c} value={c}>
+                  {c || "すべて"}
+                </option>
+              ))}
             </select>
             {source === "catalog" && (
               <label>
@@ -295,8 +319,8 @@ export default function PartSearch({
                     <h3>{p.name}</h3>
                     <dl className="part-dimensions">
                       {p.dimensions.length ? (
-                        p.dimensions.map((d) => (
-                          <div key={d.label}>
+                        p.dimensions.map((d, i) => (
+                          <div key={`${d.label}-${i}`}>
                             <dt>{d.label}</dt>
                             <dd>{d.value}</dd>
                           </div>
@@ -368,7 +392,10 @@ export default function PartSearch({
           )}
           {source === "catalog" && (
             <div className="search-footer">
-              <span>東京マルイ {catalog.length}件 · 2026/11/02確認</span>
+              <span>
+                公式カタログ {catalog.length}件 ·{" "}
+                {new Set(catalog.map((p) => p.manufacturer)).size}メーカー
+              </span>
               <div>
                 <a
                   href={`https://www.google.com/search?tbm=isch&q=${encodeURIComponent(`${query || "エアガン パーツ"} 商品画像`)}`}

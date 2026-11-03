@@ -82,9 +82,11 @@ for (const path of [...paths].sort()) {
 }
 if (data.length < 20)
   throw new Error("Catalog unexpectedly small; existing file was not changed.");
+const file=new URL("../lib/parts-catalog.json",import.meta.url);
+const otherManufacturers=JSON.parse(await fs.readFile(file,"utf8")).filter(p=>p.manufacturer!=="東京マルイ");
 await fs.writeFile(
   new URL("../lib/parts-catalog.json", import.meta.url),
-  JSON.stringify(data, null, 2) + "\n",
+  JSON.stringify([...data,...otherManufacturers], null, 2) + "\n",
 );
 console.log(
   `Updated ${data.length} products (${data.filter((p) => p.dimensions.length).length} with published dimensions).`,

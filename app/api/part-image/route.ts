@@ -11,16 +11,25 @@ export async function GET(request: Request) {
     return Response.json({ error: "画像が見つかりません。" }, { status: 404 });
   const url = new URL(item.images[index]);
   const revision = params.get("v");
-  if (revision && revision !== url.pathname.split("/").pop())
+  if (revision && revision !== `${url.pathname.split("/").pop()}${url.search}`)
     return Response.json(
       { error: "写真が更新されました。画面を再読み込みしてください。" },
       { status: 409 },
     );
-  if (
-    url.protocol !== "https:" ||
-    url.hostname !== "www.tokyo-marui.co.jp" ||
-    !url.pathname.startsWith("/appimg/option/")
-  )
+  const manufacturerImage =
+    (item.manufacturer === "東京マルイ" &&
+      url.hostname === "www.tokyo-marui.co.jp" &&
+      url.pathname.startsWith("/appimg/option/")) ||
+    (item.manufacturer === "LAYLAX" &&
+      url.hostname === "cdn.shopify.com" &&
+      url.pathname.startsWith("/s/files/1/0843/1095/0186/")) ||
+    (item.manufacturer === "NOVEL ARMS" &&
+      url.hostname === "novelarms.co.jp" &&
+      url.pathname.startsWith("/wp-content/uploads/")) ||
+    (item.manufacturer === "Vector Optics" &&
+      url.hostname === "www.vectoroptics.jp" &&
+      url.pathname.startsWith("/wp-content/uploads/"));
+  if (url.protocol !== "https:" || !manufacturerImage)
     return Response.json({ error: "画像を取得できません。" }, { status: 400 });
   try {
     const response = await fetch(url, {

@@ -701,5 +701,3254 @@
     ],
     "lengthMm": 227,
     "checkedAt": "2026-11-02"
+  },
+  {
+    "name": "ABSOLUTE EC",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2022/10/IMG_9286_2.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/10/IMG_9302_2.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/10/IMG_9313.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/10/IMG_9316.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/10/IMG_9325.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/10/IMG_9339_2.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2026/08/absolute_ec012.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2026/08/absolute_ec013.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2026/08/absolute_ec014.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "20.00 mmx18.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "46.00 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-absolute-ec",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2022/10/IMG_9286_2.jpg",
+    "url": "https://novelarms.co.jp/products/absolute-ec/",
+    "lengthMm": 46,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "ABSOLUTE PRO X",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2026/03/１.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/10/19.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2026/03/３.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/reticle09.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "29.00 mm×25.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "58.50 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-absolute-pro-x",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2026/03/１.jpg",
+    "url": "https://novelarms.co.jp/products/absolute-pro-x/",
+    "lengthMm": 58.5,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "ABSOLUTE PRO",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2022/10/absolutePro800G20230602.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/10/absoluteProBlackLogo20230602.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/10/absolutePro002.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/reticle09.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "28.00 mm×22.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "53.00 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-absolute-pro",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2022/10/absolutePro800G20230602.jpg",
+    "url": "https://novelarms.co.jp/products/absolute-pro/",
+    "lengthMm": 53,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "SURE HIT ARP2",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2023/09/sureHitAPR2_001.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2023/09/sureHitAPR2_002.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2023/09/sureHitAPR2_003.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/sureHitAPR2_009.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2023/09/sureHitAPR2_004.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/sureHitAPR2_006.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/sureHitAPR2_007.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/sureHitAPR2_008.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/reticle09-1.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "20.50 mm×16.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "47.00 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-sure-hit-arp2",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2023/09/sureHitAPR2_001.jpg",
+    "url": "https://novelarms.co.jp/products/sure-hit-arp2/",
+    "lengthMm": 47,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "SURE HIT ARS",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2021/07/surehitARS001.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2021/07/surehitARS002.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2021/07/surehitARS003.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2021/07/surehitARS004.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2021/07/surehitARS005.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/reticle09-1.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "24.50 mm"
+      },
+      {
+        "label": "全長",
+        "value": "70.00 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-sure-hit-ars",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2021/07/surehitARS001.jpg",
+    "url": "https://novelarms.co.jp/products/sure-hit-ars/",
+    "lengthMm": 70,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "SURE HIT MRS2 1M.O.A.",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/22082601_1MOA.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/08/22082602-1.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/reticle09.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "24.00 mm×17.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "47.50 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-sure-hit-mrs2-1m-o-a",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2020/03/22082601_1MOA.jpg",
+    "url": "https://novelarms.co.jp/products/sure-hit-mrs2-1m-o-a/",
+    "lengthMm": 47.5,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "SURE HIT MRS2 3M.O.A.",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2022/08/22082601.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/08/22082602-1.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/reticle09.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "24.00 mm×17.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "47.50 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-sure-hit-mrs2-3m-o-a",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2022/08/22082601.jpg",
+    "url": "https://novelarms.co.jp/products/sure-hit-mrs2-3m-o-a/",
+    "lengthMm": 47.5,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "SURE HIT ARP2用フリップオープンキャップ",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2025/07/SURE_HIT_ARP2_flipOpenCap.jpg"
+    ],
+    "dimensions": [],
+    "modelNumbers": [],
+    "id": "novel-sure-hit-arp2%e7%94%a8%e3%83%95%e3%83%aa%e3%83%83%e3%83%97%e3%82%aa%e3%83%bc%e3%83%97%e3%83%b3%e3%82%ad%e3%83%a3%e3%83%83%e3%83%97",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2025/07/SURE_HIT_ARP2_flipOpenCap.jpg",
+    "url": "https://novelarms.co.jp/products/sure-hit-arp2%e7%94%a8%e3%83%95%e3%83%aa%e3%83%83%e3%83%97%e3%82%aa%e3%83%bc%e3%83%97%e3%83%b3%e3%82%ad%e3%83%a3%e3%83%83%e3%83%97/",
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "SURE HIT M4s用レンズガード",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/shM4s08.jpg"
+    ],
+    "dimensions": [],
+    "modelNumbers": [],
+    "id": "novel-sure-hit-m4s%e7%94%a8%e3%83%ac%e3%83%b3%e3%82%ba%e3%82%ac%e3%83%bc%e3%83%89",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2020/03/shM4s08.jpg",
+    "url": "https://novelarms.co.jp/products/sure-hit-m4s%e7%94%a8%e3%83%ac%e3%83%b3%e3%82%ba%e3%82%ac%e3%83%bc%e3%83%89/",
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "SURE HIT M4s用キルフラッシュ",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/shM4s07.jpg"
+    ],
+    "dimensions": [],
+    "modelNumbers": [],
+    "id": "novel-sure-hit-m4s%e7%94%a8%e3%82%ad%e3%83%ab%e3%83%95%e3%83%a9%e3%83%83%e3%82%b7%e3%83%a5",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2020/03/shM4s07.jpg",
+    "url": "https://novelarms.co.jp/products/sure-hit-m4s%e7%94%a8%e3%82%ad%e3%83%ab%e3%83%95%e3%83%a9%e3%83%83%e3%82%b7%e3%83%a5/",
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "SURE HIT ARS用キルフラッシュ",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2022/07/killFlashSureHitARS.jpg"
+    ],
+    "dimensions": [],
+    "modelNumbers": [],
+    "id": "novel-sure-hit-ars%e7%94%a8%e3%82%ad%e3%83%ab%e3%83%95%e3%83%a9%e3%83%83%e3%82%b7%e3%83%a5",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2022/07/killFlashSureHitARS.jpg",
+    "url": "https://novelarms.co.jp/products/sure-hit-ars%e7%94%a8%e3%82%ad%e3%83%ab%e3%83%95%e3%83%a9%e3%83%83%e3%82%b7%e3%83%a5/",
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "3X TACTICAL MAGNIFIER with Outer Rubber Cover BK",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/3xtacmag_rc_01a2.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/3xtacmag_rc_01b2.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2025/02/2025020303.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "28.00 mm"
+      },
+      {
+        "label": "チューブ径",
+        "value": "30.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "100.00 mm（本体のみ）"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-3x-tactical-magnifier-with-outer-rubber-cover-bk",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2020/03/3xtacmag_rc_01a2.jpg",
+    "url": "https://novelarms.co.jp/products/3x-tactical-magnifier-with-outer-rubber-cover-bk/",
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "3X TACTICAL MAGNIFIER with Outer Rubber Cover TAN",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2026/04/3xtacmag2026-tan-01b.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2026/04/3xtacmag2026-tan-02b.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "28.00 mm"
+      },
+      {
+        "label": "チューブ径",
+        "value": "30.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "100.00 mm（本体のみ）"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-3x-tactical-magnifier-with-outer-rubber-cover-tan",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2026/04/3xtacmag2026-tan-01b.jpg",
+    "url": "https://novelarms.co.jp/products/3x-tactical-magnifier-with-outer-rubber-cover-tan/",
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Spacer for Magnifier 『4.1mm』",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2022/09/22091601.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "40.00 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-spacer-for-magnifier-%e3%80%8e4-1mm%e3%80%8f",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2022/09/22091601.jpg",
+    "url": "https://novelarms.co.jp/products/spacer-for-magnifier-%e3%80%8e4-1mm%e3%80%8f/",
+    "lengthMm": 40,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "COMBAT T1 EVO",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/t1Evo001.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/t1Evo002.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/t1Evo003.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/t1Evo004.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/t1Evo005.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/t1Evo006.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/t107.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/reticle09-1.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "22.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "68.00 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-combat-t1-evo",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2020/03/t1Evo001.jpg",
+    "url": "https://novelarms.co.jp/products/combat-t1-evo/",
+    "lengthMm": 68,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "COMBAT M68 CCO",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2020/04/m68cco.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/04/m68cco02.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/04/m68cco03.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/04/m68cco04.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/04/m68cco05.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/reticle09-1.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "28.50 mm"
+      },
+      {
+        "label": "全長",
+        "value": "126.00 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-combat-m68-cco",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2020/04/m68cco.jpg",
+    "url": "https://novelarms.co.jp/products/combat-m68-cco/",
+    "lengthMm": 126,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "COMBAT 80 3M.O.A",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/80.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/reticle09-1.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "28.50 mm×24.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "80.00 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-combat-80-3m-o-a",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2020/03/80.jpg",
+    "url": "https://novelarms.co.jp/products/combat-80-3m-o-a/",
+    "lengthMm": 80,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "COMBAT 80 8M.O.A",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/80.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/reticle10-1.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "28.50 mm×24.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "80.00 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-combat-80-8m-o-a",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2020/03/80.jpg",
+    "url": "https://novelarms.co.jp/products/combat-80-8m-o-a/",
+    "lengthMm": 80,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "COMBAT T1用レンズガード",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2020/04/lensGuard.jpg"
+    ],
+    "dimensions": [],
+    "modelNumbers": [],
+    "id": "novel-combat-t1%e7%94%a8%e3%83%ac%e3%83%b3%e3%82%ba%e3%82%ac%e3%83%bc%e3%83%89",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2020/04/lensGuard.jpg",
+    "url": "https://novelarms.co.jp/products/combat-t1%e7%94%a8%e3%83%ac%e3%83%b3%e3%82%ba%e3%82%ac%e3%83%bc%e3%83%89/",
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "COMBAT T1用キルフラッシュ",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2020/04/killFlash.jpg"
+    ],
+    "dimensions": [],
+    "modelNumbers": [],
+    "id": "novel-combat-t1%e7%94%a8%e3%82%ad%e3%83%ab%e3%83%95%e3%83%a9%e3%83%83%e3%82%b7%e3%83%a5",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2020/04/killFlash.jpg",
+    "url": "https://novelarms.co.jp/products/combat-t1%e7%94%a8%e3%82%ad%e3%83%ab%e3%83%95%e3%83%a9%e3%83%83%e3%82%b7%e3%83%a5/",
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "ABSOLUTE 31042 IR",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2022/10/ABSOLUTE31042IR001.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/10/ABSOLUTE31042IR002.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/10/ABSOLUTE31042IR003.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/10/ABSOLUTE31042IR004.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/10/ABSOLUTE31042IR005.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/10/ABSOLUTE31042IR006.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/10/ABSOLUTE31042IR007.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "42.00 mm"
+      },
+      {
+        "label": "チューブ径",
+        "value": "30.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "338.00 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-absolute-31042-ir",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2022/10/ABSOLUTE31042IR001.jpg",
+    "url": "https://novelarms.co.jp/products/absolute-31042-ir/",
+    "lengthMm": 338,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "ABSOLUTE 1624 IR CQB Black",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2022/06/ABSOLUTE1624_IR_CQB001.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/06/ABSOLUTE1624_IR_CQB002.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/06/ABSOLUTE1624_IR_CQB003.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/06/ABSOLUTE1624_IR_CQB004.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/06/ABSOLUTE1624_IR_CQB005.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/06/ABSOLUTE1624_IR_CQB006.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "24.00 mm"
+      },
+      {
+        "label": "チューブ径",
+        "value": "30.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "260.00 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-absolute-1624-ir-cqb-black",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2022/06/ABSOLUTE1624_IR_CQB001.jpg",
+    "url": "https://novelarms.co.jp/products/absolute-1624-ir-cqb-black/",
+    "lengthMm": 260,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "ABSOLUTE 1624 IR CQB FDE",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2022/06/ABSOLUTE-1624IR-CQB-FDE-2.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/06/ABSOLUTE1624_IR_CQB002.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/06/ABSOLUTE1624_IR_CQB003.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/06/ABSOLUTE1624_IR_CQB004.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/06/ABSOLUTE1624_IR_CQB005.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2022/06/ABSOLUTE1624_IR_CQB006.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "24.00 mm"
+      },
+      {
+        "label": "チューブ径",
+        "value": "30.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "260.00 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-absolute-1624-ir-cqb-fde",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2022/06/ABSOLUTE-1624IR-CQB-FDE-2.jpg",
+    "url": "https://novelarms.co.jp/products/absolute-1624-ir-cqb-fde/",
+    "lengthMm": 260,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "TAC ONE 12424 IR",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/tacOne12424IR221130001.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/tacOne12424IR221130002.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/tacOne12424IR221130003.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "24.00 mm"
+      },
+      {
+        "label": "チューブ径",
+        "value": "30.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "256.00 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-tac-one-12424-ir",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2020/03/tacOne12424IR221130001.jpg",
+    "url": "https://novelarms.co.jp/products/tac-one-12424-ir/",
+    "lengthMm": 256,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "TAC ONE 12424IR用 ハニカムサンシェード",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2020/03/12424ir02HonyComb-1.jpg"
+    ],
+    "dimensions": [],
+    "modelNumbers": [],
+    "id": "novel-tac-one-12424ir%e7%94%a8%e3%83%8f%e3%83%8b%e3%82%ab%e3%83%a0%e3%82%b5%e3%83%b3%e3%82%b7%e3%82%a7%e3%83%bc%e3%83%89",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2020/03/12424ir02HonyComb-1.jpg",
+    "url": "https://novelarms.co.jp/products/tac-one-12424ir%e7%94%a8%e3%83%8f%e3%83%8b%e3%82%ab%e3%83%a0%e3%82%b5%e3%83%b3%e3%82%b7%e3%82%a7%e3%83%bc%e3%83%89/",
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "SURE HIT MPS3（3X Micro Prism Sight）",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2024/01/mps3-main01-1.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2024/01/mps3-main02-1.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2024/01/mps3-01.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2024/01/RETICLE3.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "20.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "80.00 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-sure-hit-mps3%ef%bc%883x-micro-prism-sight%ef%bc%89",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2024/01/mps3-main01-1.jpg",
+    "url": "https://novelarms.co.jp/products/sure-hit-mps3%ef%bc%883x-micro-prism-sight%ef%bc%89/",
+    "lengthMm": 80,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "SURE HIT MPS1（1X Micro Prism Sight）",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2024/01/mps1-main01-1.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2024/01/mps1-main02-1.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2024/01/mps1-14.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2024/01/RETICLE1.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "20.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "66.00 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-sure-hit-mps1%ef%bc%881x-micro-prism-sight%ef%bc%89",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2024/01/mps1-main01-1.jpg",
+    "url": "https://novelarms.co.jp/products/sure-hit-mps1%ef%bc%881x-micro-prism-sight%ef%bc%89/",
+    "lengthMm": 66,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "ABSOLUTE MPS3（3X Micro Prism Sight）",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2024/01/ABSmps3-main01.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2024/01/ABSmps3-main02.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2024/01/ABSmps3-main03.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2024/01/ABSmps3-main04.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2024/01/spacer.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2024/01/rangeFinder.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "20.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "73.00 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-absolute-mps3%ef%bc%883x-micro-prism-sight%ef%bc%89",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2024/01/ABSmps3-main01.jpg",
+    "url": "https://novelarms.co.jp/products/absolute-mps3%ef%bc%883x-micro-prism-sight%ef%bc%89/",
+    "lengthMm": 73,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "ABSOLUTE MPS1（1X Micro Prism Sight）",
+    "images": [
+      "https://novelarms.co.jp/wp-content/uploads/2025/06/mps1_01.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2025/06/mps1_02.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2025/06/mps1_03-1.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2025/06/mps1_04-1.jpg",
+      "https://novelarms.co.jp/wp-content/uploads/2025/06/mps1_05.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "20.00 mm"
+      },
+      {
+        "label": "全長",
+        "value": "65.50 mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "novel-absolute-mps1%ef%bc%881x-micro-prism-sight%ef%bc%89",
+    "manufacturer": "NOVEL ARMS",
+    "category": "光学機器",
+    "image": "https://novelarms.co.jp/wp-content/uploads/2025/06/mps1_01.jpg",
+    "url": "https://novelarms.co.jp/products/absolute-mps1%ef%bc%881x-micro-prism-sight%ef%bc%89/",
+    "lengthMm": 65.5,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Z5 1X26X28 Red Dot Sight",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL39-1.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL39-2.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL39-3.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL39-4.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL39-5.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL39-6.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL39-7.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL39-8.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL39-9.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL39-10.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL39-11.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL39-12.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "26x28mm"
+      },
+      {
+        "label": "全長",
+        "value": "78mm"
+      }
+    ],
+    "modelNumbers": [
+      "RDSL39"
+    ],
+    "id": "vector-rdsl39",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL39-1.jpg",
+    "url": "https://www.vectoroptics.jp/rdsl39/",
+    "lengthMm": 78,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "T5 1X22 RED DOT SCOPE (RDSL38)",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL38-1.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL38-2.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL38-3.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL38-4.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL38-5.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL38-6.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL38-7.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL38-8.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL38-9.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL38-10.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL38-11.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL38-12.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "22mm"
+      },
+      {
+        "label": "全長",
+        "value": "63mm"
+      }
+    ],
+    "modelNumbers": [
+      "RDSL38"
+    ],
+    "id": "vector-rdsl38-13",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2026/10/RDSL38-1.jpg",
+    "url": "https://www.vectoroptics.jp/rdsl38-13/",
+    "lengthMm": 63,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Frenzy FLEX 1x24x29 GenII 6MOA Red Dot Sight",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCRD-76-01.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCRD-76-02.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCRD-76-03.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCRD-76-04.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCRD-76-05.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCRD-76-06.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCRD-76-07.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCRD-76-08.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCRD-76-09.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCRD-76-010.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCRD-76-011.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCRD-76-012.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "24×29 mm"
+      },
+      {
+        "label": "全長",
+        "value": "52mm"
+      }
+    ],
+    "modelNumbers": [
+      "SCRD-76"
+    ],
+    "id": "vector-scrd-76",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCRD-76-01.jpg",
+    "url": "https://www.vectoroptics.jp/scrd-76/",
+    "lengthMm": 52,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "VictOptics SRD 1x23x33 Four-Reticle Red Dot Sight",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL36-01.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL36-02.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL36-03.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL36-04.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL36-05.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL36-06.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL36-07.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL36-08.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL36-09.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL36-010.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "23×33 mm"
+      }
+    ],
+    "modelNumbers": [
+      "RDSL36"
+    ],
+    "id": "vector-rdsl36",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL36-01.jpg",
+    "url": "https://www.vectoroptics.jp/rdsl36/",
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "VictOptics SRD 1x27x39 Eight-Reticle Red Dot Sight",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL35-01.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL35-02.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL35-03.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL35-04.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL35-05.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL35-06.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL35-07.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL35-08.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL35-09.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "27×39 mm"
+      },
+      {
+        "label": "全長",
+        "value": "109mm"
+      }
+    ],
+    "modelNumbers": [
+      "RDSL35"
+    ],
+    "id": "vector-rdsl35",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2026/01/RDSL35-01.jpg",
+    "url": "https://www.vectoroptics.jp/rdsl35/",
+    "lengthMm": 109,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Maverick Mini Red Dot Scope & 3x Magnifier Kit with Integrated One-Piece Mount",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/11/VOGP-02-1.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/11/VOGP-02-2.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/11/VOGP-02-3.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/11/VOGP-02-4.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/11/VOGP-02-5.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/11/VOGP-02-6.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/11/VOGP-02-7.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/11/VOGP-02-8.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/11/VOGP-02-9.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/11/VOGP-02-10.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/11/VOGP-02-11.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/11/VOGP-02-12.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/11/VOGP-02-13.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/11/VOGP-02-14.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/11/VOGP-02-15.png"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "20mm"
+      },
+      {
+        "label": "全長",
+        "value": "80mm"
+      },
+      {
+        "label": "対物レンズ径",
+        "value": "22mm"
+      },
+      {
+        "label": "全長",
+        "value": "75mm"
+      }
+    ],
+    "modelNumbers": [
+      "VOGP-02"
+    ],
+    "id": "vector-vogp-02",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2025/11/VOGP-02-1.png",
+    "url": "https://www.vectoroptics.jp/vogp-02/",
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Frenzy-S 1x17x20 Red Dot Sight MRT Aspheric Lens EDC",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCRD-M68-1.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCRD-M68-2.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCRD-M68-3.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCRD-M68-4.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCRD-M68-5.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCRD-M68-6.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCRD-M68-7.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCRD-M68-8.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCRD-M68-9.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCRD-M68-10.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCRD-M68-11.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCRD-M68-12.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCRD-M68-13.png"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "17x20mm"
+      },
+      {
+        "label": "全長",
+        "value": "42.26mm"
+      }
+    ],
+    "modelNumbers": [
+      "SCRD-M68"
+    ],
+    "id": "vector-scrd-m68",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCRD-M68-1.png",
+    "url": "https://www.vectoroptics.jp/scrd-m68/",
+    "lengthMm": 42.26,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "VictOptics SRD 1x16x20 Compact Red Dot Sight",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/RDSL32-1.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/RDSL32-2.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/RDSL32-3.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/RDSL32-4.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/RDSL32-5.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/RDSL32-6.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/RDSL32-7.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/RDSL32-8.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/RDSL32-9.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/RDSL32-10.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/RDSL32-11.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "16×20mm"
+      },
+      {
+        "label": "全長",
+        "value": "40.8mm"
+      }
+    ],
+    "modelNumbers": [
+      "RDSL32"
+    ],
+    "id": "vector-rdsl32",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2025/10/RDSL32-1.jpg",
+    "url": "https://www.vectoroptics.jp/rdsl32/",
+    "lengthMm": 40.8,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "VictOptics SRD 1x18x20 VOD Red Dot Sight",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/09/RDSL34-1.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/09/RDSL34-2.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/09/RDSL34-3.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/09/RDSL34-4.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/09/RDSL34-5.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/09/RDSL34-6.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/09/RDSL34-7.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/09/RDSL34-8.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/09/RDSL34-9.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/09/RDSL34-10.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/09/RDSL34-11.png"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "18×20mm"
+      },
+      {
+        "label": "全長",
+        "value": "47mm"
+      }
+    ],
+    "modelNumbers": [
+      "RDSL34"
+    ],
+    "id": "vector-rdsl34",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2025/09/RDSL34-1.jpg",
+    "url": "https://www.vectoroptics.jp/rdsl34/",
+    "lengthMm": 47,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Forester 1-5x24i Fiber SFP LPVO Coyote FDE Rifle Scope",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-55-scaled.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "24mm"
+      },
+      {
+        "label": "全長",
+        "value": "262mm"
+      },
+      {
+        "label": "チューブ径",
+        "value": "30mm"
+      }
+    ],
+    "modelNumbers": [
+      "SCOC-55"
+    ],
+    "id": "vector-scoc-55",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-55-scaled.jpg",
+    "url": "https://www.vectoroptics.jp/scoc-55/",
+    "lengthMm": 262,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Victoptics C1 4×32 Prism Scope",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/OPSL40-C1-4x32-ACOM-1.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/OPSL40-C1-4x32-ACOM-2.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/OPSL40-C1-4x32-ACOM-3.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/OPSL40-C1-4x32-ACOM-4.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/OPSL40-C1-4x32-ACOM-5.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/OPSL40-C1-4x32-ACOM-8.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "32mm"
+      },
+      {
+        "label": "全長",
+        "value": "136mm"
+      },
+      {
+        "label": "チューブ径",
+        "value": "30mm"
+      }
+    ],
+    "modelNumbers": [
+      "OPSL40"
+    ],
+    "id": "vector-opsl40",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2026/06/OPSL40-C1-4x32-ACOM-1.jpg",
+    "url": "https://www.vectoroptics.jp/opsl40/",
+    "lengthMm": 136,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Continental x6 1-6X24 Fiber Rifle Scope Hunting LPVO",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-48-01.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-48-02.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-48-03.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-48-04.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-48-05.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-48-06.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-48-07.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-48-08.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-48-09.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-48-010.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "24mm"
+      },
+      {
+        "label": "全長",
+        "value": "283mm"
+      },
+      {
+        "label": "チューブ径",
+        "value": "30mm"
+      }
+    ],
+    "modelNumbers": [
+      "SCOC-48"
+    ],
+    "id": "vector-scoc-48",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-48-01.jpg",
+    "url": "https://www.vectoroptics.jp/scoc-48/",
+    "lengthMm": 283,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "TAURON 1-6×24 SFP Rifle Scope",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-49-01.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-49-02.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-49-03.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-49-04.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-49-05.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-49-06.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-49-07.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-49-08.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-49-09.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-49-010.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "24mm"
+      },
+      {
+        "label": "全長",
+        "value": "264mm"
+      },
+      {
+        "label": "チューブ径",
+        "value": "30mm"
+      }
+    ],
+    "modelNumbers": [
+      "SCOC-49"
+    ],
+    "id": "vector-scoc-49",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SCOC-49-01.jpg",
+    "url": "https://www.vectoroptics.jp/scoc-49/",
+    "lengthMm": 264,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "4×24 SVD Dragunov Scope FFP",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SSO-01-01.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SSO-01-02.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SSO-01-03.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SSO-01-04.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SSO-01-05.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SSO-01-06.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SSO-01-07.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SSO-01-08.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SSO-01-09.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SSO-01-010.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SSO-01-011.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SSO-01-012.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "24mm"
+      },
+      {
+        "label": "全長",
+        "value": "270mm"
+      }
+    ],
+    "modelNumbers": [
+      "SSO-01"
+    ],
+    "id": "vector-sso-01",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2026/06/SSO-01-01.jpg",
+    "url": "https://www.vectoroptics.jp/sso-01/",
+    "lengthMm": 270,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Forester 1-8×24 SFP FDE Riflescope",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCOC-39-01.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCOC-39-02.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCOC-39-03.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCOC-39-04.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCOC-39-05.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCOC-39-06.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCOC-39-07.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCOC-39-08.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCOC-39-09.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCOC-39-010.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "24mm"
+      },
+      {
+        "label": "全長",
+        "value": "272mm"
+      },
+      {
+        "label": "チューブ径",
+        "value": "30mm"
+      }
+    ],
+    "modelNumbers": [
+      "SCOC-39"
+    ],
+    "id": "vector-scoc-39-2",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2026/01/SCOC-39-01.jpg",
+    "url": "https://www.vectoroptics.jp/scoc-39-2/",
+    "lengthMm": 272,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Heim ES X-Nano STD",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/12/VEOT-RS08-1.jpeg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/12/VEOT-RS08-2.jpeg"
+    ],
+    "dimensions": [
+      {
+        "label": "サイズ",
+        "value": "50.9×42.9×45.2mm"
+      }
+    ],
+    "modelNumbers": [
+      "VEOT-RS08"
+    ],
+    "id": "vector-veot-rs08",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2025/12/VEOT-RS08-1.jpeg",
+    "url": "https://www.vectoroptics.jp/veot-rs08/",
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Forester 1-5×24 SFP Fiber LPVO Rifle Scope",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCPS-M10-1.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCPS-M10-2.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCPS-M10-3.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCPS-M10-4.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCPS-M10-5.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCPS-M10-6.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCPS-M10-7.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCPS-M10-8.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCPS-M10-9.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCPS-M10-10.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "30mm"
+      },
+      {
+        "label": "全長",
+        "value": "262mm"
+      },
+      {
+        "label": "チューブ径",
+        "value": "30mm"
+      }
+    ],
+    "modelNumbers": [
+      "SCOC-54"
+    ],
+    "id": "vector-scoc-54",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2025/10/SCPS-M10-1.jpg",
+    "url": "https://www.vectoroptics.jp/scoc-54/",
+    "lengthMm": 262,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Paragon 1X18 Mini Prism Scope",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386126129-1.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386126129-2.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386126129-3.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386126129-4.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386126129-5.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386126129-6.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386126129-7.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386126129-8.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386126129-9.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386126129-10.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "18mm"
+      },
+      {
+        "label": "全長",
+        "value": "60.6mm"
+      },
+      {
+        "label": "チューブ径",
+        "value": "30mm"
+      }
+    ],
+    "modelNumbers": [
+      "SCPS-M10"
+    ],
+    "id": "vector-scps-m10",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386126129-1.jpg",
+    "url": "https://www.vectoroptics.jp/scps-m10/",
+    "lengthMm": 60.6,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Orion Pro Max 4-16×44 HD SFP Rifle Scope",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386125771-1.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386125771-2.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386125771-3.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386125771-4.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386125771-5.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386125771-6.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386125771-7.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386125771-8.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386125771-9.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386125771-10.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "44mm"
+      },
+      {
+        "label": "全長",
+        "value": "344mm"
+      },
+      {
+        "label": "チューブ径",
+        "value": "30mm"
+      }
+    ],
+    "modelNumbers": [
+      "SCOL-62"
+    ],
+    "id": "vector-scol-62",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2024/10/6976386125771-1.jpg",
+    "url": "https://www.vectoroptics.jp/scol-62/",
+    "lengthMm": 344,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Maverick-III 3×22 Rubber Armored Magnifier MIL",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/SCMF-37-1.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/SCMF-37-2.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/SCMF-37-3.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/SCMF-37-4.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/SCMF-37-5.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/SCMF-37-6.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/SCMF-37-7.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/SCMF-37-8.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/SCMF-37-9.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/SCMF-37-10.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/SCMF-37-11.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/SCMF-37-12.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "22mm"
+      },
+      {
+        "label": "全長",
+        "value": "70mm"
+      }
+    ],
+    "modelNumbers": [
+      "SCMF-37"
+    ],
+    "id": "vector-scmf-37",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2026/10/SCMF-37-1.jpg",
+    "url": "https://www.vectoroptics.jp/scmf-37/",
+    "lengthMm": 70,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Victoptics SOM 3x Magnifier",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/VIMF-01_1.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/VIMF-01_2.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/VIMF-01_3.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/VIMF-01_4.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/VIMF-01_5.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/VIMF-01_6.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/VIMF-01_7.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/VIMF-01_8.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/VIMF-01_9.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/VIMF-01_10.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/VIMF-01_11.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/VIMF-01_12.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/VIMF-01_13.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/VIMF-01_14.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2026/10/VIMF-01_15.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "20mm"
+      },
+      {
+        "label": "全長",
+        "value": "73mm"
+      }
+    ],
+    "modelNumbers": [
+      "VIMF-01"
+    ],
+    "id": "vector-vimf-01",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2026/10/VIMF-01_1.jpg",
+    "url": "https://www.vectoroptics.jp/vimf-01/",
+    "lengthMm": 73,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Paragon 5×30 Magnifier",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/04/1657367339.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/04/1657367340.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/04/1657367343.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/04/1657367344.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/04/1657367345.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/04/1657367342.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/04/1657367341.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2024/04/1663666541.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "30mm"
+      }
+    ],
+    "modelNumbers": [
+      "SCMF-34"
+    ],
+    "id": "vector-scmf-34",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2024/04/1657367339.jpg",
+    "url": "https://www.vectoroptics.jp/scmf-34/",
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Paragon 3×18 Micro Magnifier",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/06/1643298163.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/06/1643298164.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/06/1643298165.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/06/1643298166.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/06/1643298167.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/06/1643298168.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/06/1643298169.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/06/1643298170.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "18mm"
+      },
+      {
+        "label": "全長",
+        "value": "70mm"
+      }
+    ],
+    "modelNumbers": [
+      "SCMF-33"
+    ],
+    "id": "vector-scmf-33",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2022/06/1643298163.jpg",
+    "url": "https://www.vectoroptics.jp/scmf-33/",
+    "lengthMm": 70,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Maverick-III 3×22 Magnifier SOP",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301774.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301775.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301776.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301777.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301778.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301779.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301780.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301781.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301782.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301783.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301784.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301785.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301786.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301787.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301788.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301789.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301790.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "22mm"
+      },
+      {
+        "label": "全長",
+        "value": "103mm"
+      }
+    ],
+    "modelNumbers": [
+      "SCMF-32"
+    ],
+    "id": "vector-scmf-32",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1629301774.jpg",
+    "url": "https://www.vectoroptics.jp/scmf-32/",
+    "lengthMm": 103,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Maverick-III 3×22 Magnifier MIL",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1625658466.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1625658467.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1625658468.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1625658469.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1625658470.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1625658471.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1625658472.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1625658473.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1625658474.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1625658475.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1625658476.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1625658477.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1625658478.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "22mm"
+      },
+      {
+        "label": "全長",
+        "value": "103mm"
+      }
+    ],
+    "modelNumbers": [
+      "SCMF-31"
+    ],
+    "id": "vector-scmf-31",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2022/01/1625658466.jpg",
+    "url": "https://www.vectoroptics.jp/scmf-31/",
+    "lengthMm": 103,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Maverick-IV 3×22 Magnifier Micro",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2021/11/1628523896.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2021/11/1628523897.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2021/11/1628523898.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2021/11/1628523899.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2021/11/1628523901.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2021/11/1628523902.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2021/11/1628594796.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2021/11/1628594797.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2021/11/1628779242.png",
+      "https://www.vectoroptics.jp/wp-content/uploads/2021/11/1628779523.png"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "22mm"
+      },
+      {
+        "label": "全長",
+        "value": "80mm"
+      }
+    ],
+    "modelNumbers": [],
+    "id": "vector-scmf-41",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2021/11/1628523896.png",
+    "url": "https://www.vectoroptics.jp/scmf-41/",
+    "lengthMm": 80,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "4×26 Magnifier w/ Flip Side Mount",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119555.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119556.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119557.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119558.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119559.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119560.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119561.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "26mm"
+      },
+      {
+        "label": "全長",
+        "value": "115mm"
+      }
+    ],
+    "modelNumbers": [
+      "SCMF-14"
+    ],
+    "id": "vector-scmf-14",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119555.jpg",
+    "url": "https://www.vectoroptics.jp/scmf-14/",
+    "lengthMm": 115,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "3×26 Magnifier w/ Flip Side Mount",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119878.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119879.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119880.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119881.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119882.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119883.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119884.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119885.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119886.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119887.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "26mm"
+      },
+      {
+        "label": "全長",
+        "value": "108mm"
+      }
+    ],
+    "modelNumbers": [
+      "SCMF-10"
+    ],
+    "id": "vector-scmf-10",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2019/08/1559119878.jpg",
+    "url": "https://www.vectoroptics.jp/scmf-10/",
+    "lengthMm": 108,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "name": "Maverick 1×22 Gen II",
+    "images": [
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/09/VO-Maverick-1x22-GenII-Acom-1.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/09/VO-Maverick-1x22-GenII-Acom-2.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/09/VO-Maverick-1x22-GenII-Acom-3.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/09/VO-Maverick-1x22-GenII-Acom-4.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/09/VO-Maverick-1x22-GenII-Acom-5.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/09/VO-Maverick-1x22-GenII-Acom-6.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/09/VO-Maverick-1x22-GenII-Acom-7.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/09/VO-Maverick-1x22-GenII-Acom-8.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/09/VO-Maverick-1x22-GenII-Acom-9.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/09/VO-Maverick-1x22-GenII-Acom-10.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/09/VO-Maverick-1x22-GenII-Acom-11.jpg",
+      "https://www.vectoroptics.jp/wp-content/uploads/2019/09/VO-Maverick-1x22-GenII-Acom-12.jpg"
+    ],
+    "dimensions": [
+      {
+        "label": "対物レンズ径",
+        "value": "22mm"
+      },
+      {
+        "label": "全長",
+        "value": "68mm"
+      }
+    ],
+    "modelNumbers": [
+      "SCRD-12II"
+    ],
+    "id": "vector-scrd-12ii",
+    "manufacturer": "Vector Optics",
+    "category": "光学機器",
+    "image": "https://www.vectoroptics.jp/wp-content/uploads/2019/09/VO-Maverick-1x22-GenII-Acom-1.jpg",
+    "url": "https://www.vectoroptics.jp/scrd-12ii/",
+    "lengthMm": 68,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753220256042",
+    "name": "ファットサイレンサーカーボン 54[MODE-2/モードツー]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241454_65375c10dff65.jpg?v=1745195376",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241454_65375c10dff65.jpg?v=1745195376",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241454_65375c16107bf.jpg?v=1745195377",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241454_65375c1a2dfea.jpg?v=1745195377",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241454_65375c1e0a04b.jpg?v=1745195377",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241454_65375c21c4d80.jpg?v=1745195377",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241454_65375c2644d89.jpg?v=1745195377",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241454_65375c2e7bebc.jpg?v=1745195377",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241454_65375c334b18b.jpg?v=1745195377"
+    ],
+    "url": "https://laylax.com/products/laylax-206",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "54mm"
+      },
+      {
+        "label": "直径",
+        "value": "30mm"
+      }
+    ],
+    "lengthMm": 54,
+    "janCodes": [
+      "4570189741422"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753220190506",
+    "name": "ファットサイレンサーカーボン 70[MODE-2/モードツー]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201506_649141de37a97.jpg?v=1745195380",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201506_649141de37a97.jpg?v=1745195380",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201506_649141e3aa59d.jpg?v=1745195380",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241450_65375b38a70f0.jpg?v=1745195380",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201506_649141e859801.jpg?v=1745195380",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201506_649141ec3b6f8.jpg?v=1745195380",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201506_649141efdea3b.jpg?v=1745195380",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201506_649141f4c1656.jpg?v=1745195380",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201506_649141f88e398.jpg?v=1745195380"
+    ],
+    "url": "https://laylax.com/products/laylax-204",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "70mm"
+      },
+      {
+        "label": "直径",
+        "value": "30mm"
+      }
+    ],
+    "lengthMm": 70,
+    "janCodes": [
+      "4571443189981"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753220223274",
+    "name": "スリムサイレンサーカーボン 54[MODE-2/モードツー]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241405_6537509e7e482.jpg?v=1745195378",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241405_6537509e7e482.jpg?v=1745195378",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241405_653750a33d6f7.jpg?v=1745195378",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241402_65374fcd29862_ab928876-d676-4825-8fb7-4a27cb71df3d.jpg?v=1745195378",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241405_653750a86eace.jpg?v=1745195378",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241405_653750ad3a658.jpg?v=1745195378",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241405_653750b11c6ca.jpg?v=1745195379",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241405_653750b51dee1.jpg?v=1745195379",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241406_653750b93565b.jpg?v=1745195379",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241406_653750bc991c8.jpg?v=1745195379"
+    ],
+    "url": "https://laylax.com/products/laylax-205",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "54mm"
+      },
+      {
+        "label": "直径",
+        "value": "23mm"
+      }
+    ],
+    "lengthMm": 54,
+    "janCodes": [
+      "4570189741439"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753220157738",
+    "name": "ファットサイレンサーカーボン 100[MODE-2/モードツー]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201501_649140b5d123f.jpg?v=1745195382",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201501_649140b5d123f.jpg?v=1745195382",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201501_649140ba48974.jpg?v=1745195382",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241451_65375b7f27a2a.jpg?v=1745195382",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201501_649140bec2bf3.jpg?v=1745195382",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201501_649140c522ba2.jpg?v=1745195382",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201501_649140c9336c3.jpg?v=1745195382",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201501_649140ce306a9.jpg?v=1745195383",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201501_649140d25d9df.jpg?v=1745195383"
+    ],
+    "url": "https://laylax.com/products/laylax-203",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "100mm"
+      },
+      {
+        "label": "直径",
+        "value": "30mm"
+      }
+    ],
+    "lengthMm": 100,
+    "janCodes": [
+      "4571443189998"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753220124970",
+    "name": "ファットサイレンサーカーボン 150[MODE-2/モードツー]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201455_64913f62b67c1.jpg?v=1745195383",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201455_64913f62b67c1.jpg?v=1745195383",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201456_64913fa1973c3.jpg?v=1745195383",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241451_65375b5ddeb0b.jpg?v=1745195383",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201456_64913fa95d918.jpg?v=1745195383",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201457_64913fae1ba90.jpg?v=1745195384",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201457_64913fb2b7251.jpg?v=1745195384",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201457_64913fb8640ae.jpg?v=1745195384",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201457_64913fbd39ba0.jpg?v=1745195384"
+    ],
+    "url": "https://laylax.com/products/laylax-202",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "150mm"
+      },
+      {
+        "label": "直径",
+        "value": "30mm"
+      }
+    ],
+    "lengthMm": 150,
+    "janCodes": [
+      "4570189740012"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753220059434",
+    "name": "スリムサイレンサーカーボン 100[MODE-2/モードツー]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201029_6491010f2c390.jpg?v=1745195386",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201029_6491010f2c390.jpg?v=1745195386",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201029_64910114cafbe.jpg?v=1745195386",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241401_65374fafb17f1.jpg?v=1745195386",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201030_6491011b08682.jpg?v=1745195386",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201030_6491011f6f2b3.jpg?v=1745195386",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201030_649101253fa48.jpg?v=1745195386",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201030_6491012fed8e6.jpg?v=1745195386",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201030_64910136033dd.jpg?v=1745195386",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06201030_6491013d6b147.jpg?v=1745195386"
+    ],
+    "url": "https://laylax.com/products/laylax-200",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "100mm"
+      },
+      {
+        "label": "直径",
+        "value": "23mm"
+      }
+    ],
+    "lengthMm": 100,
+    "janCodes": [
+      "4571443189967"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753219993898",
+    "name": "SGサイレンサー・ロング[MODE-2/モードツー]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06021027_6479459c20002.jpg?v=1745195388",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06021027_6479459c20002.jpg?v=1745195388",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/07041547_64a3c09f182da.jpg?v=1745195388",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06021028_647945a562cc0.jpg?v=1745195388",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06021028_647945a95afc1.jpg?v=1745195389",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06021028_647945ad579d8.jpg?v=1745195389",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06021028_647945b2375c9.jpg?v=1745195389",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06021028_647945b7d9aa7.jpg?v=1745195389"
+    ],
+    "url": "https://laylax.com/products/laylax-198",
+    "dimensions": [
+      {
+        "label": "外径",
+        "value": "44mm"
+      },
+      {
+        "label": "全長",
+        "value": "175mm"
+      },
+      {
+        "label": "直径",
+        "value": "44mm"
+      }
+    ],
+    "lengthMm": 175,
+    "janCodes": [
+      "4571443189349"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753219961130",
+    "name": "SGサイレンサー・ショート[MODE-2/モードツー]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06021021_647944193e74c.jpg?v=1745195389",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06021021_647944193e74c.jpg?v=1745195389",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/07041549_64a3c0dd6fc9d.jpg?v=1745195390",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06021021_64794421a0962.jpg?v=1745195390",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06021021_6479442806c0f.jpg?v=1745195390",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06021021_6479442f1def7.jpg?v=1745195390",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06021021_64794433be584.jpg?v=1745195390",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06021022_647944380c8d7.jpg?v=1745195390"
+    ],
+    "url": "https://laylax.com/products/laylax-197",
+    "dimensions": [
+      {
+        "label": "外径",
+        "value": "44mm"
+      },
+      {
+        "label": "全長",
+        "value": "115mm"
+      },
+      {
+        "label": "直径",
+        "value": "44mm"
+      }
+    ],
+    "lengthMm": 115,
+    "janCodes": [
+      "4571443189332"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753219928362",
+    "name": "HKサイレンサー リアルロング NEO [MODE-2/モードツー]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08101027_5f30a28894ce6.jpg?v=1745195390",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08101027_5f30a28894ce6.jpg?v=1745195390",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04181518_625d02bd5e708.jpg?v=1745195391",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08101027_5f30a2900ce6d.jpg?v=1745195391",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08101027_5f30a29539076.jpg?v=1745195391",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08101028_5f30a2b3b03f2.jpg?v=1745195391",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08101028_5f30a2bf792be.jpg?v=1745195391",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08101028_5f30a2c50677a.jpg?v=1745195391",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08101028_5f30a2d2820d2.jpg?v=1745195391"
+    ],
+    "url": "https://laylax.com/products/laylax-196",
+    "dimensions": [
+      {
+        "label": "外径",
+        "value": "42mm"
+      },
+      {
+        "label": "全長",
+        "value": "224mm"
+      },
+      {
+        "label": "直径",
+        "value": "42mm"
+      }
+    ],
+    "lengthMm": 224,
+    "janCodes": [
+      "4571443167798"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753219862826",
+    "name": "HKサイレンサー リアル NEO [MODE-2/モードツー]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05270942_5ecdb7709b695.jpg?v=1745195392",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05270942_5ecdb7709b695.jpg?v=1745195392",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04181520_625d0339d22a4.jpg?v=1745195392",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05270923_5ecdb2f15b60a.jpg?v=1745195392",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05270923_5ecdb2f817f3a.jpg?v=1745195392",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05270923_5ecdb2fdb0256.jpg?v=1745195392",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05270923_5ecdb304a8a16.jpg?v=1745195392"
+    ],
+    "url": "https://laylax.com/products/laylax-195",
+    "dimensions": [
+      {
+        "label": "外径",
+        "value": "42mm"
+      },
+      {
+        "label": "全長",
+        "value": "146mm"
+      },
+      {
+        "label": "直径",
+        "value": "42mm"
+      }
+    ],
+    "lengthMm": 146,
+    "janCodes": [
+      "4571443167781"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753219797290",
+    "name": "ナイツサイレンサー リアル ショート NEO [MODE-2/モードツー]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05270915_5ecdb135ce0bc.jpg?v=1745195393",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05270915_5ecdb135ce0bc.jpg?v=1745195393",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05270916_5ecdb158518e9.jpg?v=1745195393",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05270916_5ecdb14b90631.jpg?v=1745195393",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05270916_5ecdb16161067.jpg?v=1745195393",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05270916_5ecdb166944ca.jpg?v=1745195393",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05270916_5ecdb16be4310.jpg?v=1745195393",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05270916_5ecdb1708cd74.jpg?v=1745195393",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08081238_5f2e1e1fccc7d.jpg?v=1745195393",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08081238_5f2e1e2b3ebec.jpg?v=1745195393"
+    ],
+    "url": "https://laylax.com/products/laylax-194",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "113mm"
+      },
+      {
+        "label": "直径",
+        "value": "35mm"
+      }
+    ],
+    "lengthMm": 113,
+    "janCodes": [
+      "4571443167767"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753219731754",
+    "name": "ノイズリミッター",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/laylax-193-sq.jpg?v=1792138423",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/laylax-193-sq.jpg?v=1792138423",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/09091729_5f589287b6d55.jpg?v=1745195394",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05041748_5aec1e557f83e.jpg?v=1745195394"
+    ],
+    "url": "https://laylax.com/products/laylax-193",
+    "dimensions": [
+      {
+        "label": "長さ",
+        "value": "168mm"
+      },
+      {
+        "label": "外径",
+        "value": "19mm"
+      },
+      {
+        "label": "サイズ",
+        "value": "150mm"
+      },
+      {
+        "label": "外径",
+        "value": "33mm"
+      },
+      {
+        "label": "外径",
+        "value": "27mm"
+      },
+      {
+        "label": "外径",
+        "value": "29mm"
+      }
+    ],
+    "lengthMm": null,
+    "janCodes": [
+      "4582109582992"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753219698986",
+    "name": "スリムサイレンサー150 [MODE-2/モードツー]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211739_5fe05f3ec7032.jpg?v=1745195395",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211739_5fe05f3ec7032.jpg?v=1745195395",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211739_5fe05f467150d.jpg?v=1745195395",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211739_5fe05f4b04a15.jpg?v=1745195395",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211739_5fe05f4f4e4c4.jpg?v=1745195395",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211739_5fe05f577f68b.jpg?v=1745195395",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211739_5fe05f5d0f7e0.jpg?v=1745195395",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211740_5fe05f60c755d.jpg?v=1745195395"
+    ],
+    "url": "https://laylax.com/products/laylax-192",
+    "dimensions": [
+      {
+        "label": "外径",
+        "value": "23mm"
+      },
+      {
+        "label": "全長",
+        "value": "150mm"
+      },
+      {
+        "label": "直径",
+        "value": "23mm"
+      }
+    ],
+    "lengthMm": 150,
+    "janCodes": [
+      "4582109582756"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753219666218",
+    "name": "ファットサイレンサー 70 [MODE-2/モードツー]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08251335_6125c89d20f54.jpg?v=1745195396",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08251335_6125c89d20f54.jpg?v=1745195396",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08251335_6125c8a2637bb.jpg?v=1745195396",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08251335_6125c8a734026.jpg?v=1745195396",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08251335_6125c8ab33f45.jpg?v=1745195396",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08251335_6125c8aeaccab.jpg?v=1745195396",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08251336_6125c8b2c835b.jpg?v=1745195396",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08251336_6125c8b7737be.jpg?v=1745195396"
+    ],
+    "url": "https://laylax.com/products/laylax-191",
+    "dimensions": [
+      {
+        "label": "外径",
+        "value": "30mm"
+      },
+      {
+        "label": "全長",
+        "value": "70mm"
+      },
+      {
+        "label": "直径",
+        "value": "30mm"
+      }
+    ],
+    "lengthMm": 70,
+    "janCodes": [
+      "4560329185964"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753219633450",
+    "name": "ファットサイレンサー 150 [MODE-2/モードツー]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211732_5fe05da885949.jpg?v=1745195397",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211732_5fe05da885949.jpg?v=1745195397",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211732_5fe05db49a13f.jpg?v=1745195397",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211732_5fe05db980495.jpg?v=1745195397",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211733_5fe05dbdc9400.jpg?v=1745195397",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211733_5fe05dc22f5cf.jpg?v=1745195397",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211733_5fe05dc5aa20f.jpg?v=1745195397",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211733_5fe05dca03265.jpg?v=1745195397"
+    ],
+    "url": "https://laylax.com/products/laylax-190",
+    "dimensions": [
+      {
+        "label": "外径",
+        "value": "30mm"
+      },
+      {
+        "label": "全長",
+        "value": "150mm"
+      },
+      {
+        "label": "直径",
+        "value": "30mm"
+      }
+    ],
+    "lengthMm": 150,
+    "janCodes": [
+      "4582109582794"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753219600682",
+    "name": "ファットサイレンサー 100 [MODE-2/モードツー]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211721_5fe05b012e658.jpg?v=1745195398",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211721_5fe05b012e658.jpg?v=1745195398",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211721_5fe05b0dd1254.jpg?v=1745195398",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211721_5fe05b135c6f0.jpg?v=1745195398",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211721_5fe05b194dc38.jpg?v=1745195398",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211721_5fe05b1e976e1.jpg?v=1745195398",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211721_5fe05b2384c48.jpg?v=1745195398",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211721_5fe05b27e5b3c.jpg?v=1745195399"
+    ],
+    "url": "https://laylax.com/products/laylax-189",
+    "dimensions": [
+      {
+        "label": "外径",
+        "value": "30mm"
+      },
+      {
+        "label": "全長",
+        "value": "100mm"
+      },
+      {
+        "label": "直径",
+        "value": "30mm"
+      }
+    ],
+    "lengthMm": 100,
+    "janCodes": [
+      "4582109582800"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753219567914",
+    "name": "スリムサイレンサー 70 [MODE-2/モードツー]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08251456_6125db99cd5b0.jpg?v=1745195399",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08251456_6125db99cd5b0.jpg?v=1745195399",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08251456_6125db9e90d36.jpg?v=1745195399",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08251456_6125dba2cb6b1.jpg?v=1745195399",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08251456_6125dba7066fa.jpg?v=1745195399",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08251457_6125dbacb6729.jpg?v=1745195399",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08251457_6125dbb17332e.jpg?v=1745195400",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08251457_6125dbb532203.jpg?v=1745195400"
+    ],
+    "url": "https://laylax.com/products/laylax-188",
+    "dimensions": [
+      {
+        "label": "外径",
+        "value": "23mm"
+      },
+      {
+        "label": "全長",
+        "value": "70mm"
+      },
+      {
+        "label": "直径",
+        "value": "23mm"
+      }
+    ],
+    "lengthMm": 70,
+    "janCodes": [
+      "4560329185971"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753219535146",
+    "name": "スリムサイレンサー 100 [MODE-2/モードツー]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211736_5fe05e7be0541.jpg?v=1745195400",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211736_5fe05e7be0541.jpg?v=1745195400",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211736_5fe05e814f3a3.jpg?v=1745195400",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211736_5fe05e851f6ee.jpg?v=1745195400",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211736_5fe05e889149d.jpg?v=1745195400",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211736_5fe05e8cf3ca7.jpg?v=1745195400",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211736_5fe05e910082d.jpg?v=1745195401",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12211736_5fe05e96304f9.jpg?v=1745195401"
+    ],
+    "url": "https://laylax.com/products/laylax-187",
+    "dimensions": [
+      {
+        "label": "外径",
+        "value": "23mm"
+      },
+      {
+        "label": "全長",
+        "value": "100mm"
+      },
+      {
+        "label": "直径",
+        "value": "23mm"
+      }
+    ],
+    "lengthMm": 100,
+    "janCodes": [
+      "4582109582763"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-10301371973930",
+    "name": "ハイ/ロー 2WAY マルチマウントベース [NITRO.Vo/ニトロヴォイス]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/High-LowMulti-MountBase_0000_00_bdcfe348-9b48-4037-976b-8d992654d629.jpg?v=1789349592",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/High-LowMulti-MountBase_0000_00_bdcfe348-9b48-4037-976b-8d992654d629.jpg?v=1789349592",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/High-LowMulti-MountBase_0007_07_41380b24-ac04-43ec-b7af-ad2b75a98c4a.jpg?v=1789009382",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/High-LowMulti-MountBase_0005_05.jpg?v=1789003228",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/High-LowMulti-MountBase_0001_01.jpg?v=1789003227",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/High-LowMulti-MountBase_0002_02.jpg?v=1789003227",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/High-LowMulti-MountBase_0003_03.jpg?v=1789003227",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/High-LowMulti-MountBase_0004_04.jpg?v=1789003227",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/High-LowMulti-MountBase_0008_08.jpg?v=1789003227",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/High-LowMulti-MountBase_0009_09.jpg?v=1789003227",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/High-LowMulti-MountBase_0006_06.jpg?v=1789003228",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/High-LowMulti-MountBase_0010_10.jpg?v=1789003228",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/High-LowMulti-MountBase_0011_11.jpg?v=1789003227"
+    ],
+    "url": "https://laylax.com/products/4580887535469",
+    "dimensions": [],
+    "lengthMm": null,
+    "janCodes": [
+      "4580887535469"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-10031954198826",
+    "name": "東京マルイ MP7A1 ライトウェイトトップレイル [NITRO.Vo/ニトロヴォイス]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1Lightweighttoprail_0000_00_0f6ee3ac-cfb8-4b04-859f-01dcb28344c7.jpg?v=1770184283",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1Lightweighttoprail_0000_00_0f6ee3ac-cfb8-4b04-859f-01dcb28344c7.jpg?v=1770184283",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1Lightweighttoprail_0001_01.jpg?v=1770184283",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1Lightweighttoprail_0002_02.jpg?v=1770184283",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1Lightweighttoprail_0003_03.jpg?v=1770184283",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1Lightweighttoprail_0004_04.jpg?v=1770184283",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1Lightweighttoprail_0005_05.jpg?v=1770184283",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1Lightweighttoprail_0006_06.jpg?v=1770184283",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1Lightweighttoprail_0007_07.jpg?v=1770184283",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1Lightweighttoprail_0008_08.jpg?v=1770184283",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1Lightweighttoprail_0009_09.jpg?v=1770184283"
+    ],
+    "url": "https://laylax.com/products/4570189749787",
+    "dimensions": [],
+    "lengthMm": null,
+    "janCodes": [
+      "4570189749787"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-9974167339306",
+    "name": "アジャスタブルハイマウント [NITRO.Vo/ニトロヴォイス]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/AdjustableHighMount_0000_00.jpg?v=1765431673",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/AdjustableHighMount_0000_00.jpg?v=1765431673",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/AdjustableHighMount_0001_01.jpg?v=1765431673",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/AdjustableHighMount_0002_02.jpg?v=1765431673",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/AdjustableHighMount_0003_03.jpg?v=1765431673",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/AdjustableHighMount_0004_04.jpg?v=1765431684",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/AdjustableHighMount_0005_05.jpg?v=1765431684",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/AdjustableHighMount_0006_06.jpg?v=1765431684",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/AdjustableHighMount_0007_07.jpg?v=1765431684",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/AdjustableHighMount_0008_08.jpg?v=1765431684",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/AdjustableHighMount_0009_09.jpg?v=1765431684",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/AdjustableHighMount_0010_10.jpg?v=1765431684",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/AdjustableHighMount_0011_11.jpg?v=1765431684"
+    ],
+    "url": "https://laylax.com/products/4570189749428",
+    "dimensions": [],
+    "lengthMm": null,
+    "janCodes": [
+      "4570189749428"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-9899069014314",
+    "name": "KRYTAC KRISS VECTOR M-LOKパネル[NITRO.Vo/ニトロヴォイス]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/VECTORM-LOKPanel_0000_00_a74abcc6-e8bf-4e2d-b9fb-05eca65fa9eb.jpg?v=1759213804",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/VECTORM-LOKPanel_0000_00_a74abcc6-e8bf-4e2d-b9fb-05eca65fa9eb.jpg?v=1759213804",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/VECTORM-LOKPanel_0001_01.jpg?v=1759799749",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/VECTORM-LOKPanel_0002_02.jpg?v=1759799749",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/VECTORM-LOKPanel_0003_03_f8a73146-8b0e-4930-bea2-96b2840138d8.jpg?v=1759799749",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/VECTORM-LOKPanel_0004_04.jpg?v=1759799749",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/VECTORM-LOKPanel_0005_05_bd3e4aa8-d4e5-4613-8e87-c49b44746cbb.jpg?v=1759799749",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/VECTORM-LOKPanel_0006_06.jpg?v=1759799749",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/VECTORM-LOKPanel_0007_07.jpg?v=1759799749",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/VECTORM-LOKPanel_0008_08.jpg?v=1759799749",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/VECTORM-LOKPanel_0009_09.jpg?v=1759799749"
+    ],
+    "url": "https://laylax.com/products/4570189749053",
+    "dimensions": [],
+    "lengthMm": null,
+    "janCodes": [
+      "4570189749053"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-9842073239850",
+    "name": "東京マルイ MP7A1 M-LOKパネル[NITRO.Vo/ニトロヴォイス]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1M-LOKPanel_0000_00.jpg?v=1755758472",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1M-LOKPanel_0000_00.jpg?v=1755758472",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/mp7a1_mlokpanel.gif?v=1759798254",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/mp7a1_mlokpanel_change_6372bf4b-65e0-4ccd-aced-6e272fecd287.gif?v=1759800772",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1M-LOKPanel_0001_01.jpg?v=1759800772",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1M-LOKPanel_0002_02.jpg?v=1759800772",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1M-LOKPanel_0003_03.jpg?v=1759800772",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1M-LOKPanel_0004_04.jpg?v=1759800772",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1M-LOKPanel_0005_05.jpg?v=1759800772",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1M-LOKPanel_0006_06.jpg?v=1759800772",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1M-LOKPanel_0007_07.jpg?v=1759800772",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1M-LOKPanel_0008_08.jpg?v=1759800772",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/MP7A1M-LOKPanel_0009_09.jpg?v=1759800772"
+    ],
+    "url": "https://laylax.com/products/4570189748742",
+    "dimensions": [],
+    "lengthMm": null,
+    "janCodes": [
+      "4570189748742"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-9297833853226",
+    "name": "東京マルイ ガスショットガン M870 ストライクハイダー【WEB限定】",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/4560329185650_1_63daf135-dfc6-47e7-adb1-7a6d4d363301.jpg?v=1745194834",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/4560329185650_1_63daf135-dfc6-47e7-adb1-7a6d4d363301.jpg?v=1745194834",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/4560329185650_2.jpg?v=1745194834",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/4560329185650_3.jpg?v=1745194834",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/4560329185667_1.jpg?v=1745194834",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/4560329185667_2.jpg?v=1745194834",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/4560329185667_3.jpg?v=1745194834",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/4560329185650_4.jpg?v=1745194834"
+    ],
+    "url": "https://laylax.com/products/4560329185650",
+    "dimensions": [],
+    "lengthMm": null,
+    "janCodes": [
+      "4560329185650",
+      "4560329185667"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-9244825157930",
+    "name": "スコーピオン mod.M ロングトップレイル [NITRO.Vo/ニトロヴォイス]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/long-top-rail_0000_00.jpg?v=1745194843",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/long-top-rail_0000_00.jpg?v=1745194843",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/scorpion_longtoprail.gif?v=1745194843",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/long-top-rail_0010_10.jpg?v=1745194843",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/long-top-rail_0001_01.jpg?v=1745194843",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/long-top-rail_0002_02.jpg?v=1745194843",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/long-top-rail_0003_03.jpg?v=1745194843",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/long-top-rail_0004_04.jpg?v=1745194843",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/long-top-rail_0005_05.jpg?v=1745194843",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/long-top-rail_0006_06.jpg?v=1745194843",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/long-top-rail_0007_07.jpg?v=1745194843",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/long-top-rail_0008_08.jpg?v=1745194843",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/long-top-rail_0009_09.jpg?v=1745194843"
+    ],
+    "url": "https://laylax.com/products/4570189743891",
+    "dimensions": [],
+    "lengthMm": null,
+    "janCodes": [
+      "4570189743891"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753228972330",
+    "name": "次世代MP5A4・A5 レイルスリーブ [NITRO.Vo/ニトロヴォイス]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04141431_6257b1a4b3b64.jpg?v=1745195127",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04141431_6257b1a4b3b64.jpg?v=1745195127",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04141431_6257b1aad1567.jpg?v=1745195127",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04051140_624bac00f412d.jpg?v=1745195127",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04051140_624bac05be7ef.jpg?v=1745195127",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04051140_624bac0d3475f.jpg?v=1745195127",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04051140_624bac13e0bd2.jpg?v=1745195128",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04141514_6257bbca2aece.jpg?v=1745195128",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04141514_6257bbcecf29b.jpg?v=1745195128",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04141514_6257bbd394237.jpg?v=1745195128",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04141514_6257bbd830e61.jpg?v=1745195128",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04141514_6257bbdc405da.jpg?v=1745195128",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04141515_6257bbe734a06.jpg?v=1745195128"
+    ],
+    "url": "https://laylax.com/products/laylax-451",
+    "dimensions": [],
+    "lengthMm": null,
+    "janCodes": [
+      "4571443180568"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753228808490",
+    "name": "QDホールカバー [2個入り][NITRO.Vo/ニトロヴォイス]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02221119_60331495e75d6.jpg?v=1745195133",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02221119_60331495e75d6.jpg?v=1745195133",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02221112_603313264324d.jpg?v=1745195133",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02221112_60331329d1b27.jpg?v=1745195133",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02221113_6033132cd9cfc.jpg?v=1745195133",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02221113_603313309e6ed.jpg?v=1745195133",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02221113_60331335add44.jpg?v=1745195133",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02221113_6033133e7c70d.jpg?v=1745195133",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02221113_6033134342ae3.jpg?v=1745195133",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02221113_60331346e20d0.jpg?v=1745195133",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02221113_6033134b5e555.jpg?v=1745195133"
+    ],
+    "url": "https://laylax.com/products/laylax-447",
+    "dimensions": [],
+    "lengthMm": null,
+    "janCodes": [
+      "4571443172303"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753228775722",
+    "name": "マルチアドバンスドグリップ [NITRO.Vo/ニトロヴォイス]",
+    "manufacturer": "LAYLAX",
+    "category": "グリップ",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02261153_6038628f8a26b.jpg?v=1745195134",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02261153_6038628f8a26b.jpg?v=1745195134",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02261153_603862954b437.jpg?v=1745195134",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02261153_60386299e81a3.jpg?v=1745195134",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02261153_603862a0aa66d.jpg?v=1745195134",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02261153_603862a5c5a9e.jpg?v=1745195134",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02261153_603862abc0115.jpg?v=1745195134",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02261153_603862b24661d.jpg?v=1745195135",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02261153_603862b6933b0.jpg?v=1745195135",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02261234_60386c54286be.jpg?v=1745195135",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02261153_603862c075ab0.jpg?v=1745195135",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02261153_603862c513e88.jpg?v=1745195135",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/02261154_603862c941047.jpg?v=1745195135"
+    ],
+    "url": "https://laylax.com/products/laylax-446",
+    "dimensions": [],
+    "lengthMm": null,
+    "janCodes": [
+      "4571443174109"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753228644650",
+    "name": "KRISS VECTOR クリスベクター M-LOK レイルハンドガード [S][NITRO.Vo/ニトロヴォイス]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051701_5fa3b14994164.jpg?v=1745195140",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051701_5fa3b14994164.jpg?v=1745195140",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11061010_5fa4a28979d5e.jpg?v=1745195140",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051700_5fa3b10391c31.jpg?v=1745195140",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051700_5fa3b10d39495.jpg?v=1745195140",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051700_5fa3b11b3f9c0.jpg?v=1745195140",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051700_5fa3b12599123.jpg?v=1745195140",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051701_5fa3b1593f86e.jpg?v=1745195140",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051701_5fa3b16416d53.jpg?v=1745195140",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051701_5fa3b16cc38ad.jpg?v=1745195140",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051702_5fa3b178b0d5f.jpg?v=1745195140",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051645_5fa3adae23c15_43afc597-e39f-4ad8-af57-8f2e268333c6.jpg?v=1745195141",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051731_5fa3b87d0f25c.jpg?v=1745195141"
+    ],
+    "url": "https://laylax.com/products/laylax-443",
+    "dimensions": [
+      {
+        "label": "直径",
+        "value": "34mm"
+      }
+    ],
+    "lengthMm": null,
+    "janCodes": [
+      "4571443169983"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753228611882",
+    "name": "KRISS VECTOR クリスベクター M-LOK レイルハンドガード [XS][NITRO.Vo/ニトロヴォイス]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051843_5fa3c932cffcf.jpg?v=1745195141",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051843_5fa3c932cffcf.jpg?v=1745195141",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11061010_5fa4a2789ef06.jpg?v=1745195141",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051644_5fa3ad57552b3.jpg?v=1745195141",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051644_5fa3ad5fada10.jpg?v=1745195141",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051644_5fa3ad6f52eaa.jpg?v=1745195142",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051644_5fa3ad7bcb718.jpg?v=1745195142",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051645_5fa3ad8572fc3.jpg?v=1745195142",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051645_5fa3ad8e02320.jpg?v=1745195142",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051645_5fa3ad9d41237.jpg?v=1745195142",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051645_5fa3ada6ac0a3.jpg?v=1745195142",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051645_5fa3adae23c15.jpg?v=1745195142",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/11051732_5fa3b8955b3e1.jpg?v=1745195142"
+    ],
+    "url": "https://laylax.com/products/laylax-442",
+    "dimensions": [
+      {
+        "label": "直径",
+        "value": "34mm"
+      }
+    ],
+    "lengthMm": null,
+    "janCodes": [
+      "4571443169976"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753228579114",
+    "name": "東京マルイ ガスショットガン M870ブリーチャートップレイル M-LOK [NITRO.Vo/ニトロヴォイス]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10211103_5f8f96f489f4c.jpg?v=1745195143",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10211103_5f8f96f489f4c.jpg?v=1745195143",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10211103_5f8f96fb09364.jpg?v=1745195143",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10211103_5f8f96ffbd054.jpg?v=1745195143",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10211103_5f8f97055aa4a.jpg?v=1745195143",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10211103_5f8f970b14d1c.jpg?v=1745195143",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10211104_5f8f971446394.jpg?v=1745195143",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10211104_5f8f971aaaa8f.jpg?v=1745195143",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10211104_5f8f9720304b9.jpg?v=1745195143",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10211104_5f8f97251d82b.jpg?v=1745195144",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10211104_5f8f972a492dd.jpg?v=1745195144",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10211104_5f8f972e88b65.jpg?v=1745195144",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10211104_5f8f9732d85ed.jpg?v=1745195144"
+    ],
+    "url": "https://laylax.com/products/laylax-441",
+    "dimensions": [],
+    "lengthMm": null,
+    "janCodes": [
+      "4571443169969"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753228415274",
+    "name": "NITRO.Vo サイトプロテクター アイギスEz [光学サイト用防弾プロテクター]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241801_5db1687841ad5.jpg?v=1745195151",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241801_5db1687841ad5.jpg?v=1745195151",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241804_5db1691cd007b.jpg?v=1745195151",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241804_5db169238bc4c.jpg?v=1745195151",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241804_5db16929ee3af.jpg?v=1745195151",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241801_5db168870d18a.jpg?v=1745195151",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241801_5db16880b8387.jpg?v=1745195151",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241802_5db1688d2a020.jpg?v=1745195152",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241802_5db1689311eb7.jpg?v=1745195152",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241802_5db1689a9ffd6.jpg?v=1745195152",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10251134_5db25f407ae48.jpg?v=1745195152",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241802_5db168ae6475e.jpg?v=1745195152",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/10241802_5db168b44f9ac.jpg?v=1745195152"
+    ],
+    "url": "https://laylax.com/products/laylax-436",
+    "dimensions": [],
+    "lengthMm": null,
+    "janCodes": [
+      "4571443162892",
+      "4571443162908",
+      "4571443162915"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753228382506",
+    "name": "NITRO.Vo クリスベクター ストライクアドバンスドグリップ",
+    "manufacturer": "LAYLAX",
+    "category": "グリップ",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03181740_5c8f59813d022.jpg?v=1745195153",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03181740_5c8f59813d022.jpg?v=1745195153",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03181740_5c8f5986f17c9.jpg?v=1745195153",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03181750_5c8f5bdb5224a.jpg?v=1745195153",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03181740_5c8f599053974.jpg?v=1745195154",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03181740_5c8f5997274ad.jpg?v=1745195154",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03181741_5c8f59a2128ed.jpg?v=1745195154",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03181741_5c8f59a9a7e13.jpg?v=1745195154",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03181741_5c8f59b019dc2.jpg?v=1745195154",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03181741_5c8f59b56c151.jpg?v=1745195154",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03181741_5c8f59baba43d.jpg?v=1745195154"
+    ],
+    "url": "https://laylax.com/products/laylax-435",
+    "dimensions": [],
+    "lengthMm": null,
+    "janCodes": [
+      "4571443159762"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753228251434",
+    "name": "NITRO.Vo デュアルレイル[XS]エクストラショート45mm(Keymod/M-LOK対応ピカティニーレイル)",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04270103_5ae1f851eeb75.jpg?v=1745195160",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04270103_5ae1f851eeb75.jpg?v=1745195160",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04270103_5ae1f8582c626.jpg?v=1745195160",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04270103_5ae1f85e9da57.jpg?v=1745195160",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04270103_5ae1f86470e60.jpg?v=1745195160",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04270103_5ae1f86a73951.jpg?v=1745195160",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04270104_5ae1f876397c7.jpg?v=1745195160"
+    ],
+    "url": "https://laylax.com/products/laylax-431",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "45mm"
+      }
+    ],
+    "lengthMm": 45,
+    "janCodes": [
+      "4571443147448"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753228218666",
+    "name": "NITRO.Vo KRISS VECTOR ストライク レイルシステム",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03171451_5aacacc8e882b.jpg?v=1745195161",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03171451_5aacacc8e882b.jpg?v=1745195161",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03171451_5aacacd15a6ef.jpg?v=1745195161",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03171451_5aacacda3846f.jpg?v=1745195161",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03171451_5aacace18f9a2.jpg?v=1745195161",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03171451_5aacace8bfcd0.jpg?v=1745195161",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03171451_5aacacf1848ac.jpg?v=1745195161",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03171451_5aacacf8349b7.jpg?v=1745195161",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03171452_5aacad01a0753.jpg?v=1745195162",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03171452_5aacad0b535f4.jpg?v=1745195162",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03171543_5aacb8f70b57f.jpg?v=1745195162"
+    ],
+    "url": "https://laylax.com/products/laylax-430",
+    "dimensions": [],
+    "lengthMm": null,
+    "janCodes": [
+      "4571443147134"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753228022058",
+    "name": "東京マルイ ガスショットガン M870 マルチレイルワイドユース/ミドル95mm【メール便対応】",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/laylax-424-sq.jpg?v=1792138910",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/laylax-424-sq.jpg?v=1792138910",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03281950_5abb73849e7af.jpg?v=1745195168",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03281950_5abb738d24598.jpg?v=1745195168",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/03281950_5abb7393d7433.jpg?v=1745195168"
+    ],
+    "url": "https://laylax.com/products/laylax-424",
+    "dimensions": [
+      {
+        "label": "幅",
+        "value": "20mm"
+      }
+    ],
+    "lengthMm": null,
+    "janCodes": [
+      "4560329182284"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753227989290",
+    "name": "ハイマウントレイル Lサイズ",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/laylax-423-sq.jpg?v=1792138262",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/laylax-423-sq.jpg?v=1792138262",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/01291119_5a6e84b8483c0.jpg?v=1745195169"
+    ],
+    "url": "https://laylax.com/products/laylax-423",
+    "dimensions": [
+      {
+        "label": "幅",
+        "value": "20mm"
+      }
+    ],
+    "lengthMm": null,
+    "janCodes": [
+      "4560329182048"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753227956522",
+    "name": "ハイマウントレイル Mサイズ【メール便対応】",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/laylax-422-sq.jpg?v=1792138262",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/laylax-422-sq.jpg?v=1792138262",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05041113_5aebc1da8e0b8.jpg?v=1745195170",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05041113_5aebc1e380511.jpg?v=1745195170",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/05041114_5aebc1f2299b8.jpg?v=1745195170"
+    ],
+    "url": "https://laylax.com/products/laylax-422",
+    "dimensions": [
+      {
+        "label": "幅",
+        "value": "20mm"
+      }
+    ],
+    "lengthMm": null,
+    "janCodes": [
+      "4560329182031"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753227825450",
+    "name": "キャリングハンドルロング",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06011718_647854588ec12.jpg?v=1745195174",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06011718_647854588ec12.jpg?v=1745195174",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06011718_6478545ed6f00.jpg?v=1745195174",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06011718_64785462bcc7e.jpg?v=1745195174",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06011718_6478546671e79.jpg?v=1745195174",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06011731_64785761ed788.jpg?v=1745195174",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06011718_6478546fdea30.jpg?v=1745195174",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06011719_6478547509af5.jpg?v=1745195174",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/06011719_6478547a241ce.jpg?v=1745195174"
+    ],
+    "url": "https://laylax.com/products/laylax-418",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "220mm"
+      }
+    ],
+    "lengthMm": 220,
+    "janCodes": [
+      "4571443135926"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753227792682",
+    "name": "東京マルイ MP7A1エクステンションフレーム",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04301104_5cc7ad2561ed8.jpg?v=1745195175",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04301104_5cc7ad2561ed8.jpg?v=1745195175",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04301104_5cc7ad2a9db78.jpg?v=1745195175",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04301104_5cc7ad2f8f4fe.jpg?v=1745195175",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04301104_5cc7ad3445095.jpg?v=1745195175",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04301104_5cc7ad39d7d6d.jpg?v=1745195176",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04301104_5cc7ad3e1e512.jpg?v=1745195176",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04301104_5cc7ad42e98d8.jpg?v=1745195176",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04301104_5cc7ad476376c.jpg?v=1745195176",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04301104_5cc7ad4bd0bda.jpg?v=1745195176"
+    ],
+    "url": "https://laylax.com/products/laylax-417",
+    "dimensions": [],
+    "lengthMm": null,
+    "janCodes": [
+      "4571443135971"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753227759914",
+    "name": "NITRO.Vo VSR-10 アンダーレイル【メール便対応】",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/nitro-024_0.jpg?v=1745195177",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/nitro-024_0.jpg?v=1745195177",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/01301810_5e329d873c4fe.jpg?v=1745195177",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/nitro-024_2.jpg?v=1745195177",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/nitro-024_3.jpg?v=1745195177",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/nitro-024_4.jpg?v=1745195177"
+    ],
+    "url": "https://laylax.com/products/laylax-416",
+    "dimensions": [],
+    "lengthMm": null,
+    "janCodes": [
+      "4571443144058"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-10026754015530",
+    "name": "ダットサイト用M3皿ねじセット[Quintes sence]",
+    "manufacturer": "LAYLAX",
+    "category": "光学機器",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/M3FlatHeadScrewSet_0000_00_f350cdfd-66f1-41dc-8689-cff80393586f.jpg?v=1769584442",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/M3FlatHeadScrewSet_0000_00_f350cdfd-66f1-41dc-8689-cff80393586f.jpg?v=1769584442",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/M3FlatHeadScrewSet_0001_01.jpg?v=1769584442",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/M3FlatHeadScrewSet_0002_02.jpg?v=1769584442",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/M3FlatHeadScrewSet_0003_03.jpg?v=1769584442",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/M3FlatHeadScrewSet_0004_04.jpg?v=1769584442",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/M3FlatHeadScrewSet_0005_05.jpg?v=1769584442",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/M3FlatHeadScrewSet_0006_06.jpg?v=1769584442",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/M3FlatHeadScrewSet_0007_07.jpg?v=1769584442",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/M3-Flat-Head-Screw-Set_47323385-ce4d-4bb7-9162-7b0b4e1a35cd.jpg?v=1769586724",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/M3FlatHeadScrewSet_0008_08.jpg?v=1769586724",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/files/M3-Flat-Head-Screw-Set2.jpg?v=1769587508"
+    ],
+    "url": "https://laylax.com/products/4570189749688",
+    "dimensions": [],
+    "lengthMm": null,
+    "janCodes": [
+      "4570189749688"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753236967722",
+    "name": "RS1-4×24mm ショートスコープ SOL2[Quintes sence]",
+    "manufacturer": "LAYLAX",
+    "category": "光学機器",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12281352_63abcba6ee968.jpg?v=1745194943",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12281352_63abcba6ee968.jpg?v=1745194943",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12281354_63abcbf2835b3.jpg?v=1745194943",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/01061434_63b7b2c92bba7.jpg?v=1745194943",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12281354_63abcbf738e4f.jpg?v=1745194943",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12281354_63abcbfbc492e.jpg?v=1745194943",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12281354_63abcbffc550a.jpg?v=1745194943",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12281354_63abcc0864653.jpg?v=1745194943",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12281354_63abcc0c064e5.jpg?v=1745194943",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12281354_63abcc0fcfc19.jpg?v=1745194943",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12281354_63abcc13d4383.jpg?v=1745194943",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12281354_63abcc18dc2fd.jpg?v=1745194943",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/12281354_63abcc1d2c391.jpg?v=1745194943"
+    ],
+    "url": "https://laylax.com/products/laylax-662",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "240mm"
+      }
+    ],
+    "lengthMm": 240,
+    "janCodes": [
+      "4571443182715"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753237000490",
+    "name": "アジャスタブルマウントリング(2個入)[Quintes sence]",
+    "manufacturer": "LAYLAX",
+    "category": "外装",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08240907_64e69f2da520e.jpg?v=1745194941",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08240907_64e69f2da520e.jpg?v=1745194941",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08031352_64cb329f7d929.jpg?v=1745194941",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08031125_64cb1010d2fcf.jpg?v=1745194942",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08031352_64cb32a5c944e.jpg?v=1745194942",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08031353_64cb32ac42b28.jpg?v=1745194942",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08031353_64cb32b49d79e.jpg?v=1745194942",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08031355_64cb3357116db.jpg?v=1745194942",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08031354_64cb32ffe4d9d.jpg?v=1745194942",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08031354_64cb330b996aa.jpg?v=1745194942",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/08031355_64cb335d7e926.jpg?v=1745194942"
+    ],
+    "url": "https://laylax.com/products/laylax-663",
+    "dimensions": [
+      {
+        "label": "外径",
+        "value": "70mm"
+      }
+    ],
+    "lengthMm": null,
+    "janCodes": [
+      "4570189741064"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753236082986",
+    "name": "レッドドットサイト SOL XT-04 QS-MIL[Quintes sence]",
+    "manufacturer": "LAYLAX",
+    "category": "光学機器",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04131634_62567d024949f.jpg?v=1745194946",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04131634_62567d024949f.jpg?v=1745194946",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04131630_62567c3158988.jpg?v=1745194946",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04060935_624ce0379181b.jpg?v=1745194946",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04131631_62567c37c17d2.jpg?v=1745194946",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04060936_624ce08049438.jpg?v=1745194946",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04131631_62567c3e7d69e.jpg?v=1745194946",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04060936_624ce089378ed.jpg?v=1745194946",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04131631_62567c438b8b4.jpg?v=1745194946",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04131631_62567c477beb9.jpg?v=1745194946",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04060936_624ce0971b688.jpg?v=1745194946",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04060936_624ce09c1b67b.jpg?v=1745194946",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04060936_624ce09fc8361.jpg?v=1745194946"
+    ],
+    "url": "https://laylax.com/products/laylax-660",
+    "dimensions": [
+      {
+        "label": "本体サイズ",
+        "value": "46x27x27mm"
+      },
+      {
+        "label": "サイズ",
+        "value": "24x15mm"
+      }
+    ],
+    "lengthMm": null,
+    "janCodes": [
+      "4571443181916"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "laylax-8753236115754",
+    "name": "レッドドットサイト SOL BED-70 QS-MIL[Quintes sence]",
+    "manufacturer": "LAYLAX",
+    "category": "光学機器",
+    "image": "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04061252_624d0e6eb6965.jpg?v=1745194944",
+    "images": [
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04061252_624d0e6eb6965.jpg?v=1745194944",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04060924_624cdda8db537.jpg?v=1745194944",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04060924_624cddade8077.jpg?v=1745194944",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04060924_624cddb409dfb.jpg?v=1745194944",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04060924_624cddbbb1c21.jpg?v=1745194944",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04060924_624cddc1aab10.jpg?v=1745194944",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04060924_624cddc76f3c7.jpg?v=1745194944",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04060924_624cddd1154b7.jpg?v=1745194945",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04060924_624cddd68fb8d.jpg?v=1745194945",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04060924_624cdddbe82b1.jpg?v=1745194945",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04060925_624cdde12542a.jpg?v=1745194945",
+      "https://cdn.shopify.com/s/files/1/0843/1095/0186/products/04060925_624cdde94c8b7.jpg?v=1745194945"
+    ],
+    "url": "https://laylax.com/products/laylax-661",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "68mm"
+      }
+    ],
+    "lengthMm": 68,
+    "janCodes": [
+      "4571443181923"
+    ],
+    "modelNumbers": [],
+    "checkedAt": "2026-11-03"
   }
 ]

@@ -1,4 +1,4 @@
-import { airsoftGenreId, normalizeRakuten, searchParams } from "@/lib/rakuten";
+import { searchGenre, normalizeRakuten, searchParams } from "@/lib/rakuten";
 export const runtime = "nodejs";
 export const maxDuration = 15;
 export async function GET(request: Request) {
@@ -35,7 +35,10 @@ export async function GET(request: Request) {
   url.search = new URLSearchParams({
     applicationId,
     keyword: query.keyword,
-    genreId: airsoftGenreId,
+    genreId: searchGenre(
+      params.get("category") || "",
+      params.get("scope") || "",
+    ),
     page: String(query.page),
     sort: query.sort,
     hits: "12",

@@ -1,21 +1,97 @@
 export default function BBLoadingAnimation() {
-  return <svg className="bb-loading-animation" viewBox="0 0 280 270" aria-hidden="true">
-    <ellipse cx="142" cy="252" rx="68" ry="7" fill="#e8f3f9" />
-    <g className="bb-plunger"><rect x="115" y="5" width="8" height="34" rx="3" fill="#7b94a8" /><rect x="98" y="2" width="42" height="9" rx="4" fill="#3f627b" /></g>
-    <path d="M94 28H144Q153 28 153 38V119L131 135H111L86 119V38Q86 28 94 28Z" fill="#effaff" stroke="#6691ae" strokeWidth="2.5" />
-    <path d="M94 28H145" stroke="#3f627b" strokeWidth="7" strokeLinecap="round" />
-    <path d="M111 135H131V145H111Z" fill="#67d1f6" stroke="#278bb8" strokeWidth="2" />
-    <path d="M96 44V113L112 124" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" />
-    <g fill="#9adff8" stroke="#5bb8db" strokeWidth="1">
-      {[[107,62],[125,59],[139,69],[101,82],[119,78],[134,86],[105,100],[121,99],[136,105],[116,117]].map(([x,y],i)=><circle key={i} cx={x} cy={y} r="6" />)}
-    </g>
-    <g className="bb-transfer"><circle cx="121" cy="146" r="4" fill="#38bdf8" /><circle cx="121" cy="136" r="4" fill="#8ad8f5" /></g>
-    <path d="M109 160H151L156 209Q158 232 141 245L101 235Q117 218 109 160Z" fill="#39586e" />
-    <path d="M113 156H148V163H113Z" fill="#54798e" />
-    <path d="M120 174H140L144 213Q146 227 136 233L117 229Q126 214 120 174Z" fill="#edf9ff" />
-    <path d="M101 233L144 243L142 250L98 240Z" fill="#25455b" />
-    <path d="M149 177L153 210M147 220L140 237" fill="none" stroke="#7699ad" strokeWidth="2" strokeLinecap="round" />
-    {[[130,225],[135,215],[132,204],[131,193],[129,182]].map(([x,y],i)=><circle key={i} className="bb-magazine-bb" style={{animationDelay:`${i*.16}s`}} cx={x} cy={y} r="4.3" fill="#38bdf8" />)}
-    <path d="M181 122L187 128L181 134M181 147L187 153L181 159" fill="none" stroke="#a7d9ef" strokeWidth="2" strokeLinecap="round" transform="rotate(90 184 140)" />
-  </svg>;
+  return (
+    <svg
+      className="bb-loading-animation"
+      viewBox="0 0 280 285"
+      aria-hidden="true"
+    >
+      <ellipse cx="140" cy="272" rx="64" ry="6" fill="#e8f3f9" />
+      <g className="bb-plunger">
+        <rect x="124" y="7" width="7" height="37" rx="2" fill="#7b8790" />
+        <rect x="111" y="4" width="33" height="8" rx="2" fill="#28343c" />
+        <path d="M128 12V39" stroke="#d1dce4" strokeWidth="1.5" />
+      </g>
+      <path
+        d="M97 40L145 35Q153 35 155 44L159 137Q159 149 148 151L98 153Q91 153 91 145L88 50Q88 42 97 40Z"
+        fill="#253139"
+        stroke="#111e27"
+        strokeWidth="2"
+      />
+      <path
+        d="M94 48L98 143M149 44L153 139"
+        stroke="#53636e"
+        strokeWidth="1.6"
+        fill="none"
+      />
+      <path d="M122 64L111 91L122 120L130 89Z" fill="#8999a5" />
+      <path d="M122 64V119L130 89Z" fill="#566976" />
+      {[64, 81, 98, 115, 132].map((y) => (
+        <circle key={y} cx="141" cy={y} r="3" fill="#1a252d" stroke="#3b4b57" />
+      ))}
+      <path d="M97 151H111V158H97Z" fill="#202d36" />
+      <path d="M99 158H109V167H99Z" fill="#586e7c" />
+      <g className="bb-transfer">
+        <circle cx="104" cy="166" r="3.3" fill="#38bdf8" />
+        <circle cx="104" cy="157" r="3.3" fill="#9be0fa" />
+      </g>
+      <g transform="rotate(-10 129 220)">
+        <path
+          d="M103 182H145L151 265H105Z"
+          fill="#9caab5"
+          stroke="#566c7c"
+          strokeWidth="2"
+        />
+        <path
+          d="M104 182L111 172H125L128 184H145V193H103Z"
+          fill="#c7d3dc"
+          stroke="#566c7c"
+          strokeWidth="2"
+        />
+        <path
+          d="M113 173L116 181H122L120 173M132 177H144V185H132Z"
+          fill="#354b5b"
+        />
+        <path d="M108 195H113L120 255H114Z" fill="#405968" />
+        <path d="M118 198H124L131 253H125Z" fill="#d9eef8" />
+        <path
+          d="M142 197L147 255M131 209H139V222H133Z"
+          fill="none"
+          stroke="#778d9d"
+          strokeWidth="1.5"
+        />
+        {[203, 221, 239].map((y) => (
+          <circle
+            key={y}
+            cx={135 + (y - 203) * 0.08}
+            cy={y}
+            r="1.6"
+            fill="#405968"
+          />
+        ))}
+        <path
+          d="M101 261L151 259L154 268L102 273Z"
+          fill="#748b9c"
+          stroke="#4b6475"
+          strokeWidth="2"
+        />
+        {[
+          [127, 248],
+          [126, 237],
+          [124, 226],
+          [123, 215],
+          [121, 204],
+        ].map(([x, y], i) => (
+          <circle
+            key={i}
+            className="bb-magazine-bb"
+            style={{ animationDelay: `${i * 0.16}s` }}
+            cx={x}
+            cy={y}
+            r="2.6"
+            fill="#38bdf8"
+          />
+        ))}
+      </g>
+    </svg>
+  );
 }

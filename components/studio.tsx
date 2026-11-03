@@ -1117,7 +1117,37 @@ export default function Studio() {
               : undefined
           }
           add={async (part) => {
-            if (!(await addStoredPart(part)))
+            if (part.category === "本体") {
+              const validated = await parseProject({
+                version: 2,
+                name: "base",
+                layers: [part],
+              });
+              const base = project.layers[0];
+              const replacement = {
+                ...validated.layers[0],
+                id: base?.id || uid(),
+                category: "本体",
+                x: base?.x ?? 120,
+                y: base?.y ?? 190,
+                mm: base?.mm ?? 800,
+                rotation: base?.rotation ?? 0,
+                flip: base?.flip ?? false,
+                visible: true,
+                attachedToBase: false,
+              };
+              commit({
+                ...project,
+                layers: [replacement, ...project.layers.slice(1)],
+              });
+              setSelected(replacement.id);
+              setTab("layers");
+              notify(
+                base
+                  ? "本体画像を入れ替えました。実寸を確認してください。"
+                  : "本体画像を追加しました。",
+              );
+            } else if (!(await addStoredPart(part)))
               throw new Error(
                 "追加できません。レイヤー数と画像を確認してください。",
               );

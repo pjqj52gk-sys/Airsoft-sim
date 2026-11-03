@@ -1,5 +1,19 @@
+import { partCategory } from "./part-categories.ts";
+import {
+  productIdentifiers,
+  productDimensions,
+  referenceLengthMm,
+  type ProductDimension,
+  type ProductIdentifiers,
+} from "./product-specs.ts";
 // Rakuten Genre API: サバイバルゲーム・トイガン (verified 2026-11-03).
 export const airsoftGenreId = "213684";
+export function searchGenre(category: string, scope = "") {
+  return (
+    partCategory(category)?.genreId ||
+    (scope === "guns" ? "213685" : airsoftGenreId)
+  );
+}
 export type RakutenItem = {
   id: string;
   name: string;
@@ -10,6 +24,9 @@ export type RakutenItem = {
   productUrl: string;
   url: string;
   sponsored: boolean;
+  identifiers: ProductIdentifiers;
+  dimensions: ProductDimension[];
+  referenceMm?: number;
 };
 export type RakutenResults = {
   items: RakutenItem[];
@@ -78,6 +95,9 @@ export function normalizeRakuten(data: unknown): RakutenResults {
   const items: RakutenItem[] = rows.slice(0, 30).flatMap((row) => {
     if (!row || typeof row !== "object") return [];
     const item = row.item ?? row.Item ?? row;
+    const caption =
+      typeof item.itemCaption === "string" ? item.itemCaption : "";
+    const dimensions = productDimensions(caption);
     const url = rakutenUrl(item.affiliateUrl) || rakutenUrl(item.itemUrl);
     const images = Array.isArray(item.mediumImageUrls)
       ? [
@@ -109,6 +129,9 @@ export function normalizeRakuten(data: unknown): RakutenResults {
       {
         id: String(item.itemCode || url),
         name: item.itemName.slice(0, 500),
+        identifiers: productIdentifiers(item.itemName, caption),
+        dimensions,
+        referenceMm: referenceLengthMm(dimensions),
         shop: String(item.shopName || "").slice(0, 100),
         price: item.itemPrice,
         image,
