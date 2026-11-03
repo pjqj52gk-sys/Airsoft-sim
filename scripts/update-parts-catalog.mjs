@@ -1,6 +1,7 @@
 // Update metadata only. Product images are fetched from the manufacturer at runtime.
 import fs from "node:fs/promises";
 import { productPhotos } from "../lib/catalog-photos.mjs";
+import { maruiPrice } from "../lib/catalog-price.ts";
 const origin = "https://www.tokyo-marui.co.jp";
 const decode = (text) =>
   text
@@ -76,17 +77,20 @@ for (const path of [...paths].sort()) {
     images,
     url: origin + path,
     dimensions,
+    price: maruiPrice(text),
     lengthMm: length ? Number(length[1]) : null,
     checkedAt: new Date().toISOString().slice(0, 10),
   });
 }
 if (data.length < 20)
   throw new Error("Catalog unexpectedly small; existing file was not changed.");
-const file=new URL("../lib/parts-catalog.json",import.meta.url);
-const otherManufacturers=JSON.parse(await fs.readFile(file,"utf8")).filter(p=>p.manufacturer!=="東京マルイ");
+const file = new URL("../lib/parts-catalog.json", import.meta.url);
+const otherManufacturers = JSON.parse(await fs.readFile(file, "utf8")).filter(
+  (p) => p.manufacturer !== "東京マルイ",
+);
 await fs.writeFile(
   new URL("../lib/parts-catalog.json", import.meta.url),
-  JSON.stringify([...data,...otherManufacturers], null, 2) + "\n",
+  JSON.stringify([...data, ...otherManufacturers], null, 2) + "\n",
 );
 console.log(
   `Updated ${data.length} products (${data.filter((p) => p.dimensions.length).length} with published dimensions).`,

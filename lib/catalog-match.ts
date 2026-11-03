@@ -1,4 +1,5 @@
 import type { ProductIdentifiers } from "./product-specs.ts";
+import type { CatalogPrice } from "./catalog-price.ts";
 export type CatalogProduct = {
   id: string;
   name: string;
@@ -9,6 +10,7 @@ export type CatalogProduct = {
   dimensions: { label: string; value: string }[];
   lengthMm: number | null;
   checkedAt: string;
+  price?: CatalogPrice | null;
   janCodes?: string[];
   modelNumbers?: string[];
 };

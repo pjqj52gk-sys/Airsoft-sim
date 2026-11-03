@@ -4,7 +4,7 @@ import type { RakutenItem, RakutenResults } from "@/lib/rakuten";
 import { readImage, uid, type Layer } from "@/lib/project";
 import type { ShopProduct } from "@/lib/shop-product";
 import CategoryBrowser from "./category-browser";
-import catalog from "@/lib/parts-catalog.json";
+import catalogData from "@/lib/parts-catalog.json";
 import { matchCatalog, type CatalogProduct } from "@/lib/catalog-match";
 import { catalogImageUrl } from "@/lib/catalog-image";
 import {
@@ -14,6 +14,7 @@ import {
   type ProductDimension,
 } from "@/lib/product-specs";
 import { partCategory } from "@/lib/part-categories";
+const catalog = catalogData as CatalogProduct[];
 
 export default function RakutenSearch({
   attachLink,

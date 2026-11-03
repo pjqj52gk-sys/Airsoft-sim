@@ -1,5 +1,6 @@
 // Read publicly published manufacturer product data only. Never fetch account/cart data.
 import fs from "node:fs/promises";
+import { variantPrice } from "../lib/catalog-price.ts";
 import {
   productDimensions,
   referenceLengthMm,
@@ -56,6 +57,7 @@ for (const collection of collections) {
       name: product.title,
       manufacturer: "LAYLAX",
       category,
+      price: variantPrice(variants),
       image: images[0],
       images,
       url: `https://laylax.com/products/${product.handle}`,

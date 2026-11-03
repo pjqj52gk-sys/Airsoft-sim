@@ -5,11 +5,14 @@ import ShopImport from "./shop-import";
 import RakutenSearch from "./rakuten-search";
 import LoadingOverlay from "./loading-overlay";
 import Icon from "./icon";
-import catalog from "@/lib/parts-catalog.json";
+import catalogData from "@/lib/parts-catalog.json";
+import type { CatalogProduct } from "@/lib/catalog-match";
+import { referenceCatalogPrice, catalogPriceLabel } from "@/lib/catalog-price";
 import { matchesPart } from "@/lib/part-search";
 import { catalogImageUrl } from "@/lib/catalog-image";
 import { listParts, type StoredPart } from "@/lib/storage";
 import { readImage, uid, type Layer } from "@/lib/project";
+const catalog = catalogData as CatalogProduct[];
 
 export default function PartSearch({
   close,
@@ -91,7 +94,7 @@ export default function PartSearch({
         flip: false,
         visible: true,
         attachedToBase: false,
-        price: 0,
+        price: referenceCatalogPrice(item.price),
         url: item.url,
         category: item.category,
       });
@@ -320,6 +323,12 @@ export default function PartSearch({
                       {p.manufacturer} · {p.category}
                     </small>
                     <h3>{p.name}</h3>
+                    <p
+                      className="hint"
+                      title={`公式掲載価格・${p.checkedAt}確認`}
+                    >
+                      {p.price ? catalogPriceLabel(p.price) : "価格未掲載"}
+                    </p>
                     <dl className="part-dimensions">
                       {p.dimensions.length ? (
                         p.dimensions.map((d, i) => (
