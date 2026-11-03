@@ -7,7 +7,52 @@ import {
   referenceLengthMm,
   mergeDimensions,
   combinedReferenceLength,
+  referenceLengthOptions,
 } from "../lib/product-specs.ts";
+test("published stock length alternatives are selectable, carry conditions, and exclude package and rail sizes", () => {
+  const dims = productDimensions(
+    "<div>●全長：803 mm / 878 mm（ストック伸長時）<br>●パッケージサイズ：1000x200x100mm</div>",
+  );
+  const options = referenceLengthOptions(dims, dims);
+  assert.deepEqual(
+    options.map((o) => o.mm),
+    [803, 878],
+  );
+  assert.match(options[1].label, /ストック伸長時/);
+  assert.equal(referenceLengthMm(dims), undefined);
+  assert.deepEqual(
+    referenceLengthOptions([
+      { label: "全長", value: "80.3 / 87.8cm", kind: "product" },
+    ]).map((o) => o.mm),
+    [803, 878],
+  );
+  assert.deepEqual(
+    referenceLengthOptions([
+      { label: "全長", value: "100mm", kind: "package" },
+    ]),
+    [],
+  );
+  const conflict = referenceLengthOptions(
+    [{ label: "全長", value: "48mm", kind: "product" }],
+    [{ label: "全長", value: "50mm", kind: "product" }],
+  );
+  assert.deepEqual(
+    conflict.map((o) => o.mm),
+    [48, 50],
+  );
+  assert.deepEqual(
+    referenceLengthOptions([
+      { label: "直径", value: "30mm", kind: "product" },
+    ]).map((o) => o.mm),
+    [30],
+  );
+  assert.deepEqual(
+    referenceLengthOptions([
+      { label: "サイズ", value: "46x27x27mm", kind: "product" },
+    ]),
+    [],
+  );
+});
 test("published JAN codes and manufacturer model numbers are extracted separately from shop item codes", () => {
   assert.equal(validJan("4570189741422"), true);
   assert.equal(validJan("4570189741423"), false);

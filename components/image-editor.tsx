@@ -9,7 +9,11 @@ import { cropRect, measuredWidth, distance } from "@/lib/image-edit";
 import { cropImage, rectifyImage, eraseImage } from "@/lib/image-processing";
 import type { Point } from "@/lib/image-edit";
 export type EditMode =
-  "crop" | "erase" | "perspective" | "measure" | "background";
+  | "crop"
+  | "erase"
+  | "perspective"
+  | "measure"
+  | "background";
 const titles = {
   crop: "画像を切り出す",
   erase: "フリーハンドで消す",
@@ -29,7 +33,15 @@ export default function ImageEditor({
   apply: (updates: Partial<Layer>, extract: boolean) => void;
 }) {
   const [points, setPoints] = useState<Point[]>([]);
-  const [length, setLength] = useState(String(layer.referenceMm || 100));
+  const [length, setLength] = useState(
+    layer.referenceMm
+      ? String(layer.referenceMm)
+      : layer.referenceOptions?.length === 1
+        ? String(layer.referenceOptions[0].mm)
+        : layer.referenceOptions?.length
+          ? ""
+          : "100",
+  );
   const [tolerance, setTolerance] = useState(28);
   const [preview, setPreview] = useState(layer.src);
   const [extract, setExtract] = useState(false);
@@ -82,7 +94,10 @@ export default function ImageEditor({
     try {
       let updates: Partial<Layer>;
       if (mode === "measure")
-        updates = { mm: measuredWidth(layer.width, points, Number(length)) };
+        updates = {
+          mm: measuredWidth(layer.width, points, Number(length)),
+          referenceMm: Number(length),
+        };
       else if (mode === "crop")
         updates = await cropImage(
           layer,
@@ -147,7 +162,9 @@ export default function ImageEditor({
               : mode === "perspective"
                 ? "画像を平面の長方形に補正します。左上 → 右上 → 右下 → 左下の順に4点を選択。"
                 : mode === "measure"
-                  ? "長さが分かる区間の両端を選び、その区間の実寸を入力してください。"
+                  ? layer.referenceOptions?.length
+                    ? "取得した寸法を選び、画像上の対応する2点を選択してください。"
+                    : "長さが分かる区間の両端を選び、その区間の実寸を入力してください。"
                   : "左上の色を基準に外周の背景を透過します。許容差を変えて確認できます。"}
         </p>
         <div className="image-edit-surface">
@@ -293,6 +310,28 @@ export default function ImageEditor({
         </div>
         {mode === "measure" && (
           <div className="measurement-fields">
+            {!!layer.referenceOptions?.length && (
+              <label className="field-label">
+                取得した寸法
+                <select
+                  aria-label="取得した寸法"
+                  disabled={busy}
+                  value={
+                    layer.referenceOptions.some((o) => String(o.mm) === length)
+                      ? length
+                      : ""
+                  }
+                  onChange={(e) => setLength(e.target.value)}
+                >
+                  <option value="">寸法を選択、または下に入力</option>
+                  {layer.referenceOptions.map((o) => (
+                    <option key={o.mm} value={o.mm}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
             <label className="field-label">
               選択区間の実寸（mm）
               <input
@@ -398,6 +437,10 @@ export default function ImageEditor({
             className="button primary"
             disabled={
               busy ||
+              (mode === "measure" &&
+                (!Number.isFinite(Number(length)) ||
+                  Number(length) <= 0 ||
+                  Number(length) > 5000)) ||
               (mode === "background"
                 ? !changed
                 : mode === "erase"

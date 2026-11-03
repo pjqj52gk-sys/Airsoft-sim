@@ -87,6 +87,19 @@ test("package size never becomes the airsoft part calibration reference", () => 
   assert.equal(p.dimensions[0].kind, "package");
   assert.equal(p.referenceMm, undefined);
 });
+test("HBLT-style plain description stock lengths are retained without silently choosing the first number", () => {
+  const p = extractShopProduct(
+    '<title>東京マルイ Colt M4 SOPMOD</title><div class="contentBox">●全長：803 mm / 878 mm（ストック伸長時）<br>●パッケージサイズ：横860 x 縦290 x 厚100 mm</div>',
+    "https://item.rakuten.co.jp/hblt/hb000022786/",
+  );
+  assert.ok(
+    p.dimensions.some(
+      (d) =>
+        d.kind === "product" && d.label === "全長" && d.value.includes("878"),
+    ),
+  );
+  assert.equal(p.referenceMm, undefined);
+});
 test("image URLs and page challenges cannot turn into unsafe or fabricated product results", () => {
   const p = extractShopProduct(
     `<script type="application/ld+json">{"@type":"Product","name":"safe","image":["http://127.0.0.1/a.jpg","data:image/png;base64,abc","https://cdn.example.com/picture.jpg"]}</script>`,

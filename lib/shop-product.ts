@@ -1,10 +1,16 @@
 import { shopUrl } from "./shop-url.ts";
 import { productPhotos } from "./catalog-photos.mjs";
 import type { CatalogProduct } from "./catalog-match.ts";
+import {
+  productDimensions,
+  referenceLengthMm,
+  productIdentifiers,
+  type ProductIdentifiers,
+} from "./product-specs.ts";
 export type ShopDimension = {
   label: string;
   value: string;
-  kind: "product" | "package";
+  kind: "product" | "package" | "compatibility";
 };
 export type ShopProduct = {
   url: string;
@@ -12,6 +18,7 @@ export type ShopProduct = {
   site: string;
   images: string[];
   imageDetails?: { url: string; width: number; height: number }[];
+  identifiers?: ProductIdentifiers;
   dimensions: ShopDimension[];
   referenceMm?: number;
   linkOnly?: boolean;
@@ -308,32 +315,25 @@ export function extractShopProduct(html: string, source: string): ShopProduct {
     );
     if (m) addDimension(m[1], m[2]);
   }
-  const known = dimensions.find(
-    (d) =>
-      d.kind === "product" &&
-      /^(?:全長|長さ|overall length|length)$/i.test(d.label),
-  );
-  const mm = known?.value.match(
-    /^(?:約\s*)?([\d.]+)\s*(mm|cm|m|in(?:ch)?|インチ|ミリ|センチ)\b/i,
-  );
-  const reference = mm
-    ? Number(mm[1]) *
-      ({
-        mm: 1,
-        cm: 10,
-        m: 1000,
-        in: 25.4,
-        inch: 25.4,
-        インチ: 25.4,
-        ミリ: 1,
-        センチ: 10,
-      }[mm[2].toLowerCase()] || 1)
-    : undefined;
+  for (const d of productDimensions(html)) {
+    if (
+      !dimensions.some(
+        (x) =>
+          x.label === d.label &&
+          x.value === d.value &&
+          (x.kind === d.kind || (d.kind === "package" && x.kind === "product")),
+      ) &&
+      dimensions.length < 16
+    )
+      dimensions.push(d);
+  }
+  const reference = referenceLengthMm(dimensions);
   return {
     url: url.href,
     name,
     site: url.hostname,
     images,
+    identifiers: productIdentifiers(name, html),
     dimensions,
     referenceMm:
       reference && reference > 0 && reference <= 5000 ? reference : undefined,

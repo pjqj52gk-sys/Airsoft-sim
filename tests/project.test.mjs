@@ -35,6 +35,11 @@ test("V2 round-trip preserves coordinates, visibility, rotation and purchase not
     url: "https://example.com/part",
     attachedToBase: true,
     referenceMm: 67,
+    referenceOptions: [
+      { mm: 67, label: "公式 · 全長 67mm" },
+      { mm: 71, label: "公式 · 全長 71mm（装着時）" },
+      { mm: -1, label: "invalid" },
+    ],
   };
   const result = await parseProject(JSON.parse(JSON.stringify(source)));
   const part = result.layers[1];
@@ -47,6 +52,10 @@ test("V2 round-trip preserves coordinates, visibility, rotation and purchase not
   assert.equal(part.url, source.layers[1].url);
   assert.equal(part.attachedToBase, true);
   assert.equal(part.referenceMm, 67);
+  assert.deepEqual(
+    part.referenceOptions,
+    source.layers[1].referenceOptions.slice(0, 2),
+  );
   assert.notEqual(part.id, source.layers[1].id);
 });
 test("legacy pixel offsets and height-based dimensions migrate to millimetres", async () => {

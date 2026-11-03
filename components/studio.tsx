@@ -1167,7 +1167,8 @@ export default function Studio() {
                 "追加できません。レイヤー数と画像を確認してください。",
               );
             setSearch(null);
-            if (part.referenceMm) setEditor("measure");
+            if (part.referenceMm || part.referenceOptions?.length)
+              setEditor("measure");
           }}
         />
       )}

@@ -36,6 +36,7 @@ export async function POST(request: Request) {
     const officialMatch = matchCatalog(
       product.name,
       catalog as CatalogProduct[],
+      product.identifiers,
     );
     return Response.json(
       { ...product, ...images, ...(officialMatch ? { officialMatch } : {}) },

@@ -10,6 +10,8 @@ import { catalogImageUrl } from "@/lib/catalog-image";
 import {
   mergeDimensions,
   combinedReferenceLength,
+  referenceLengthOptions,
+  type ReferenceLengthOption,
   type SourcedDimension,
   type ProductDimension,
 } from "@/lib/product-specs";
@@ -57,6 +59,9 @@ export default function RakutenSearch({
   >([]);
   const [lowResolution, setLowResolution] = useState(false);
   const [referenceMm, setReferenceMm] = useState<number | undefined>();
+  const [referenceOptions, setReferenceOptions] = useState<
+    ReferenceLengthOption[]
+  >([]);
   const controller = useRef<AbortController | null>(null);
   useEffect(() => () => controller.current?.abort(), []);
   function loadingImage(value: boolean) {
@@ -98,6 +103,13 @@ export default function RakutenSearch({
         official?.lengthMm,
       ),
     );
+    setReferenceOptions(
+      referenceLengthOptions(
+        officialDimensions,
+        retailDimensions,
+        official?.lengthMm,
+      ),
+    );
     setError("");
     setNotice("検索画像（小）");
     if (preferOfficial && official?.images.length) {
@@ -121,6 +133,43 @@ export default function RakutenSearch({
       });
       if (!response.ok) throw new Error();
       const product: ShopProduct = await response.json();
+      const pageMatch = product.officialMatch;
+      const chosenOfficial = official || pageMatch?.product;
+      const chosenDimensions = (chosenOfficial?.dimensions || []).map((d) => ({
+        ...d,
+        kind: "product" as const,
+      }));
+      const allRetail = [...retailDimensions, ...product.dimensions];
+      setDimensions(mergeDimensions(chosenDimensions, allRetail));
+      setReferenceMm(
+        combinedReferenceLength(
+          chosenDimensions,
+          allRetail,
+          chosenOfficial?.lengthMm,
+        ),
+      );
+      setReferenceOptions(
+        referenceLengthOptions(
+          chosenDimensions,
+          allRetail,
+          chosenOfficial?.lengthMm,
+        ),
+      );
+      if (chosenOfficial) {
+        setSelectedOfficial(chosenOfficial);
+        setMatchMethod(matched?.method || pageMatch?.method || "name");
+        setSelectedLayerCategory(chosenOfficial.category);
+        if (preferOfficial && chosenOfficial.images.length) {
+          setImages(
+            chosenOfficial.images.map((_, i) =>
+              catalogImageUrl(chosenOfficial, i),
+            ),
+          );
+          setPhotoSource("official");
+          setNotice("公式カタログの写真");
+          return;
+        }
+      }
       if (!product.images.length) throw new Error();
       setImages(product.images);
       setImageDetails(product.imageDetails || []);
@@ -130,15 +179,6 @@ export default function RakutenSearch({
           : "商品ページの写真",
       );
       setResolution("");
-      const allRetail = [...retailDimensions, ...product.dimensions];
-      setDimensions(mergeDimensions(officialDimensions, allRetail));
-      setReferenceMm(
-        combinedReferenceLength(
-          officialDimensions,
-          allRetail,
-          official?.lengthMm,
-        ),
-      );
     } catch {
       if (!current.signal.aborted)
         setNotice(
@@ -178,6 +218,7 @@ export default function RakutenSearch({
         name: selected.name,
         mm: selectedLayerCategory === "本体" ? 800 : 150,
         referenceMm,
+        referenceOptions,
         x: 430,
         y: 160,
         rotation: 0,

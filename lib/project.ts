@@ -1,3 +1,4 @@
+import type { ReferenceLengthOption } from "./product-specs.ts";
 export type Layer = {
   id: string;
   name: string;
@@ -7,6 +8,7 @@ export type Layer = {
   height: number;
   mm: number;
   referenceMm?: number;
+  referenceOptions?: ReferenceLengthOption[];
   x: number;
   y: number;
   rotation: number;
@@ -147,6 +149,19 @@ export async function parseProject(value: unknown): Promise<Project> {
           row.referenceMm <= 5000
             ? row.referenceMm
             : undefined,
+        referenceOptions: Array.isArray(row.referenceOptions)
+          ? row.referenceOptions.slice(0, 16).flatMap((o: unknown) => {
+              if (!o || typeof o !== "object") return [];
+              const option = o as Record<string, unknown>;
+              return typeof option.mm === "number" &&
+                Number.isFinite(option.mm) &&
+                option.mm > 0 &&
+                option.mm <= 5000 &&
+                typeof option.label === "string"
+                ? [{ mm: option.mm, label: option.label.slice(0, 120) }]
+                : [];
+            })
+          : undefined,
         x: legacy ? 120 + number(pos.x, 0) * scale : number(row.x, 120),
         y: legacy ? 190 + number(pos.y, 0) * scale : number(row.y, 190),
         rotation: number(row.rotation, 0, -360, 360),

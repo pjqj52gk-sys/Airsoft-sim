@@ -109,11 +109,31 @@ export function productDimensions(description: string): ProductDimension[] {
 export function referenceLengthMm(dimensions: ProductDimension[]) {
   const lengths = dimensions
     .filter(
-      (d) => d.kind === "product" && /^(?:本体|商品|製品)?全長$/.test(d.label),
+      (d) =>
+        d.kind === "product" &&
+        /^(?:(?:本体|商品|製品)?全長|長さ|length|overall length)$/i.test(
+          d.label,
+        ),
     )
     .map((d) => {
-      const m = d.value.match(/^(\d+(?:\.\d+)?)\s*(mm|cm|ミリ|センチ)$/i);
-      return m ? Number(m[1]) * (/cm|センチ/i.test(m[2]) ? 10 : 1) : undefined;
+      const m = d.value.match(
+        /^(?:約\s*)?(\d+(?:\.\d+)?)\s*(mm|cm|m|in(?:ch)?|インチ|ミリ|センチ)$/i,
+      );
+      const factor = m
+        ? (
+            {
+              mm: 1,
+              cm: 10,
+              m: 1000,
+              in: 25.4,
+              inch: 25.4,
+              インチ: 25.4,
+              ミリ: 1,
+              センチ: 10,
+            } as Record<string, number>
+          )[m[2].toLowerCase()]
+        : 1;
+      return m ? Number(m[1]) * factor : undefined;
     });
   const unique = [...new Set(lengths)];
   return unique.length === 1 &&
@@ -127,6 +147,56 @@ export type SourcedDimension = ProductDimension & {
   source: "official" | "retail";
   conflict?: boolean;
 };
+export type ReferenceLengthOption = { mm: number; label: string };
+export function referenceLengthOptions(
+  official: ProductDimension[],
+  retail: ProductDimension[] = [],
+  published?: number | null,
+): ReferenceLengthOption[] {
+  const options: ReferenceLengthOption[] = [];
+  const dimensions = mergeDimensions(official, retail).sort(
+    (a, b) =>
+      Number(/全長|overall length/i.test(b.label)) -
+      Number(/全長|overall length/i.test(a.label)),
+  );
+  for (const d of dimensions) {
+    if (
+      d.kind !== "product" ||
+      !/^(?:(?:本体|商品|製品)?(?:全長|全幅|全高|長さ|幅|高さ|直径|外径)|対物レンズ径|チューブ径|length|overall length|width|height)$/i.test(
+        d.label,
+      )
+    )
+      continue;
+    const value = d.value.normalize("NFKC");
+    const plain = value.replace(/\([^)]*\)/g, "");
+    if (/[×x*]/i.test(plain)) continue;
+    const inherited = plain.replace(
+      /(\d+(?:\.\d+)?)\s*([/〜~～-])\s*(\d+(?:\.\d+)?)\s*(mm|cm|ミリ|センチ)/gi,
+      "$1$4 $2 $3$4",
+    );
+    const values = [
+      ...inherited.matchAll(/(\d+(?:\.\d+)?)\s*(mm|cm|ミリ|センチ)/gi),
+    ];
+    const note = value.match(/\(([^)]*)\)\s*$/)?.[1];
+    for (const [i, m] of values.entries()) {
+      const mm = Number(m[1]) * (/cm|センチ/i.test(m[2]) ? 10 : 1);
+      if (mm <= 0 || mm > 5000 || options.some((o) => o.mm === mm)) continue;
+      options.push({
+        mm,
+        label: `${d.source === "official" ? "公式" : "販売店"} · ${d.label} ${mm} mm${i === values.length - 1 && note ? `（${note}）` : ""}`,
+      });
+    }
+  }
+  if (
+    published &&
+    Number.isFinite(published) &&
+    published > 0 &&
+    published <= 5000 &&
+    !options.some((o) => o.mm === published)
+  )
+    options.unshift({ mm: published, label: `公式 · 全長 ${published} mm` });
+  return options.slice(0, 16);
+}
 const dimensionKey = (s: string) =>
   s.replace(/^(本体|製品|商品)/, "").replace(/\s/g, "");
 const dimensionValue = (s: string) =>

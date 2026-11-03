@@ -12,6 +12,10 @@ import { matchesPart } from "@/lib/part-search";
 import { catalogImageUrl } from "@/lib/catalog-image";
 import { listParts, type StoredPart } from "@/lib/storage";
 import { readImage, uid, type Layer } from "@/lib/project";
+import {
+  referenceLengthOptions,
+  combinedReferenceLength,
+} from "@/lib/product-specs";
 const catalog = catalogData as CatalogProduct[];
 
 export default function PartSearch({
@@ -87,7 +91,16 @@ export default function PartSearch({
         id: uid(),
         name: item.name,
         mm: 150,
-        referenceMm: item.lengthMm ?? undefined,
+        referenceMm: combinedReferenceLength(
+          item.dimensions.map((d) => ({ ...d, kind: "product" })),
+          [],
+          item.lengthMm,
+        ),
+        referenceOptions: referenceLengthOptions(
+          item.dimensions.map((d) => ({ ...d, kind: "product" })),
+          [],
+          item.lengthMm,
+        ),
         x: 430,
         y: 160,
         rotation: 0,

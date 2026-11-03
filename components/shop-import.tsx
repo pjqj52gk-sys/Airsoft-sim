@@ -5,6 +5,10 @@ import { readImage, uid } from "@/lib/project";
 import type { ShopProduct } from "@/lib/shop-product";
 import { shopUrl } from "@/lib/shop-url";
 import { catalogImageUrl } from "@/lib/catalog-image";
+import {
+  referenceLengthOptions,
+  combinedReferenceLength,
+} from "@/lib/product-specs";
 
 export default function ShopImport({
   add,
@@ -33,6 +37,11 @@ export default function ShopImport({
     useOfficial && official?.images.length
       ? official.images.map((_, i) => catalogImageUrl(official, i))
       : product?.images || [];
+  const calibrationOptions = referenceLengthOptions(
+    (official?.dimensions || []).map((d) => ({ ...d, kind: "product" })),
+    product?.dimensions || [],
+    official?.lengthMm,
+  );
   const files = useRef<HTMLInputElement>(null);
   const loading = (value: boolean) => {
     setBusy(value);
@@ -66,8 +75,14 @@ export default function ShopImport({
       setUrl(found.url);
       setName(found.name);
       setPhoto(0);
-      const reference =
-        found.officialMatch?.product.lengthMm ?? found.referenceMm;
+      const reference = combinedReferenceLength(
+        (found.officialMatch?.product.dimensions || []).map((d) => ({
+          ...d,
+          kind: "product",
+        })),
+        found.dimensions,
+        found.officialMatch?.product.lengthMm,
+      );
       setLength(reference ? String(reference) : "");
       if (!found.images.length && !found.linkOnly) {
         setError(
@@ -94,6 +109,7 @@ export default function ShopImport({
       name: name.trim() || "ショップのパーツ",
       mm: category === "本体" ? 800 : 150,
       referenceMm: mm,
+      referenceOptions: calibrationOptions,
       x: 430,
       y: 160,
       rotation: 0,

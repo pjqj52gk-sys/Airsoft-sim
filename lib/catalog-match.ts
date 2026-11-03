@@ -18,7 +18,10 @@ const normalize = (s: string) =>
   s
     .normalize("NFKC")
     .toUpperCase()
-    .replace(/[\s\p{P}\p{S}]/gu, "");
+    .replace(/[\s\p{P}\p{S}]/gu, "")
+    .replace(/SOPMOD/g, "ソップモッド")
+    .replace(/M4ソップモッド/g, "ソップモッドM4")
+    .replace(/DELTACUSTOM/g, "デルタカスタム");
 const aliases: Record<string, string[]> = {
   "396": ["マイクロプロサイト"],
   "397": ["グロック用マイクロプロサイトマウント"],
@@ -65,6 +68,11 @@ export function matchCatalog(
   }
   const candidates: { product: CatalogProduct; score: number }[] = [];
   for (const product of catalog) {
+    if (
+      product.id === "marui-body-201" &&
+      /URGI|ブロック[123]|BLOCK[123]/.test(text)
+    )
+      continue;
     if (product.manufacturer === "東京マルイ") {
       if (
         !/東京マルイ|TOKYOMARUI/.test(text) ||
