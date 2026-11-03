@@ -39,7 +39,7 @@ export default function Studio() {
   current.current = project;
   const [selected, setSelected] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
-  const [search, setSearch] = useState(false);
+  const [search, setSearch] = useState<"parts" | "guns" | null>(null);
   const [grid, setGrid] = useState(true);
   const [compare, setCompare] = useState(false);
   const [tab, setTab] = useState("layers");
@@ -623,6 +623,13 @@ export default function Studio() {
                     <small>ここに画像をドロップしても追加できます</small>
                   </button>
                 )}
+                <button
+                  className="button secondary full-width"
+                  onClick={() => setSearch("guns")}
+                  disabled={!ready || busy}
+                >
+                  本体を検索
+                </button>
                 <div className="section-label parts-label">
                   パーツ{" "}
                   <span>
@@ -673,7 +680,7 @@ export default function Studio() {
                 </button>
                 <button
                   className="button secondary full-width"
-                  onClick={() => setSearch(true)}
+                  onClick={() => setSearch("parts")}
                   disabled={!ready || busy}
                 >
                   パーツを検索
@@ -780,6 +787,13 @@ export default function Studio() {
                 >
                   <Icon name="plus" />
                   画像を選択
+                </button>
+                <button
+                  className="button secondary"
+                  onClick={() => setSearch("guns")}
+                  disabled={!ready || busy}
+                >
+                  本体を検索して追加
                 </button>
                 <button
                   className="demo-button"
@@ -1106,12 +1120,13 @@ export default function Studio() {
       </footer>
       {search && (
         <PartSearch
-          close={() => setSearch(false)}
+          initialScope={search}
+          close={() => setSearch(null)}
           attachLink={
             layer
               ? (url) => {
                   update(layer.id, { url });
-                  setSearch(false);
+                  setSearch(null);
                   notify("購入リンクを設定しました。");
                 }
               : undefined
@@ -1151,7 +1166,7 @@ export default function Studio() {
               throw new Error(
                 "追加できません。レイヤー数と画像を確認してください。",
               );
-            setSearch(false);
+            setSearch(null);
             if (part.referenceMm) setEditor("measure");
           }}
         />

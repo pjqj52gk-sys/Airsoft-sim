@@ -19,14 +19,16 @@ export default function RakutenSearch({
   attachLink,
   add,
   onBusy,
+  initialScope = "parts",
 }: {
   attachLink?: (url: string) => void;
   add: (layer: Layer) => Promise<void>;
   onBusy: (busy: boolean) => void;
+  initialScope?: "parts" | "guns";
 }) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("standard");
-  const [scope, setScope] = useState("parts");
+  const [scope, setScope] = useState<string>(initialScope);
   const [result, setResult] = useState<RakutenResults | null>(null);
   const [activeCategory, setActiveCategory] = useState("");
   const [submitted, setSubmitted] = useState({
@@ -375,6 +377,7 @@ export default function RakutenSearch({
       ) : (
         <>
           <CategoryBrowser
+            initialGroup={initialScope === "guns" ? "guns" : "optics"}
             active={activeCategory}
             disabled={busy}
             choose={(category) => {

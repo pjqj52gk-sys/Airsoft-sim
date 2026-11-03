@@ -15,10 +15,12 @@ export default function PartSearch({
   close,
   add,
   attachLink,
+  initialScope = "parts",
 }: {
   close: () => void;
   add: (part: Layer) => Promise<void>;
   attachLink?: (url: string) => void;
+  initialScope?: "parts" | "guns";
 }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
@@ -102,7 +104,7 @@ export default function PartSearch({
   return (
     <Dialog
       wide
-      label="パーツ検索"
+      label={initialScope === "guns" ? "本体を検索" : "パーツ検索"}
       close={() => {
         if (!busy) close();
       }}
@@ -115,7 +117,7 @@ export default function PartSearch({
       >
         <Icon name="close" />
       </button>
-      <h2>パーツ検索</h2>
+      <h2>{initialScope === "guns" ? "本体を検索" : "パーツ検索"}</h2>
       <div className="shelf-tabs" role="tablist" aria-label="検索対象">
         <button
           role="tab"
@@ -159,6 +161,7 @@ export default function PartSearch({
       </div>
       {source === "rakuten" ? (
         <RakutenSearch
+          initialScope={initialScope}
           add={add}
           attachLink={attachLink}
           onBusy={(value) => setBusy(value ? "rakuten" : null)}
