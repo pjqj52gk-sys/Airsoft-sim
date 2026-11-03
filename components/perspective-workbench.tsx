@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Dialog from "./dialog";
 import Icon from "./icon";
+import LoadingOverlay from "./loading-overlay";
 import type { Layer } from "@/lib/project";
 import type { Point, Rect } from "@/lib/image-edit";
 import {
@@ -662,6 +663,7 @@ export default function PerspectiveWorkbench({
           </button>
         )}
       </div>
+      {busy && <LoadingOverlay label="画像を補正中…" />}
     </Dialog>
   );
 }

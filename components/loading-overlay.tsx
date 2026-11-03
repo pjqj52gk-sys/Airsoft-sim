@@ -1,5 +1,6 @@
 "use client";
 import { createPortal } from "react-dom";
+import BBLoadingAnimation from "./bb-loading-animation";
 
 export default function LoadingOverlay({
   label = "読み込み中…",
@@ -10,7 +11,7 @@ export default function LoadingOverlay({
   return createPortal(
     <div className="processing-overlay" role="status" aria-live="polite">
       <div className="loading-indicator">
-        <span className="loading-spinner" aria-hidden="true" />
+        <BBLoadingAnimation />
         <span>{label}</span>
       </div>
     </div>,
