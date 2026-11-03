@@ -4814,5 +4814,955 @@
     "url": "https://www.vectoroptics.jp/scrd-12ii/",
     "lengthMm": 68,
     "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-504",
+    "name": "MP5 A4",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_240619024928.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_240619024928.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_240619024928.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_240619024928.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_240619024928.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_240619024928.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_240619024928.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/504",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "680 mm"
+      }
+    ],
+    "price": {
+      "amount": 74800,
+      "maxAmount": 74800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": 680,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-497",
+    "name": "MP5 SD6",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_221207054948.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_221207054948.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_221207054948.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_221207054948.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_221207054948.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_221207054948.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/497",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "600 mm / 760 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 75800,
+      "maxAmount": 75800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-496",
+    "name": "URG-I 11.5inch ブラック",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_221026025820.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_221026025820.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_221026025820.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_221026025820.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_221026025820.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_221026025820.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_221026025820.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/496",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "750 mm / 825 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 84800,
+      "maxAmount": 84800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-490",
+    "name": "URG-I 11.5inch ソップモッド ブロック3",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_220215021624.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_220215021624.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_220201013431.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_220201013431.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_220201013431.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_220215021624.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_220201013431.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/490",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "750 mm / 825 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 84800,
+      "maxAmount": 84800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-489",
+    "name": "AK ホワイトストーム",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_211124025630.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_211124025630.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_211124025630.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_211124025630.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_211124025630.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_211124025630.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_211124025630.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/489",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "715 mm / 790 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 62800,
+      "maxAmount": 62800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-487",
+    "name": "MP5 A5",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210728014903.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210728014903.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210728014903.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210728014903.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210728014903.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210728014903.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_210728014903.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/487",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "500 mm / 660 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 74800,
+      "maxAmount": 74800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-481",
+    "name": "URG-I ソップモッド ブロック3",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210202021944.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210202021944.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210202021944.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210202021944.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210202021944.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210202021944.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_210202021944.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/481",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "825 mm / 900 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 84800,
+      "maxAmount": 84800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-476",
+    "name": "AKストーム",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_201120024930.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_201120024930.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_201120024930.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_201120024930.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_201120024930.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_201120024930.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_201120024930.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/476",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "715 mm / 790 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 62800,
+      "maxAmount": 62800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-472",
+    "name": "マーク46 モッド0",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_201214082222.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_201214082222.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_201214082222.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_201214082222.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_201214082222.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_201214082222.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_201214082222.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/472",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "920 mm"
+      }
+    ],
+    "price": {
+      "amount": 198000,
+      "maxAmount": 198000,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": 920,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-463",
+    "name": "AKS47",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_201214083015.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_201214083015.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_201214083015.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_201214083015.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_201214083015.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_201214083015.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_201214083015.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/463",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "643 mm / 888 mm(ストック展開時)"
+      }
+    ],
+    "price": {
+      "amount": 59800,
+      "maxAmount": 59800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-460",
+    "name": "マーク18 モッド1",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_201214083959.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_201214083959.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_201214083959.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_201214083959.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_201214083959.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_201214083959.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_201214083959.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/460",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "715 mm / 790 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 84800,
+      "maxAmount": 84800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-457",
+    "name": "HK416 デルタカスタム ブラック",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_201214084523.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_201214084523.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_201214084523.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_201214084523.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_201214084523.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_201214084523.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_201214084523.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/457",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "711 mm / 787 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 79800,
+      "maxAmount": 79800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-440",
+    "name": "AK47",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119011638.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119011638.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119011638.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119011638.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119011638.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119011638.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_210119011638.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/440",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "875 mm"
+      }
+    ],
+    "price": {
+      "amount": 59800,
+      "maxAmount": 59800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": 875,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-426",
+    "name": "HK416 デルタカスタム",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119012502.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119012502.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119012502.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119012502.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119012502.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119012502.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_210119012502.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/426",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "711 mm / 787 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 79800,
+      "maxAmount": 79800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-413",
+    "name": "HK416C カスタム",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119013102.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119013102.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119013102.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119013102.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119013102.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119013102.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_210119013102.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/413",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "571 mm / 695 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 72800,
+      "maxAmount": 72800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-396",
+    "name": "HK417 アーリーバリアント",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119013710.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119013710.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119013710.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119013710.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119013710.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119013710.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_210119013710.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/396",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "921 mm / 998 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 92800,
+      "maxAmount": 92800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-370",
+    "name": "DEVGRUカスタム HK416D",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119021218.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119021218.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119021218.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119021218.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119021218.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119021218.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_210119021218.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/370",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "【サイレンサー有】800 mm / 880 mm(ストック伸長時) 【サイレンサー無】715 mm / 790 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 82800,
+      "maxAmount": 82800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-283",
+    "name": "HK416D",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119021603.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119021603.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119021603.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119021603.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119021603.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119021603.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_210119021603.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/283",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "【14.5インチ】819 mm / 894 mm(ストック伸長時) 【10.4インチ】712 mm / 787 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 74800,
+      "maxAmount": 74800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-270",
+    "name": "スカーH フラット・ダークアース",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119021959.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119021959.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119021959.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119021959.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119021959.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119021959.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/270",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "【16インチ】711 mm(ストック折りたたみ時)/ 902 mm / 965 mm(ストック伸長時) 【13インチ】635 mm(ストック折りたたみ時)/ 826 mm / 889 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 72800,
+      "maxAmount": 72800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-264",
+    "name": "スカーL CQC フラット・ダークアース",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119022559.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119022559.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119022559.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119022559.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119022559.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119022559.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_210119022559.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/264",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "541 mm(ストック折りたたみ時)/ 732 mm / 795 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 69800,
+      "maxAmount": 69800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-263",
+    "name": "G36Cカスタム",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119023105.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119023105.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119023105.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119023105.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119023105.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119023105.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_210119023105.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/263",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "530 mm / 745 mm(ストック展開時)"
+      }
+    ],
+    "price": {
+      "amount": 59800,
+      "maxAmount": 59800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-256",
+    "name": "スカーL フラット・ダークアース",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119023315.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119023315.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119023315.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119023315.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119023315.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119023315.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_210119023315.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/256",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "635 mm(ストック折りたたみ時)/ 826 mm / 899 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 69800,
+      "maxAmount": 69800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-232",
+    "name": "CQB-R ブラックモデル",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119045327.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119045327.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119045327.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119045327.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119045327.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119045327.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_210119045327.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/232",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "705 mm / 780 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 64800,
+      "maxAmount": 64800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-231",
+    "name": "G36K",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119045940.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119045940.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119045940.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119045940.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119045940.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119045940.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_210119045940.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/231",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "615mm / 860 mm(ストック展開時)"
+      }
+    ],
+    "price": {
+      "amount": 59800,
+      "maxAmount": 59800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-219",
+    "name": "AK102",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119050318.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119050318.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119050318.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119050318.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119050318.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119050318.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_210119050318.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/219",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "602 mm / 848 mm(ストック展開時)"
+      }
+    ],
+    "price": {
+      "amount": 59800,
+      "maxAmount": 59800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-202",
+    "name": "M4A1 カービン",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119051110.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119051110.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119051110.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119051110.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119051110.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119051110.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/202",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "777 mm / 861 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 59800,
+      "maxAmount": 59800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-201",
+    "name": "ソップモッドM4",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119051500.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119051500.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119051500.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119051500.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119051500.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119051500.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/201",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "803 mm / 878 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 64800,
+      "maxAmount": 64800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-199",
+    "name": "AKS74U",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119051729.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119051729.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119051729.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119051729.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119051729.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119051729.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_210119051729.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/199",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "499 mm / 739 mm(ストック展開時)"
+      }
+    ],
+    "price": {
+      "amount": 49800,
+      "maxAmount": 49800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-198",
+    "name": "AK74MN",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_201214084906.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_201214084906.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_201214084906.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_201214084906.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_201214084906.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_201214084906.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub6_201214084906.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/198",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "700 mm / 943 mm(ストック展開時)"
+      }
+    ],
+    "price": {
+      "amount": 64800,
+      "maxAmount": 64800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-220",
+    "name": "AKS74N",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119050840.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119050840.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119050840.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119050840.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119050840.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119050840.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/220",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "703 mm / 945 mm(ストック展開時)"
+      }
+    ],
+    "price": {
+      "amount": 59800,
+      "maxAmount": 59800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-254",
+    "name": "レシーライフル ブラック",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119023910.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119023910.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119023910.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub3_210119023910.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub4_210119023910.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub5_210119023910.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/254",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "【12インチ】739 mm / 815 mm(ストック伸長時) 【16インチ】845 mm / 920 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 64800,
+      "maxAmount": 64800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
+  },
+  {
+    "id": "marui-body-269",
+    "name": "レシーライフル タンカラーモデル",
+    "manufacturer": "東京マルイ",
+    "category": "本体",
+    "image": "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119044416.jpg",
+    "images": [
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_210119044416.jpg",
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub2_210119044416.jpg"
+    ],
+    "url": "https://www.tokyo-marui.co.jp/products/electric/nextgeneration/269",
+    "dimensions": [
+      {
+        "label": "全長",
+        "value": "【12インチ】739 mm / 815 mm(ストック伸長時) 【16インチ】845 mm / 920 mm(ストック伸長時)"
+      }
+    ],
+    "price": {
+      "amount": 64800,
+      "maxAmount": 64800,
+      "tax": "excluded",
+      "kind": "msrp"
+    },
+    "lengthMm": null,
+    "checkedAt": "2026-11-03"
   }
 ]

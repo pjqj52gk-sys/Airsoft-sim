@@ -86,7 +86,7 @@ if (data.length < 20)
   throw new Error("Catalog unexpectedly small; existing file was not changed.");
 const file = new URL("../lib/parts-catalog.json", import.meta.url);
 const otherManufacturers = JSON.parse(await fs.readFile(file, "utf8")).filter(
-  (p) => p.manufacturer !== "東京マルイ",
+  (p) => p.manufacturer !== "東京マルイ" || p.category === "本体",
 );
 await fs.writeFile(
   new URL("../lib/parts-catalog.json", import.meta.url),

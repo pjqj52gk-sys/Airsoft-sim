@@ -4,6 +4,7 @@ import type { Layer } from "@/lib/project";
 import { readImage, uid } from "@/lib/project";
 import type { ShopProduct } from "@/lib/shop-product";
 import { shopUrl } from "@/lib/shop-url";
+import { catalogImageUrl } from "@/lib/catalog-image";
 
 export default function ShopImport({
   add,
@@ -26,6 +27,12 @@ export default function ShopImport({
   const [error, setError] = useState("");
   const [resolution, setResolution] = useState("");
   const [lowResolution, setLowResolution] = useState(false);
+  const [useOfficial, setUseOfficial] = useState(true);
+  const official = product?.officialMatch?.product;
+  const photos =
+    useOfficial && official?.images.length
+      ? official.images.map((_, i) => catalogImageUrl(official, i))
+      : product?.images || [];
   const files = useRef<HTMLInputElement>(null);
   const loading = (value: boolean) => {
     setBusy(value);
@@ -53,10 +60,15 @@ export default function ShopImport({
         throw new Error(data.error || "商品情報を取得できません。");
       const found = data as ShopProduct;
       setProduct(found);
+      setUseOfficial(true);
+      if (found.officialMatch)
+        setCategory(found.officialMatch.product.category);
       setUrl(found.url);
       setName(found.name);
       setPhoto(0);
-      setLength(found.referenceMm ? String(found.referenceMm) : "");
+      const reference =
+        found.officialMatch?.product.lengthMm ?? found.referenceMm;
+      setLength(reference ? String(reference) : "");
       if (!found.images.length && !found.linkOnly) {
         setError(
           "商品画像が見つかりません。画像URLまたはファイルから追加してください。",
@@ -80,7 +92,7 @@ export default function ShopImport({
       ...image,
       id: uid(),
       name: name.trim() || "ショップのパーツ",
-      mm: 150,
+      mm: category === "本体" ? 800 : 150,
       referenceMm: mm,
       x: 430,
       y: 160,
@@ -97,11 +109,13 @@ export default function ShopImport({
     loading(true);
     setError("");
     try {
-      const response = await fetch("/api/shop-image", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: value }),
-      });
+      const response = value.startsWith("/api/part-image?")
+        ? await fetch(value)
+        : await fetch("/api/shop-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: value }),
+          });
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || "画像を取得できません。");
@@ -253,12 +267,49 @@ export default function ShopImport({
           </label>
         </div>
       )}
-      {!!product?.images.length && (
+      {!!photos.length && (
         <>
+          {official && (
+            <div className="catalog-match-info">
+              <a href={official.url} target="_blank" rel="noopener noreferrer">
+                公式候補：{official.name} ↗
+              </a>
+              <div
+                className="photo-source-tabs"
+                role="group"
+                aria-label="画像の取得元"
+              >
+                <button
+                  className="mini-button"
+                  aria-pressed={useOfficial}
+                  disabled={busy}
+                  onClick={() => {
+                    setUseOfficial(true);
+                    setPhoto(0);
+                    setResolution("");
+                  }}
+                >
+                  公式写真
+                </button>
+                <button
+                  className="mini-button"
+                  aria-pressed={!useOfficial}
+                  disabled={busy}
+                  onClick={() => {
+                    setUseOfficial(false);
+                    setPhoto(0);
+                    setResolution("");
+                  }}
+                >
+                  販売店の写真
+                </button>
+              </div>
+            </div>
+          )}
           <div className="shop-photo-preview">
             <img
-              key={product.images[photo]}
-              src={product.images[photo]}
+              key={photos[photo]}
+              src={photos[photo]}
               referrerPolicy="no-referrer"
               alt="選択したショップの商品写真"
               onLoad={(e) => {
@@ -280,7 +331,7 @@ export default function ShopImport({
             <button
               className="button primary"
               disabled={busy}
-              onClick={() => void importUrl(product.images[photo])}
+              onClick={() => void importUrl(photos[photo])}
             >
               この写真を追加
             </button>
@@ -298,7 +349,7 @@ export default function ShopImport({
             role="group"
             aria-label="ショップの写真候補"
           >
-            {product.images.map((src, i) => (
+            {photos.map((src, i) => (
               <button
                 key={src}
                 aria-label={`写真${i + 1}を選択`}
@@ -315,7 +366,7 @@ export default function ShopImport({
                   alt={`商品写真 ${i + 1}`}
                   loading="lazy"
                 />
-                {product.imageDetails?.find((d) => d.url === src) && (
+                {product?.imageDetails?.find((d) => d.url === src) && (
                   <small>
                     {product.imageDetails.find((d) => d.url === src)!.width} ×{" "}
                     {product.imageDetails.find((d) => d.url === src)!.height}

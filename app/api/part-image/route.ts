@@ -19,7 +19,9 @@ export async function GET(request: Request) {
   const manufacturerImage =
     (item.manufacturer === "東京マルイ" &&
       url.hostname === "www.tokyo-marui.co.jp" &&
-      url.pathname.startsWith("/appimg/option/")) ||
+      (url.pathname.startsWith("/appimg/option/") ||
+        (item.category === "本体" &&
+          url.pathname.startsWith("/appimg/product/")))) ||
     (item.manufacturer === "LAYLAX" &&
       url.hostname === "cdn.shopify.com" &&
       url.pathname.startsWith("/s/files/1/0843/1095/0186/")) ||

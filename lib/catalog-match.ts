@@ -123,7 +123,8 @@ export function matchCatalog(
         continue;
       score = Math.max(score, name.length);
     }
-    if (score) candidates.push({ product, score });
+    if (score)
+      candidates.push({ product, score: score + (expected.length ? 2 : 0) });
   }
   candidates.sort((a, b) => b.score - a.score);
   if (

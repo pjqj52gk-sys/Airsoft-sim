@@ -1,5 +1,6 @@
 import { shopUrl } from "./shop-url.ts";
 import { productPhotos } from "./catalog-photos.mjs";
+import type { CatalogProduct } from "./catalog-match.ts";
 export type ShopDimension = {
   label: string;
   value: string;
@@ -15,6 +16,7 @@ export type ShopProduct = {
   referenceMm?: number;
   linkOnly?: boolean;
   notice?: string;
+  officialMatch?: { product: CatalogProduct; method: "jan" | "model" | "name" };
 };
 const decode = (s: string) =>
   s

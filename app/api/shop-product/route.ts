@@ -3,6 +3,8 @@ import { extractShopProduct } from "@/lib/shop-product";
 import { amazonStore } from "@/lib/commerce";
 import { shopUrl } from "@/lib/shop-url";
 import { rankShopImages } from "@/lib/shop-image-quality";
+import catalog from "@/lib/parts-catalog.json";
+import { matchCatalog, type CatalogProduct } from "@/lib/catalog-match";
 export const runtime = "nodejs";
 export const maxDuration = 30;
 export async function POST(request: Request) {
@@ -31,8 +33,12 @@ export async function POST(request: Request) {
     if (amazonStore(file.url)) return amazon(file.url);
     const product = extractShopProduct(decodeShopHtml(file), file.url);
     const images = await rankShopImages(product.images);
+    const officialMatch = matchCatalog(
+      product.name,
+      catalog as CatalogProduct[],
+    );
     return Response.json(
-      { ...product, ...images },
+      { ...product, ...images, ...(officialMatch ? { officialMatch } : {}) },
       {
         headers: { "Cache-Control": "no-store" },
       },
