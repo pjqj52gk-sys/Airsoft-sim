@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { estimateCylinderGuide } from "@/lib/image-contours";
 import Dialog from "./dialog";
 import LoadingOverlay from "./loading-overlay";
 import useCylinderPreview from "./use-cylinder-preview";
@@ -49,6 +50,33 @@ export default function CylinderWorkbench({
   );
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
+  const initialized = useRef(false),
+    touched = useRef(false);
+  const [autoMessage, setAutoMessage] = useState("");
+  const autoFit = useCallback(() => {
+    if (!live.pixels) return;
+    const estimated = estimateCylinderGuide(live.pixels);
+    if (!estimated) {
+      setAutoMessage(
+        "輪郭から推定できません。背景を透過するか、手動で合わせてください。",
+      );
+      return;
+    }
+    setGuide(estimated);
+    setView(
+      fitImageViewport(
+        layer.width,
+        layer.height,
+        cylinderGeometry(estimated).corners,
+      ),
+    );
+    setAutoMessage("輪郭に合わせました。端面の位置を確認してください。");
+  }, [live.pixels, layer.width, layer.height]);
+  useEffect(() => {
+    if (!live.pixels || initialized.current) return;
+    initialized.current = true;
+    if (!touched.current) autoFit();
+  }, [live.pixels, autoFit]);
   const svg = useRef<SVGSVGElement>(null);
   const drag = useRef<{
     index: number;
@@ -104,6 +132,7 @@ export default function CylinderWorkbench({
   }, [layer.width]);
   function begin(e: React.PointerEvent<SVGElement>, index: number) {
     if (busy) return;
+    if (index !== -2) touched.current = true;
     e.preventDefault();
     e.stopPropagation();
     drag.current = {
@@ -158,6 +187,7 @@ export default function CylinderWorkbench({
     initialRatio = ellipseRatio,
   ) {
     if (index === 5) {
+      touched.current = true;
       const g = cylinderGeometry(source);
       setEllipseRatio(
         cylinderEndRatio(
@@ -168,7 +198,10 @@ export default function CylinderWorkbench({
           source.endRadius,
         ),
       );
-    } else setGuide(moveCylinderHandle(source, index, dx, dy));
+    } else {
+      touched.current = true;
+      setGuide(moveCylinderHandle(source, index, dx, dy));
+    }
   }
   const radius = Math.max(view.w, view.h) / 65;
   return (
@@ -203,7 +236,17 @@ export default function CylinderWorkbench({
           <p className="editor-instructions">
             軸の両端で長さ・角度を合わせ、太さと端面の開きを調整
           </p>
+          <p className="hint" role="status">
+            {autoMessage}
+          </p>
           <div className="perspective-viewport-tools">
+            <button
+              className="mini-button"
+              disabled={!live.pixels || busy}
+              onClick={autoFit}
+            >
+              自動で合わせ直す
+            </button>
             <button
               className="mini-button"
               onClick={() =>
@@ -221,6 +264,7 @@ export default function CylinderWorkbench({
             <button
               className="text-button"
               onClick={() => {
+                touched.current = true;
                 setGuide(initialCylinderGuide(layer.width, layer.height));
                 setEllipseRatio(0.22);
                 setTapered(false);
@@ -451,6 +495,7 @@ export default function CylinderWorkbench({
                     max={max}
                     step="1"
                     onChange={(e) => {
+                      touched.current = true;
                       const n = e.target.valueAsNumber;
                       if (!Number.isFinite(n) || n < min || n > max) return;
                       try {
@@ -498,6 +543,7 @@ export default function CylinderWorkbench({
               type="checkbox"
               checked={tapered}
               onChange={(e) => {
+                touched.current = true;
                 setTapered(e.target.checked);
                 if (!e.target.checked)
                   setGuide(

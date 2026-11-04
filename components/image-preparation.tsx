@@ -1,6 +1,7 @@
 "use client";
 import "./image-preparation.css";
 import { useEffect, useRef, useState } from "react";
+import LogoCleanup from "./logo-cleanup";
 import Image from "next/image";
 import type { Layer } from "@/lib/project";
 
@@ -45,6 +46,8 @@ function PreparationDialog({
   cancel: () => void;
 }) {
   const element = useRef<HTMLDialogElement>(null);
+  const [processed, setProcessed] = useState(prepared);
+  const [cleaning, setCleaning] = useState<number | null>(null);
   const [usePrepared, setUsePrepared] = useState(original.map(() => true));
   useEffect(() => {
     const dialog = element.current!;
@@ -73,7 +76,7 @@ function PreparationDialog({
           <section key={layer.id}>
             <h3>{layer.name}</h3>
             <div className="preparation-comparison">
-              {[layer, prepared[i]].map((image, index) => (
+              {[layer, processed[i]].map((image, index) => (
                 <figure key={index}>
                   <div className="preparation-image">
                     <Image
@@ -103,6 +106,9 @@ function PreparationDialog({
               />{" "}
               処理後を使う
             </label>
+            <button className="mini-button" onClick={() => setCleaning(i)}>
+              余白のロゴ・文字を探す
+            </button>
           </section>
         ))}
       </div>
@@ -115,7 +121,7 @@ function PreparationDialog({
           onClick={() =>
             accept(
               original.map((layer, i) =>
-                usePrepared[i] ? prepared[i] : layer,
+                usePrepared[i] ? processed[i] : layer,
               ),
             )
           }
@@ -123,6 +129,21 @@ function PreparationDialog({
           選んだ画像を追加
         </button>
       </div>
+      {cleaning !== null && (
+        <LogoCleanup
+          layer={processed[cleaning]}
+          close={() => setCleaning(null)}
+          apply={(value) => {
+            setProcessed((items) =>
+              items.map((item, i) => (i === cleaning ? value : item)),
+            );
+            setUsePrepared((items) =>
+              items.map((item, i) => (i === cleaning ? true : item)),
+            );
+            setCleaning(null);
+          }}
+        />
+      )}
     </dialog>
   );
 }

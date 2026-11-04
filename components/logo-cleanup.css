@@ -1,0 +1,62 @@
+.logo-cleanup {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  height: fit-content;
+  max-height: 90dvh;
+}
+.logo-cleanup::backdrop {
+  background: #0c294b66;
+  backdrop-filter: blur(3px);
+}
+.logo-cleanup-heading,
+.logo-cleanup-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.logo-cleanup-photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 16px 0;
+}
+.logo-cleanup-photos figure {
+  margin: 0;
+  min-width: 0;
+}
+.logo-cleanup-photos img,
+.logo-cleanup-photos svg {
+  width: 100%;
+  height: 260px;
+  object-fit: contain;
+  background: repeating-conic-gradient(#eaf1f7 0% 25%, #fff 0% 50%) 0/20px 20px;
+  border: 1px solid #d6e8f3;
+  border-radius: 10px;
+}
+.logo-cleanup-photos figcaption {
+  margin: 8px 0;
+  font-size: 12px;
+  color: #64748b;
+}
+.logo-cleanup-candidates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.logo-cleanup-candidates label {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.logo-cleanup-actions {
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+@media (max-width: 600px) {
+  .logo-cleanup-photos img,
+  .logo-cleanup-photos svg {
+    height: 180px;
+  }
+}

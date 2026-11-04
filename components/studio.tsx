@@ -16,6 +16,7 @@ import { updateLayer } from "@/lib/attachments";
 import PartSearch from "./part-search";
 import PerspectiveWorkbench from "./perspective-workbench";
 import { useImagePreparation } from "./image-preparation";
+import LogoCleanup from "./logo-cleanup";
 import PlanComparison from "./plan-comparison";
 import {
   createComparisonPlans,
@@ -59,6 +60,7 @@ export default function Studio() {
   const preparation = useImagePreparation();
   const [project, setProject] = useState<Project>(emptyProject);
   const [plans, setPlans] = useState<ComparisonPlans | null>(null);
+  const [logoCleanup, setLogoCleanup] = useState(false);
   const [comparisonOpen, setComparisonOpen] = useState(false);
   const livePlans = plans ? capturePlan(plans, project) : null;
   function switchPlan(key: PlanKey) {
@@ -119,6 +121,7 @@ export default function Studio() {
       !shelf &&
       !search &&
       !comparisonOpen &&
+      !logoCleanup &&
       !addDialog &&
       !help &&
       !clearDialog,
@@ -260,6 +263,7 @@ export default function Studio() {
         search ||
         addDialog ||
         comparisonOpen ||
+        logoCleanup ||
         busy
       )
         return;
@@ -1179,6 +1183,13 @@ export default function Studio() {
                 >
                   透明な余白を詰める
                 </button>
+                <button
+                  className="mini-button full-width"
+                  disabled={busy}
+                  onClick={() => setLogoCleanup(true)}
+                >
+                  余白のロゴ・文字を除去
+                </button>
                 {layer.originalSrc && (
                   <button
                     className="text-button"
@@ -1425,6 +1436,16 @@ export default function Studio() {
           close={() => setShelf(null)}
           load={openBuild}
           add={(part) => addStoredPart(part, true)}
+        />
+      )}
+      {logoCleanup && layer && (
+        <LogoCleanup
+          layer={layer}
+          close={() => setLogoCleanup(false)}
+          apply={async (value) => {
+            await applyImage(value);
+            setLogoCleanup(false);
+          }}
         />
       )}
       {preparation.dialog}
