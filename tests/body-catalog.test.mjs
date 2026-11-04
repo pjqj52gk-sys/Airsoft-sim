@@ -50,3 +50,67 @@ test("gun body galleries use original product photos and exclude promotional and
   const html = `<meta property="og:image" content="${base}banner.jpg"><ul class="products-Slider_List"><li><img src="${base}p_sub1.jpg"></li></ul><ul class="products-Slider_Menu"><li><img src="${base}small.jpg"></li></ul>`;
   assert.deepEqual(productPhotos(html), [base + "p_sub1.jpg"]);
 });
+
+test("PLUS edition titles select their own catalog galleries without requiring display annotations", () => {
+  const expected = catalog.find((p) => p.id === "marui-body-500");
+  for (const title of [
+    "東京マルイ P90プラス",
+    "東京マルイ 電動ガン本体 FN P90プラス PLUSシステム FET搭載 P90+",
+    "東京マルイ P-90プラス ブラック",
+    "東京マルイ P90 PLUS",
+    "東京マルイ P-90 PLUS 電動ガンプラス",
+    "東京マルイ P90+",
+    "東京マルイ P90＋",
+    "東京マルイ P-90プラス【電動ガンプラス】",
+  ]) {
+    const result = matchCatalog(title, catalog);
+    assert.equal(result?.product.id, expected.id, title);
+    assert.equal(
+      result.product.images[0],
+      "https://www.tokyo-marui.co.jp/appimg/product/p_sub1_230425024331.jpg",
+    );
+    assert.equal(result.product.lengthMm, 505);
+  }
+  assert.equal(
+    matchCatalog("東京マルイ P90", catalog)?.product.id,
+    "marui-body-16",
+  );
+  assert.equal(
+    matchCatalog("東京マルイ P90 TR", catalog)?.product.id,
+    "marui-body-15",
+  );
+  assert.equal(
+    matchCatalog("東京マルイ P90プラス バージョン・レン", catalog)?.product.id,
+    "marui-body-520",
+  );
+  assert.equal(
+    matchCatalog("東京マルイ P90 バージョン・レン", catalog)?.product.id,
+    "marui-body-453",
+  );
+  assert.equal(
+    matchCatalog(
+      "東京マルイ P90プラス",
+      catalog.filter((p) => p.id !== expected.id),
+    ),
+    null,
+  );
+  assert.equal(matchCatalog("東京マルイ P90プラス用 マガジン", catalog), null);
+  assert.equal(
+    matchCatalog("東京マルイ P90プラス 電動ガン スタンダードタイプ", catalog)
+      ?.product.id,
+    expected.id,
+  );
+});
+
+test("PLUS name handling also distinguishes other upgraded bodies from their original models", () => {
+  for (const title of [
+    "東京マルイ G36Cプラス",
+    "東京マルイ パトリオットプラス",
+  ]) {
+    const expected = catalog.find((p) =>
+      p.name.startsWith(title.replace("東京マルイ ", "")),
+    );
+    assert.ok(expected, title);
+    assert.equal(matchCatalog(title, catalog)?.product.id, expected.id, title);
+  }
+});

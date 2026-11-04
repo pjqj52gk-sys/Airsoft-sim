@@ -1,3 +1,8 @@
+import {
+  bodyVariantCompatible,
+  bodyVariantMatcher,
+  bodyVariantIdentity,
+} from "./catalog-variant.ts";
 import type { ProductIdentifiers } from "./product-specs.ts";
 import type { CatalogPrice } from "./catalog-price.ts";
 import { normalizeModelNumber } from "./product-metadata.ts";
@@ -22,10 +27,12 @@ export type CatalogProduct = {
 // magnification and model suffixes: they distinguish physically different items.
 const vocabulary: [RegExp, string][] = [
   [/TOKYO\s*MARUI|マルイ/gi, "東京マルイ"],
+  [/H\s*&\s*K|HECKLER\s*(?:&|AND)\s*KOCH/gi, ""],
   [/NOVEL\s*ARMS|ノーベルアームズ/gi, "NOVELARMS"],
   [/VECTOR\s*OPTICS|ベクターオプティクス/gi, "VECTOROPTICS"],
   [/LAYLAX|ライラクス/gi, "LAYLAX"],
   [/KRYTAC|クライタック/gi, "KRYTAC"],
+  [/\bPLUS\b/gi, "プラス"],
   [/SOPMOD/gi, "ソップモッド"],
   [/DELTA\s*CUSTOM/gi, "デルタカスタム"],
   [/GLOCK/gi, "グロック"],
@@ -42,7 +49,7 @@ const normalize = (s: string) =>
   vocabulary
     .reduce(
       (text, [pattern, value]) => text.replace(pattern, value),
-      s.normalize("NFKC"),
+      s.normalize("NFKC").replace(/([A-Z0-9])\s*\+(?![A-Z0-9])/gi, "$1プラス"),
     )
     .toUpperCase()
     .replace(/[\s\p{P}\p{S}]/gu, "")
@@ -68,28 +75,20 @@ function colors(s: string) {
     /オリーブドラブ|\b(?:OD|ODG|OLIVE DRAB)\b/.test(value) ? "od" : "",
   ].filter(Boolean);
 }
-function seriesKind(s: string) {
-  if (/電動ブローバック\s*フルオート/.test(s)) return "electric:blowbackauto";
-  if (/電動ブローバック/.test(s)) return "electric:blowback";
-  if (/BOYS|ボーイズ/i.test(s)) return "electric:boys";
-  if (/ライトプロ|LIGHT\s*PRO/i.test(s)) return "electric:lightpro";
-  if (/電動(?:ガン\s*)?ハンドガン|電動ガン\s*ハンドガンタイプ/.test(s))
-    return "electric:handgun";
-  if (/電動コンパクト/.test(s)) return "electric:compact";
-  if (/エア[ー]?ハンドガン.*10[才歳]/.test(s)) return "air:handgun10";
-  if (/エア[ー]?ハンドガン.*18[才歳]/.test(s)) return "air:handgun18";
-  if (/次世代|NEXT\s*GEN/i.test(s)) return "nextgeneration";
-  if (/ハイサイクル|HIGH\s*CYCLE/i.test(s)) return "highcycle";
-  if (/電動.*(?:スタンダード|標準)|スタンダード.*電動/.test(s))
-    return "standard";
-  if (/ガスブローバック|GAS\s*BLOWBACK|\bGBB\b/i.test(s)) return "gas";
-  if (
-    /エア[ー]?コッキング|エア[ー]?ハンドガン|ボルトアクション|BOLT\s*ACTION/i.test(
-      s,
-    )
-  )
-    return "air";
-  return "";
+const bodyFamilies = new WeakMap<CatalogProduct, string>();
+function bodyFamily(product: CatalogProduct) {
+  const cached = bodyFamilies.get(product);
+  if (cached !== undefined) return cached;
+  const family = normalize(
+    product.name
+      .replace(
+        /【(?:電動ガンプラス|ハイグレード\/ホップアップ|ホップアップ)】/g,
+        "",
+      )
+      .replace(/\(ハイグレードバージョン\)/g, ""),
+  ).replace(/^(?:コルト|COLT|HK|FN)/, "");
+  bodyFamilies.set(product, family);
+  return family;
 }
 const modelPatterns = new Map<string, RegExp | null>();
 function modelExpression(code: string) {
@@ -125,8 +124,8 @@ export function matchCatalog(
   identifiers?: ProductIdentifiers,
 ): { product: CatalogProduct; method: "jan" | "model" | "name" } | null {
   const text = normalize(title);
-  const actual = colors(title),
-    actualSeries = seriesKind(title);
+  const actual = colors(title);
+  const compatibleVariant = bodyVariantMatcher(title);
   if (/レプリカ|互換|社外/.test(text)) return null;
   for (const method of ["jan", "model"] as const) {
     const values =
@@ -137,6 +136,7 @@ export function matchCatalog(
         : identifiers?.modelNumbers;
     const hits = catalog.filter(
       (product) =>
+        compatibleVariant(product) &&
         // Explicit variant conflicts must not inherit another variant's image.
         !(
           colors(product.name).length &&
@@ -209,29 +209,7 @@ export function matchCatalog(
       })
     )
       continue;
-    const expectedSeries =
-      seriesKind(product.series || "") ||
-      (product.url.includes("/nextgeneration/")
-        ? "nextgeneration"
-        : product.url.includes("/highcycle/")
-          ? "highcycle"
-          : product.url.includes("/standard/")
-            ? "standard"
-            : product.url.includes("/gas/")
-              ? "gas"
-              : product.url.includes("/aircocking/")
-                ? "air"
-                : product.url.includes("/electric/")
-                  ? `electric:${product.url.split("/")[5]}`
-                  : "");
-    if (
-      product.category === "本体" &&
-      actualSeries &&
-      expectedSeries &&
-      actualSeries !== expectedSeries &&
-      !(actualSeries === "air" && expectedSeries.startsWith("air:"))
-    )
-      continue;
+    if (!compatibleVariant(product, true)) continue;
     if (
       product.id === "marui-body-201" &&
       /URGI|ブロック[123]|BLOCK[123]/.test(text)
@@ -275,10 +253,15 @@ export function matchCatalog(
     )
       continue;
     const stem = product.name
+      .replace(
+        /\s*【(?:電動ガンプラス|ハイグレード\/ホップアップ|ホップアップ)】\s*$/,
+        "",
+      )
       .replace(/\s*\[[^\]]+\]\s*$/, "")
       .replace(/\s*(?:ブラック|ホワイト|FDE|BLACK|WHITE)$/i, "");
     const names = [
       normalize(stem),
+      ...(product.category === "本体" ? [bodyFamily(product)] : []),
       ...(aliases[product.id] || []).map(normalize),
       ...(product.nameAliases || []).map(normalize),
     ];
@@ -306,8 +289,10 @@ export function matchCatalog(
       if (
         !publishedAlias &&
         /^[A-Z0-9]{1,5}$/.test(name) &&
-        (/[A-Z0-9]/.test(text[index - 1] || "") ||
-          /[A-Z0-9]/.test(text[index + name.length] || ""))
+        !new RegExp(
+          `(?:^|[^A-Z0-9])${[...name].join("[\\s._-]*")}(?![A-Z0-9])`,
+          "i",
+        ).test(title.normalize("NFKC"))
       )
         continue;
       const rest = text
@@ -315,6 +300,9 @@ export function matchCatalog(
         .replaceAll(normalize(product.series || ""), "")
         .replace(/電動ガンスタンダードタイプ|電動ガンハンドガンタイプ/g, "")
         .replace(/^(?:BK|BLACK|FDE|WHITE|WH|ブラック|ホワイト)/, "");
+      // Do not let a base model stand in for its PLUS edition, even when the
+      // edition is absent from a partial catalog or excluded by other evidence.
+      if (!names[0].includes("プラス") && /^プラス/.test(rest)) continue;
       if (
         /用|専用|対応|マウント|カバー|保護|アダプター|ホルスター|リング|電池|ネジ|レンズ|セット|キット|(?<!軽量化)タイプ|レプリカ/.test(
           rest,
@@ -332,7 +320,26 @@ export function matchCatalog(
     (candidates[1] && candidates[0].score === candidates[1].score)
   )
     return null;
-  return { product: candidates[0].product, method: "name" };
+  const chosen = candidates[0].product;
+  if (chosen.category === "本体") {
+    const family = bodyFamily(chosen),
+      variant = bodyVariantIdentity(chosen);
+    // Manufacturer prefixes and display annotations are not evidence of a different
+    // gun. A longer title must not win over an otherwise indistinguishable mechanism.
+    if (
+      catalog.some(
+        (p) =>
+          p.category === "本体" &&
+          p.manufacturer === chosen.manufacturer &&
+          p.id !== chosen.id &&
+          bodyFamily(p) === family &&
+          compatibleVariant(p, true) &&
+          bodyVariantIdentity(p) !== variant,
+      )
+    )
+      return null;
+  }
+  return { product: chosen, method: "name" };
 }
 export function findCatalogMatch(
   title: string,
@@ -393,6 +400,11 @@ export function resolveCatalogMatch(
       : separate;
   if (!chosen) return null;
   const product = chosen.product;
+  if (
+    !bodyVariantCompatible(initial.name, product) ||
+    !bodyVariantCompatible(page.name, product)
+  )
+    return null;
   if (
     product.janCodes?.length &&
     identifiers.janCodes.some((code) => !product.janCodes!.includes(code))
