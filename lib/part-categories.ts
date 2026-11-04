@@ -224,6 +224,11 @@ export const partCategoryGroups: PartCategoryGroup[] = [
         label: "ショートマガジン",
         keyword: "ショートマガジン",
       },
+      {
+        id: "long-magazine",
+        label: "ロングマガジン",
+        keyword: "ロングマガジン",
+      },
     ],
   },
   {
