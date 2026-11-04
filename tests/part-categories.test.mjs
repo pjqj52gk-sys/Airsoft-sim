@@ -38,6 +38,8 @@ test("optics and muzzle shortcuts search the requested subtype and preserve impo
     ["muzzle-brake", "マズルブレーキ", "マズル", "外装"],
     ["foregrip", "フォアグリップ", "フォアグリップ", "グリップ"],
     ["pistol-grip", "ピストルグリップ", "ピストルグリップ", "グリップ"],
+    ["bipod", "バイポッド", "バイポッド", "外装"],
+    ["laser-sight", "レーザーサイト", "レーザーサイト", "光学機器"],
   ])
     assert.deepEqual(partCategory(id), {
       id,

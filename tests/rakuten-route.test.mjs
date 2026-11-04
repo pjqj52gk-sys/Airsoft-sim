@@ -140,7 +140,7 @@ test("airsoft body categories and manual body scope use the body genre, never th
     },
   );
   for (const search of [
-    { q: "M4", category: "gun-m4" },
+    { q: "アサルトライフル", category: "gun-assault-rifle" },
     { q: "M4", scope: "guns" },
   ])
     assert.equal(

@@ -1,5 +1,6 @@
 "use client";
 import { partCategoryGroups } from "@/lib/part-categories";
+import { useId } from "react";
 
 const locations: Record<
   string,
@@ -9,7 +10,9 @@ const locations: Record<
   stocks: { x: 865, y: 72, point: [886, 214], line: "M865 93V150L886 214" },
   optics: { x: 600, y: 45, point: [560, 154], line: "M600 66V108L560 154" },
   mounts: { x: 405, y: 50, point: [470, 154], line: "M405 71V112L470 154" },
-  lights: { x: 205, y: 75, point: [307, 192], line: "M205 96V155L307 192" },
+  lights: { x: 260, y: 75, point: [307, 192], line: "M260 96V155L307 192" },
+  lasers: { x: 90, y: 65, point: [330, 170], line: "M90 86V124L330 170" },
+  bipods: { x: 170, y: 390, point: [250, 201], line: "M170 369V312L250 201" },
   muzzle: { x: 100, y: 322, point: [111, 180], line: "M100 301V260L111 180" },
   handguards: {
     x: 250,
@@ -36,6 +39,7 @@ export default function M4PartsMap({
   disabled: boolean;
   select: (id: string) => void;
 }) {
+  const silhouetteMask = useId();
   return (
     <div className="m4-parts-map">
       <svg
@@ -43,13 +47,32 @@ export default function M4PartsMap({
         role="img"
         aria-label="M4カービンのシルエットとパーツの取り付け位置"
       >
-        <title>M4カービンのパーツマップ</title>
-        <image
-          href="/images/m4-search-silhouette.png"
+        <defs>
+          <mask
+            id={silhouetteMask}
+            maskUnits="userSpaceOnUse"
+            x="40"
+            y="65"
+            width="920"
+            height="306.67"
+            style={{ maskType: "alpha" }}
+          >
+            <image
+              href="/images/m4-search-silhouette.png"
+              x="40"
+              y="65"
+              width="920"
+              height="306.67"
+            />
+          </mask>
+        </defs>
+        <rect
           x="40"
           y="65"
           width="920"
           height="306.67"
+          fill="var(--silhouette)"
+          mask={`url(#${silhouetteMask})`}
         />
         <g className="map-leaders">
           {partCategoryGroups.map((group) => {
