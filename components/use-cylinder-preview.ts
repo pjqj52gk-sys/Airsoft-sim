@@ -91,7 +91,12 @@ export default function useCylinderPreview(
           surface.corners,
           surface.aspect,
           surface.map,
-          { maxEdge: 480, pixels: input.pixels },
+          {
+            maxEdge: 480,
+            pixels: input.pixels,
+            pixelCenters: true,
+            mask: surface.visible,
+          },
         );
         if (mounted.current && latest.current === input) {
           setPreview(result);

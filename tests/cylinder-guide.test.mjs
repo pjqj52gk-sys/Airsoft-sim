@@ -97,69 +97,73 @@ test("axis length, diameter and angle can be set independently around the same c
   assert.throws(() => setCylinderDimensions(source, { length: 0 }));
 });
 
-test("side-only sampling excludes every row of the selected end ellipse instead of leaving its center", () => {
-  const g = {
-    start: { x: 20, y: 50 },
-    end: { x: 180, y: 50 },
-    startRadius: 20,
-    endRadius: 20,
-  };
-  const full = cylinderSideSurface(g, 1, 0.5, "none");
-  const side = cylinderSideSurface(g, 1, 0.5, "end");
-  const inside = (p, cx) =>
-    ((p.x - cx) / 10) ** 2 + ((p.y - 50) / 20) ** 2 <= 1;
-  assert.equal(inside(full.map(1, 0.5), 180), true);
-  for (let row = 0; row <= 100; row++)
-    for (const u of [0, 0.25, 0.5, 0.75, 1]) {
-      assert.equal(inside(side.map(u, row / 100), 180), false);
-    }
-  const both = cylinderSideSurface(g, 1, 0.5, "both");
-  for (let row = 0; row <= 100; row++)
-    for (const u of [0, 0.25, 0.5, 0.75, 1]) {
-      const p = both.map(u, row / 100);
-      assert.equal(inside(p, 20), false);
-      assert.equal(inside(p, 180), false);
-    }
-  assert.deepEqual(full.map(0.3, 0.4), cylinderGeometry(g).map(0.3, 0.4));
-  assert.deepEqual(side.map(0, 0.5), g.start);
-  assert.ok(side.aspect < full.aspect);
-  near(side.aspect, (side.map(1, 0.5).x - side.map(0, 0.5).x) / 40);
-  const start = cylinderSideSurface(g, 1, 0.5, "start");
-  assert.deepEqual(start.map(1, 0.5), g.end);
+const guide = {
+  start: { x: 40, y: 60 },
+  end: { x: 240, y: 60 },
+  startRadius: 40,
+  endRadius: 40,
+};
+test("selected curved side is stretched to straight edges without cropping its upper and lower tips", () => {
+  const side = cylinderSideSurface(guide, 1, 0.5, "start");
+  for (const v of [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1]) {
+    const arc = Math.sqrt(1 - (2 * v - 1) ** 2);
+    near(side.map(0, v).x, 40 + 20 * arc);
+    near(side.map(1, v).x, 240 + 20 * arc);
+    near(side.map(0.3, v).x, 100 + 20 * arc);
+    near(side.map(0.3, v).y, 20 + 80 * v);
+  }
+  assert.equal(side.map(0, 0).x, 40);
+  assert.equal(side.map(0, 0.5).x, 60);
+  near(side.aspect, 2.5);
+  assert.ok(side.outline.some((p) => p.x === 260));
+});
+test("opposite visible cap reverses both curved boundaries; no cap preserves the planar map", () => {
+  const side = cylinderSideSurface(guide, 1, 0.5, "end");
+  near(side.map(0, 0.5).x, 20);
+  near(side.map(1, 0.5).x, 220);
+  const both = cylinderSideSurface(guide, 1, 0.5, "both");
+  near(both.map(0, 0.5).x, 60);
+  near(both.map(1, 0.5).x, 220);
+  const full = cylinderSideSurface(guide, 1, 0.5, "none");
+  assert.deepEqual(full.map(0.3, 0.4), cylinderGeometry(guide).map(0.3, 0.4));
+  assert.deepEqual(
+    cylinderSideSurface(guide, 2, 0.5, "start").map(0.3, 0.4),
+    cylinderSideSurface(guide, 1, 0.5, "start").map(0.3, 0.4),
+  );
+  near(cylinderSideSurface(guide, 2, 0.5, "start").aspect, 5);
   assert.throws(() =>
-    cylinderSideSurface({ ...g, end: { x: 30, y: 50 } }, 1, 1, "both"),
+    cylinderSideSurface({ ...guide, end: { x: 65, y: 60 } }, 1, 1, "both"),
   );
 });
-test("ellipse-aware exclusion follows rotated and tapered cylinder axes", () => {
+test("source cap mask excludes cap and its subpixel rim but retains far silhouette and nearby side", () => {
+  const side = cylinderSideSurface(guide, 1, 0.5, "start");
+  assert.equal(side.visible(40, 60), false);
+  assert.equal(side.visible(60.4, 60), false);
+  assert.equal(side.visible(61, 60), true);
+  assert.equal(side.visible(260, 60), true);
+  assert.equal(side.visible(49, 21), true);
+  assert.equal(cylinderSideSurface(guide, 1, 0, "start").visible(40, 60), true);
+});
+test("arc mapping follows rotated tapered cylinders without modifying the guide", () => {
   const g = {
-    start: { x: 100, y: 20 },
-    end: { x: 100, y: 220 },
+    start: { x: 100, y: 30 },
+    end: { x: 100, y: 230 },
     startRadius: 30,
     endRadius: 15,
   };
   const s = cylinderSideSurface(g, 1, 0.6, "end");
-  for (const v of [0, 0.2, 0.5, 0.8, 1]) {
-    const p = s.map(1, v);
-    assert.ok(((p.y - 220) / 9) ** 2 + ((p.x - 100) / 15) ** 2 > 1);
-  }
-  assert.deepEqual(g.end, { x: 100, y: 220 });
+  for (const u of [0, 0.3, 1])
+    for (const v of [0.1, 0.5, 0.9]) {
+      const t = 2 * v - 1,
+        r = 30 * (1 - u) + 15 * u;
+      near(s.map(u, v).x, 100 - r * t);
+      near(s.map(u, v).y, 30 + 200 * u - 0.6 * r * Math.sqrt(1 - t * t));
+    }
+  assert.equal(s.visible(100, 230), false);
+  assert.equal(s.visible(100, 210), true);
+  assert.deepEqual(g.start, { x: 100, y: 30 });
 });
-
-test("cap exclusion also rejects subpixel and antialiased cap rims near image edges", () => {
-  const guide = {
-    start: { x: 20, y: 50 },
-    end: { x: 180, y: 50 },
-    startRadius: 20,
-    endRadius: 20,
-  };
-  const side = cylinderSideSurface(guide, 1, 0.5, "end");
-  for (let row = 0; row <= 200; row++) {
-    const p = side.map(1, row / 200);
-    assert.ok(((p.x - 180) / 10.5) ** 2 + ((p.y - 50.5) / 20.5) ** 2 > 1);
-  }
-});
-
-test("automatic contour endpoints are moved from outer bounds to the end-face centers", () => {
+test("automatic contour endpoints move to ellipse centers, with curved selection retaining outer tips", () => {
   const bounds = {
     start: { x: 30, y: 50 },
     end: { x: 370, y: 50 },
@@ -169,35 +173,10 @@ test("automatic contour endpoints are moved from outer bounds to the end-face ce
   const centered = centerGuideOnEndFaces(bounds, 2 / 3);
   assert.deepEqual(centered.start, { x: 50, y: 50 });
   assert.deepEqual(centered.end, { x: 350, y: 50 });
-  const surface = cylinderSideSurface(centered, 1, 2 / 3, "both");
-  for (const v of [0, 0.1, 0.5, 0.9, 1]) {
-    assert.ok(surface.map(0, v).x > 70);
-    assert.ok(surface.map(1, v).x < 330);
-    near(surface.map(0.25, v).x, surface.map(0.25, 0.5).x);
-  }
+  const surface = cylinderSideSurface(centered, 1, 2 / 3, "start");
+  near(surface.map(0, 0).x, 50);
+  near(surface.map(0, 0.5).x, 70);
+  near(surface.map(1, 0.5).x, 370);
   assert.deepEqual(bounds.start, { x: 30, y: 50 });
   assert.throws(() => centerGuideOnEndFaces(bounds, Infinity));
-  assert.throws(() =>
-    centerGuideOnEndFaces({ ...bounds, end: { x: 40, y: 50 } }, 1),
-  );
-});
-
-test("end-rim exclusion scales with high-resolution source pixels", () => {
-  for (const scale of [1, 8]) {
-    const guide = {
-      start: { x: 20 * scale, y: 50 * scale },
-      end: { x: 180 * scale, y: 50 * scale },
-      startRadius: 20 * scale,
-      endRadius: 20 * scale,
-    };
-    const surface = cylinderSideSurface(guide, 1, 0.5, "end");
-    for (let row = 0; row <= 100; row++) {
-      const p = surface.map(1, row / 100);
-      assert.ok(
-        ((p.x - guide.end.x) / (12 * scale)) ** 2 +
-          ((p.y - guide.end.y) / (24 * scale)) ** 2 >
-          1,
-      );
-    }
-  }
 });

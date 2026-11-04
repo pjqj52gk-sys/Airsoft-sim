@@ -40,7 +40,7 @@ export default function CylinderWorkbench({
   const [lengthScale, setLengthScale] = useState(1);
   const [ellipseRatio, setEllipseRatio] = useState(0.4);
   const [tapered, setTapered] = useState(false);
-  const [excludeEnd, setExcludeEnd] = useState<CylinderEnd>("both");
+  const [excludeEnd, setExcludeEnd] = useState<CylinderEnd>("start");
   const [showOriginal, setShowOriginal] = useState(false);
   const live = useCylinderPreview(
     layer,
@@ -92,8 +92,10 @@ export default function CylinderWorkbench({
     ellipseRatio: number;
   } | null>(null);
   let geometry: ReturnType<typeof cylinderGeometry> | null = null;
+  let side: ReturnType<typeof cylinderSideSurface> | null = null;
   try {
     geometry = cylinderGeometry(guide, lengthScale);
+    side = cylinderSideSurface(guide, lengthScale, ellipseRatio, excludeEnd);
   } catch {
     /* Display a recoverable invalid guide instead of applying it. */
   }
@@ -327,10 +329,14 @@ export default function CylinderWorkbench({
                 />
                 {geometry && (
                   <>
-                    <polygon
-                      points={geometry.corners
-                        .map((p) => `${p.x},${p.y}`)
-                        .join(" ")}
+                    <path
+                      data-testid="cylinder-side-selection"
+                      aria-label="平面化する側面"
+                      d={
+                        (side?.outline || geometry.corners)
+                          .map((p, i) => `${i ? "L" : "M"}${p.x},${p.y}`)
+                          .join(" ") + " Z"
+                      }
                       fill="#38bdf826"
                       stroke="#0284c7"
                       strokeWidth={radius / 7}
@@ -528,19 +534,19 @@ export default function CylinderWorkbench({
             <output>{Math.round(ellipseRatio * 100)}%</output>
           </label>
           <label className="cylinder-taper">
-            除く端面
+            見えている端面
             <select
               value={excludeEnd}
               onChange={(e) => setExcludeEnd(e.target.value as CylinderEnd)}
             >
-              <option value="end">先端</option>
-              <option value="start">根元</option>
-              <option value="both">両端</option>
-              <option value="none">除かない</option>
+              <option value="end">先側（先）</option>
+              <option value="start">根側（根）</option>
+              <option value="both">両側</option>
+              <option value="none">なし</option>
             </select>
           </label>
           <p className="hint">
-            見えている端面の円の中心に軸の端を合わせます。橙色の端面を除き、側面だけを使います。
+            青い範囲が補正対象です。円弧の縁を直線に変形します。
           </p>
           <label className="cylinder-taper">
             <input
@@ -576,7 +582,7 @@ export default function CylinderWorkbench({
           </button>
           <details className="hint">
             <summary>合わせ方</summary>
-            軸の両端をドラッグすると長さと角度が変わります。「太」で直径、「面」で端面の楕円を調整します。除く端面では、端面全体を除いて側面だけを補正します。隠れた側面や模様は復元しません。適用後に実寸を確認してください。
+            軸の両端をドラッグすると長さと角度が変わります。「太」で直径、「面」で端面の楕円を調整します。見えている端面を選び、青い側面の円弧を写真に合わせます。隠れた側面や模様は復元しません。適用後に実寸を確認してください。
           </details>
         </>
       }
@@ -611,7 +617,11 @@ export default function CylinderWorkbench({
                 surface.corners,
                 surface.aspect,
                 surface.map,
-                { pixels: live.pixels },
+                {
+                  pixels: live.pixels,
+                  pixelCenters: true,
+                  mask: surface.visible,
+                },
               );
               await apply(full);
             } catch (e) {

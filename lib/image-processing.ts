@@ -79,7 +79,12 @@ export async function rectifyImage(
   points: Point[],
   aspectRatio?: number,
   surfaceMap?: (u: number, v: number) => Point,
-  options?: { maxEdge?: number; pixels?: ImageData },
+  options?: {
+    maxEdge?: number;
+    pixels?: ImageData;
+    pixelCenters?: boolean;
+    mask?: (x: number, y: number) => boolean;
+  },
 ): Promise<Partial<Layer>> {
   const map = surfaceMap || quadMap(points);
   const source = options?.pixels || (await readImagePixels(layer.src));
@@ -104,10 +109,16 @@ export async function rectifyImage(
   c.height = h;
   const ctx = c.getContext("2d")!;
   const output = ctx.createImageData(w, h);
+  const alphaAt = (x: number, y: number, index: number) =>
+    src[index + 3] && (!options?.mask || options.mask(x, y))
+      ? src[index + 3]
+      : 0;
   // Bilinear interpolation in premultiplied-alpha space avoids dark fringes around transparent edges.
   for (let y = 0; y < h; y++)
     for (let x = 0; x < w; x++) {
-      const p = map(x / (w - 1), y / (h - 1));
+      const p = options?.pixelCenters
+        ? map((x + 0.5) / w, (y + 0.5) / h)
+        : map(x / (w - 1), y / (h - 1));
       if (p.x < 0 || p.y < 0 || p.x > source.width || p.y > source.height)
         continue;
       const px = Math.max(0, Math.min(source.width - 1, p.x)),
@@ -122,10 +133,10 @@ export async function rectifyImage(
         i10 = (y0 * source.width + x1) * 4;
       const i01 = (y1 * source.width + x0) * 4,
         i11 = (y1 * source.width + x1) * 4;
-      const a00 = src[i00 + 3] * (1 - fx) * (1 - fy),
-        a10 = src[i10 + 3] * fx * (1 - fy);
-      const a01 = src[i01 + 3] * (1 - fx) * fy,
-        a11 = src[i11 + 3] * fx * fy;
+      const a00 = alphaAt(x0, y0, i00) * (1 - fx) * (1 - fy),
+        a10 = alphaAt(x1, y0, i10) * fx * (1 - fy);
+      const a01 = alphaAt(x0, y1, i01) * (1 - fx) * fy,
+        a11 = alphaAt(x1, y1, i11) * fx * fy;
       const alpha = a00 + a10 + a01 + a11;
       const i = (y * w + x) * 4;
       output.data[i + 3] = alpha;

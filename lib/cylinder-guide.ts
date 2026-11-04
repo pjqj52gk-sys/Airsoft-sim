@@ -181,47 +181,73 @@ export function cylinderSideSurface(
     !["none", "start", "end", "both"].includes(exclude)
   )
     throw new Error("除く端面と開きを確認してください。");
-  const startExtent =
-    exclude === "start" || exclude === "both"
-      ? guide.startRadius * ellipseRatio
-      : 0;
-  const endExtent =
-    exclude === "end" || exclude === "both"
-      ? guide.endRadius * ellipseRatio
-      : 0;
-  const safeExtent = (extent: number, radius: number) =>
-    extent > 0
-      ? extent + Math.max(1, radius * 0.12) + Math.min(1, extent * 0.1)
-      : 0;
+  const startExtent = guide.startRadius * ellipseRatio;
+  const endExtent = guide.endRadius * ellipseRatio;
+  // On a visible cylinder side both end arcs bend in the same direction.
+  // The near cap is excluded; the far arc is the outer silhouette, not a crop.
+  const startDirection =
+    exclude === "start" || exclude === "both" ? 1 : exclude === "end" ? -1 : 0;
+  const endDirection =
+    exclude === "end" || exclude === "both" ? -1 : exclude === "start" ? 1 : 0;
   if (
-    geometry.length -
-      safeExtent(startExtent, guide.startRadius) -
-      safeExtent(endExtent, guide.endRadius) <
+    geometry.length +
+      Math.min(0, endDirection * endExtent - startDirection * startExtent) <
     4
   )
     throw new Error(
-      "側面が短すぎます。軸の両端を円の中心に合わせ、端面の開きを確認してください。",
+      "側面の縁が重なっています。軸の両端と端面の開きを確認してください。",
     );
-  // A constant axial crop excludes the entire end face. Following the ellipse
-  // separately for each row stretches lettering and carries rim pixels into the side.
-  const start = safeExtent(startExtent, guide.startRadius),
-    end = safeExtent(endExtent, guide.endRadius);
-  const point = (along: number) => ({
-    x:
-      guide.start.x + ((guide.end.x - guide.start.x) * along) / geometry.length,
-    y:
-      guide.start.y + ((guide.end.y - guide.start.y) * along) / geometry.length,
-  });
-  const radius = (along: number) =>
-    guide.startRadius +
-    ((guide.endRadius - guide.startRadius) * along) / geometry.length;
-  return cylinderGeometry(
-    {
-      start: point(start),
-      end: point(geometry.length - end),
-      startRadius: radius(start),
-      endRadius: radius(geometry.length - end),
-    },
-    lengthScale,
-  );
+  const axis = {
+    x: (guide.end.x - guide.start.x) / geometry.length,
+    y: (guide.end.y - guide.start.y) / geometry.length,
+  };
+  const map = (u: number, v: number): Point => {
+    const t = 2 * v - 1,
+      arc = Math.sqrt(Math.max(0, 1 - t * t));
+    const start = startDirection * startExtent * arc;
+    const end = geometry.length + endDirection * endExtent * arc;
+    const along = start * (1 - u) + end * u;
+    const radius = guide.startRadius * (1 - u) + guide.endRadius * u;
+    return {
+      x: guide.start.x + axis.x * along + geometry.normal.x * radius * t,
+      y: guide.start.y + axis.y * along + geometry.normal.y * radius * t,
+    };
+  };
+  // Mask source cap pixels before interpolation, so their color cannot bleed
+  // into the remapped side. Only a subpixel antialias rim is excluded.
+  const visible = (x: number, y: number) => {
+    const dx = x - guide.start.x,
+      dy = y - guide.start.y;
+    const along = dx * axis.x + dy * axis.y,
+      cross = dx * geometry.normal.x + dy * geometry.normal.y;
+    const inside = (center: number, extent: number, radius: number) => {
+      if (extent === 0) return false;
+      const a = extent + 0.6,
+        b = radius + 0.6,
+        px = along - center;
+      return (
+        Math.abs(px) <= a &&
+        Math.abs(cross) <= b &&
+        (px / a) ** 2 + (cross / b) ** 2 <= 1
+      );
+    };
+    return !(
+      ((exclude === "start" || exclude === "both") &&
+        inside(0, startExtent, guide.startRadius)) ||
+      ((exclude === "end" || exclude === "both") &&
+        inside(geometry.length, endExtent, guide.endRadius))
+    );
+  };
+  const outline = [
+    map(0, 0),
+    ...Array.from({ length: 65 }, (_, i) => map(1, i / 64)),
+    ...Array.from({ length: 65 }, (_, i) => map(0, 1 - i / 64)),
+  ];
+  return {
+    ...geometry,
+    map,
+    visible,
+    outline,
+    corners: [map(0, 0), map(1, 0), map(1, 1), map(0, 1)],
+  };
 }
