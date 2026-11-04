@@ -6,6 +6,7 @@ import LoadingOverlay from "./loading-overlay";
 import useCylinderPreview from "./use-cylinder-preview";
 import {
   initialCylinderGuide,
+  centerGuideOnEndFaces,
   cylinderGeometry,
   moveCylinderHandle,
   setCylinderDimensions,
@@ -27,7 +28,7 @@ export default function CylinderWorkbench({
 }: {
   layer: Layer;
   close: () => void;
-  apply: (patch: Partial<Layer>) => void;
+  apply: (patch: Partial<Layer>) => void | Promise<void>;
   useCube: () => void;
 }) {
   const [guide, setGuide] = useState(() =>
@@ -37,9 +38,9 @@ export default function CylinderWorkbench({
     fitImageViewport(layer.width, layer.height),
   );
   const [lengthScale, setLengthScale] = useState(1);
-  const [ellipseRatio, setEllipseRatio] = useState(0.22);
+  const [ellipseRatio, setEllipseRatio] = useState(0.4);
   const [tapered, setTapered] = useState(false);
-  const [excludeEnd, setExcludeEnd] = useState<CylinderEnd>("end");
+  const [excludeEnd, setExcludeEnd] = useState<CylinderEnd>("both");
   const [showOriginal, setShowOriginal] = useState(false);
   const live = useCylinderPreview(
     layer,
@@ -55,7 +56,10 @@ export default function CylinderWorkbench({
   const [autoMessage, setAutoMessage] = useState("");
   const autoFit = useCallback(() => {
     if (!live.pixels) return;
-    const estimated = estimateCylinderGuide(live.pixels);
+    const contour = estimateCylinderGuide(live.pixels);
+    const estimated = contour
+      ? centerGuideOnEndFaces(contour, ellipseRatio)
+      : null;
     if (!estimated) {
       setAutoMessage(
         "輪郭から推定できません。背景を透過するか、手動で合わせてください。",
@@ -71,7 +75,7 @@ export default function CylinderWorkbench({
       ),
     );
     setAutoMessage("輪郭に合わせました。端面の位置を確認してください。");
-  }, [live.pixels, layer.width, layer.height]);
+  }, [live.pixels, layer.width, layer.height, ellipseRatio]);
   useEffect(() => {
     if (!live.pixels || initialized.current) return;
     initialized.current = true;
@@ -266,7 +270,7 @@ export default function CylinderWorkbench({
               onClick={() => {
                 touched.current = true;
                 setGuide(initialCylinderGuide(layer.width, layer.height));
-                setEllipseRatio(0.22);
+                setEllipseRatio(0.4);
                 setTapered(false);
                 setLengthScale(1);
                 setError("");
@@ -572,7 +576,7 @@ export default function CylinderWorkbench({
           </button>
           <details className="hint">
             <summary>合わせ方</summary>
-            軸の両端をドラッグすると長さと角度が変わります。「太」で直径、「面」で端面の楕円を調整します。除く端面では、楕円の内側の輪郭に沿って側面だけを補正します。隠れた側面や模様は復元しません。適用後に実寸を確認してください。
+            軸の両端をドラッグすると長さと角度が変わります。「太」で直径、「面」で端面の楕円を調整します。除く端面では、端面全体を除いて側面だけを補正します。隠れた側面や模様は復元しません。適用後に実寸を確認してください。
           </details>
         </>
       }

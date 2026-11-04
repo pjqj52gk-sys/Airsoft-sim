@@ -135,6 +135,37 @@ export function cylinderEndRatio(extent: number, radius: number) {
   return Math.max(0, Math.min(1, extent / radius));
 }
 
+// Contour estimation returns the outermost ends, whereas ellipse controls use face centers.
+export function centerGuideOnEndFaces(
+  bounds: CylinderGuide,
+  ellipseRatio: number,
+): CylinderGuide {
+  if (!Number.isFinite(ellipseRatio) || ellipseRatio < 0 || ellipseRatio > 1)
+    throw new Error("端面の開きを確認してください。");
+  const geometry = cylinderGeometry(bounds);
+  const start = bounds.startRadius * ellipseRatio,
+    end = bounds.endRadius * ellipseRatio;
+  if (geometry.length - start - end < 4)
+    throw new Error("端面が大きすぎます。開きを小さくしてください。");
+  const point = (along: number) => ({
+    x:
+      bounds.start.x +
+      ((bounds.end.x - bounds.start.x) * along) / geometry.length,
+    y:
+      bounds.start.y +
+      ((bounds.end.y - bounds.start.y) * along) / geometry.length,
+  });
+  const radius = (along: number) =>
+    bounds.startRadius +
+    ((bounds.endRadius - bounds.startRadius) * along) / geometry.length;
+  return {
+    start: point(start),
+    end: point(geometry.length - end),
+    startRadius: radius(start),
+    endRadius: radius(geometry.length - end),
+  };
+}
+
 export type CylinderEnd = "none" | "start" | "end" | "both";
 export function cylinderSideSurface(
   guide: CylinderGuide,
@@ -160,7 +191,7 @@ export function cylinderSideSurface(
       : 0;
   const safeExtent = (extent: number, radius: number) =>
     extent > 0
-      ? extent + Math.min(1.5, radius * 0.1) + Math.min(1, extent * 0.1)
+      ? extent + Math.max(1, radius * 0.12) + Math.min(1, extent * 0.1)
       : 0;
   if (
     geometry.length -
@@ -171,33 +202,26 @@ export function cylinderSideSurface(
     throw new Error(
       "側面が短すぎます。軸の両端を円の中心に合わせ、端面の開きを確認してください。",
     );
-  const axis = {
-    x: (guide.end.x - guide.start.x) / geometry.length,
-    y: (guide.end.y - guide.start.y) / geometry.length,
-  };
-  // Follow the inward rim of each visible ellipse for every image row. The
-  // visible cap is an ellipse, so a rectangular crop would either leave its
-  // center behind or discard useful side pixels near the top and bottom.
-  const map = (u: number, v: number): Point => {
-    const t = 2 * v - 1;
-    // Include a small pixel margin around the cap to avoid its anti-aliased
-    // rim leaking into the side, including at the top and bottom of the image.
-    const inset = (extent: number, radius: number) => {
-      if (extent === 0) return 0;
-      const padding = Math.min(1.5, radius * 0.1);
-      const rim = Math.sqrt(
-        Math.max(0, 1 - ((radius * t) / (radius + padding)) ** 2),
-      );
-      return (extent + padding) * rim + Math.min(1, extent * 0.1);
-    };
-    const along =
-      inset(startExtent, guide.startRadius) * (1 - u) +
-      (geometry.length - inset(endExtent, guide.endRadius)) * u;
-    const radius = guide.startRadius * (1 - u) + guide.endRadius * u;
-    return {
-      x: guide.start.x + axis.x * along + geometry.normal.x * radius * t,
-      y: guide.start.y + axis.y * along + geometry.normal.y * radius * t,
-    };
-  };
-  return { ...geometry, map };
+  // A constant axial crop excludes the entire end face. Following the ellipse
+  // separately for each row stretches lettering and carries rim pixels into the side.
+  const start = safeExtent(startExtent, guide.startRadius),
+    end = safeExtent(endExtent, guide.endRadius);
+  const point = (along: number) => ({
+    x:
+      guide.start.x + ((guide.end.x - guide.start.x) * along) / geometry.length,
+    y:
+      guide.start.y + ((guide.end.y - guide.start.y) * along) / geometry.length,
+  });
+  const radius = (along: number) =>
+    guide.startRadius +
+    ((guide.endRadius - guide.startRadius) * along) / geometry.length;
+  return cylinderGeometry(
+    {
+      start: point(start),
+      end: point(geometry.length - end),
+      startRadius: radius(start),
+      endRadius: radius(geometry.length - end),
+    },
+    lengthScale,
+  );
 }

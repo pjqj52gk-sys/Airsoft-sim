@@ -18,7 +18,6 @@ import type { DropTarget } from "./use-file-drop";
 import { updateLayer } from "@/lib/attachments";
 const PartSearch = dynamic(() => import("./part-search"));
 import PerspectiveWorkbench from "./perspective-workbench";
-import { useImagePreparation } from "./image-preparation";
 import LogoCleanup from "./logo-cleanup";
 import PlanComparison from "./plan-comparison";
 import {
@@ -60,7 +59,6 @@ const yen = (n: number) =>
     maximumFractionDigits: 0,
   }).format(n);
 export default function Studio() {
-  const preparation = useImagePreparation();
   const [project, setProject] = useState<Project>(emptyProject);
   const [plans, setPlans] = useState<ComparisonPlans | null>(null);
   const [logoCleanup, setLogoCleanup] = useState(false);
@@ -329,7 +327,6 @@ export default function Studio() {
       const replacingBase = target === "base" && project.layers.length > 0;
       if (project.layers.length + (replacingBase ? 0 : list.length) > 60)
         throw new Error("レイヤーは60件まで追加できます。");
-      const originals: Layer[] = [];
       const prepared = await mapConcurrent(
         list,
         3,
@@ -351,11 +348,10 @@ export default function Studio() {
             url: "",
             category: base ? "本体" : "その他",
           };
-          originals[i] = original;
           return prepareAddedLayer(original, base, tolerance);
         },
       );
-      const images = await preparation.review(originals, prepared);
+      const images = prepared;
       if (replacingBase) {
         const base = project.layers[0];
         const replacement = {
@@ -529,13 +525,17 @@ export default function Studio() {
   }
   async function applyImage(updates: Partial<Layer>) {
     if (!layer) return;
-    const next =
-      updates.src && editor !== "perspective"
-        ? await trimTransparentLayer({ ...layer, ...updates })
-        : updates;
+    const correcting = editor === "perspective";
+    const next = updates.src
+      ? await trimTransparentLayer({ ...layer, ...updates })
+      : updates;
     update(layer.id, next);
-    setEditor(null);
-    notify("画像の編集を適用しました。");
+    setEditor(correcting ? "measure" : null);
+    notify(
+      correcting
+        ? "補正しました。続けて実寸を合わせてください。"
+        : "画像の編集を適用しました。",
+    );
   }
   async function openBuild(savedProject: Project) {
     setBusy(true);
@@ -581,12 +581,7 @@ export default function Studio() {
       };
       const part = reuse
         ? { ...original, attachedToBase: !isBase }
-        : (
-            await preparation.review(
-              [original],
-              [await prepareAddedLayer(original, isBase, tolerance)],
-            )
-          )[0];
+        : await prepareAddedLayer(original, isBase, tolerance);
       commit({ ...project, layers: [...project.layers, part] });
       setSelected(part.id);
       setShelf(null);
@@ -1397,12 +1392,7 @@ export default function Studio() {
               };
               const replacement = reuse
                 ? original
-                : (
-                    await preparation.review(
-                      [original],
-                      [await prepareAddedLayer(original, true, tolerance)],
-                    )
-                  )[0];
+                : await prepareAddedLayer(original, true, tolerance);
               commit({
                 ...project,
                 layers: [replacement, ...project.layers.slice(1)],
@@ -1419,8 +1409,6 @@ export default function Studio() {
                 "追加できません。レイヤー数と画像を確認してください。",
               );
             setSearch(null);
-            if (!reuse && (part.referenceMm || part.referenceOptions?.length))
-              setEditor("measure");
           }}
         />
       )}
@@ -1460,7 +1448,6 @@ export default function Studio() {
           }}
         />
       )}
-      {preparation.dialog}
       {comparisonOpen && livePlans && (
         <PlanComparison
           plans={livePlans}
@@ -1468,9 +1455,7 @@ export default function Studio() {
           edit={switchPlan}
         />
       )}
-      {busy && !preparation.reviewing && (
-        <LoadingOverlay label="画像を処理中…" />
-      )}
+      {busy && <LoadingOverlay label="画像を処理中…" />}
       {message && (
         <div role="status" className="toast">
           <Icon name="info" />

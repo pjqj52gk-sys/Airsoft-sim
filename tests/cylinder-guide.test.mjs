@@ -5,6 +5,7 @@ import {
   initialCylinderGuide,
   moveCylinderHandle,
   cylinderSideSurface,
+  centerGuideOnEndFaces,
 } from "../lib/cylinder-guide.ts";
 const near = (a, b) => assert.ok(Math.abs(a - b) < 1e-7, `${a} != ${b}`);
 test("cylinder straightening uses a continuous side with evenly spaced axial samples", () => {
@@ -121,7 +122,8 @@ test("side-only sampling excludes every row of the selected end ellipse instead 
     }
   assert.deepEqual(full.map(0.3, 0.4), cylinderGeometry(g).map(0.3, 0.4));
   assert.deepEqual(side.map(0, 0.5), g.start);
-  assert.equal(side.aspect, full.aspect);
+  assert.ok(side.aspect < full.aspect);
+  near(side.aspect, (side.map(1, 0.5).x - side.map(0, 0.5).x) / 40);
   const start = cylinderSideSurface(g, 1, 0.5, "start");
   assert.deepEqual(start.map(1, 0.5), g.end);
   assert.throws(() =>
@@ -154,5 +156,48 @@ test("cap exclusion also rejects subpixel and antialiased cap rims near image ed
   for (let row = 0; row <= 200; row++) {
     const p = side.map(1, row / 200);
     assert.ok(((p.x - 180) / 10.5) ** 2 + ((p.y - 50.5) / 20.5) ** 2 > 1);
+  }
+});
+
+test("automatic contour endpoints are moved from outer bounds to the end-face centers", () => {
+  const bounds = {
+    start: { x: 30, y: 50 },
+    end: { x: 370, y: 50 },
+    startRadius: 30,
+    endRadius: 30,
+  };
+  const centered = centerGuideOnEndFaces(bounds, 2 / 3);
+  assert.deepEqual(centered.start, { x: 50, y: 50 });
+  assert.deepEqual(centered.end, { x: 350, y: 50 });
+  const surface = cylinderSideSurface(centered, 1, 2 / 3, "both");
+  for (const v of [0, 0.1, 0.5, 0.9, 1]) {
+    assert.ok(surface.map(0, v).x > 70);
+    assert.ok(surface.map(1, v).x < 330);
+    near(surface.map(0.25, v).x, surface.map(0.25, 0.5).x);
+  }
+  assert.deepEqual(bounds.start, { x: 30, y: 50 });
+  assert.throws(() => centerGuideOnEndFaces(bounds, Infinity));
+  assert.throws(() =>
+    centerGuideOnEndFaces({ ...bounds, end: { x: 40, y: 50 } }, 1),
+  );
+});
+
+test("end-rim exclusion scales with high-resolution source pixels", () => {
+  for (const scale of [1, 8]) {
+    const guide = {
+      start: { x: 20 * scale, y: 50 * scale },
+      end: { x: 180 * scale, y: 50 * scale },
+      startRadius: 20 * scale,
+      endRadius: 20 * scale,
+    };
+    const surface = cylinderSideSurface(guide, 1, 0.5, "end");
+    for (let row = 0; row <= 100; row++) {
+      const p = surface.map(1, row / 100);
+      assert.ok(
+        ((p.x - guide.end.x) / (12 * scale)) ** 2 +
+          ((p.y - guide.end.y) / (24 * scale)) ** 2 >
+          1,
+      );
+    }
   }
 });

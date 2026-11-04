@@ -1,3 +1,8 @@
+import {
+  analyzeContours,
+  isolatedCandidates,
+  removeIsolatedCandidates,
+} from "./image-contours.ts";
 import { loadImage, removeBackground } from "./project.ts";
 import type { Layer } from "./project.ts";
 import { croppedPlacement } from "./image-edit.ts";
@@ -81,14 +86,40 @@ export async function trimTransparentLayer(layer: Layer): Promise<Layer> {
   };
 }
 
+export async function removeMarginMarks(src: string): Promise<string> {
+  const image = await loadImage(src),
+    canvas = document.createElement("canvas");
+  canvas.width = image.naturalWidth;
+  canvas.height = image.naturalHeight;
+  const context = canvas.getContext("2d")!;
+  context.drawImage(image, 0, 0);
+  const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+  const analysis = analyzeContours(pixels),
+    candidates = isolatedCandidates(analysis);
+  if (!candidates.length) return src;
+  pixels.data.set(
+    removeIsolatedCandidates(
+      pixels,
+      analysis,
+      candidates,
+      candidates.map((c) => c.id),
+    ),
+  );
+  context.putImageData(pixels, 0, 0);
+  return canvas.toDataURL("image/png");
+}
+
 export async function prepareAddedLayer(
   layer: Layer,
   isBase: boolean,
   tolerance = 28,
 ): Promise<Layer> {
-  const src = layer.originalSrc
+  const transparent = layer.originalSrc
     ? layer.src
     : await removeBackground(layer.src, tolerance, true);
+  const src = layer.originalSrc
+    ? transparent
+    : await removeMarginMarks(transparent);
   return trimTransparentLayer({
     ...layer,
     src,

@@ -40,7 +40,7 @@ const axisColors = ["#0369a1", "#0891b2", "#1d4ed8", "#0f766e"];
 type WorkbenchProps = {
   layer: Layer;
   close: () => void;
-  apply: (patch: Partial<Layer>) => void;
+  apply: (patch: Partial<Layer>) => void | Promise<void>;
 };
 export default function PerspectiveWorkbench(props: WorkbenchProps) {
   const [mode, setMode] = useState(() =>
@@ -62,7 +62,7 @@ function CubeWorkbench({
 }: {
   layer: Layer;
   close: () => void;
-  apply: (patch: Partial<Layer>) => void;
+  apply: (patch: Partial<Layer>) => void | Promise<void>;
   useCylinder: () => void;
 }) {
   const [template] = useState(() =>
@@ -687,8 +687,21 @@ function CubeWorkbench({
         ) : (
           <button
             className="button primary"
-            onClick={() => {
-              if (result) apply(result);
+            disabled={busy}
+            onClick={async () => {
+              if (!result || busy) return;
+              setBusy(true);
+              try {
+                await apply(result);
+              } catch (e) {
+                setError(
+                  e instanceof Error
+                    ? e.message
+                    : "補正を適用できませんでした。",
+                );
+              } finally {
+                setBusy(false);
+              }
             }}
           >
             この面を適用
