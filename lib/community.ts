@@ -28,7 +28,10 @@ export type CommunityCard = Omit<CommunitySubmission, "project"> & {
   createdAt: string;
   published: boolean;
   owned: boolean;
+  likeCount: number;
+  liked: boolean;
 };
+export type CommunityLike = { id: string; likeCount: number; liked: boolean };
 export type CommunityBuild = CommunityCard & { project: Project };
 export type CommunityList = {
   items: CommunityCard[];

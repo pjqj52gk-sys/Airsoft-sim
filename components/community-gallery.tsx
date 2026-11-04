@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
@@ -7,10 +7,13 @@ import Icon from "./icon";
 import Dialog from "./dialog";
 import PurchaseLink from "./purchase-link";
 import LoadingOverlay from "./loading-overlay";
+import CommunityLikeButton from "./community-like-button";
 import {
   gunTypes,
   type CommunityBuild,
   type CommunityList,
+  type CommunityCard,
+  type CommunityLike,
 } from "@/lib/community";
 import { communityRequest } from "@/lib/community-client";
 import { parseProject, uid } from "@/lib/project";
@@ -49,8 +52,40 @@ export default function CommunityGallery({
   const [detailLoading, setDetailLoading] = useState(false),
     [publish, setPublish] = useState(false),
     [busy, setBusy] = useState(false);
+  const [likes, setLikes] = useState<Record<string, CommunityLike>>({});
+  const [likePending, setLikePending] = useState<Set<string>>(new Set());
+  const likeRequests = useRef(new Set<string>());
+  const likeRevision = useRef(0);
+  const [likeError, setLikeError] = useState("");
+  async function toggleLike(build: CommunityCard) {
+    if (!build.published || likeRequests.current.has(build.id)) return;
+    likeRequests.current.add(build.id);
+    likeRevision.current++;
+    setLikePending(new Set(likeRequests.current));
+    setLikeError("");
+    try {
+      const result = await communityRequest<CommunityLike>(
+        `/api/community/${build.id}/like`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            liked: !(likes[build.id]?.liked ?? build.liked),
+          }),
+        },
+      );
+      likeRevision.current++;
+      setLikes((previous) => ({ ...previous, [build.id]: result }));
+    } catch (error) {
+      setLikeError(message(error));
+    } finally {
+      likeRequests.current.delete(build.id);
+      setLikePending(new Set(likeRequests.current));
+    }
+  }
   useEffect(() => {
     const controller = new AbortController();
+    const revision = likeRevision.current;
     setLoading(true);
     setError("");
     const params = new URLSearchParams({
@@ -64,7 +99,12 @@ export default function CommunityGallery({
     communityRequest<CommunityList>(`/api/community?${params}`, {
       signal: controller.signal,
     })
-      .then(setData)
+      .then((result) => {
+        if (controller.signal.aborted) return;
+        setData(result);
+        // New list reads can replace local counts unless a vote raced the read.
+        if (revision === likeRevision.current) setLikes({});
+      })
       .catch((error) => {
         if (!controller.signal.aborted) setError(message(error));
       })
@@ -214,6 +254,7 @@ export default function CommunityGallery({
               onChange={(e) => filter({ sort: e.target.value })}
             >
               <option value="new">新しい順</option>
+              <option value="likes">いいねが多い順</option>
               <option value="budget">価格が低い順</option>
             </select>
           </label>
@@ -236,6 +277,11 @@ export default function CommunityGallery({
             再読み込み
           </button>
         </div>
+      ) : null}
+      {likeError && !detail ? (
+        <p className="community-error" role="alert">
+          {likeError}
+        </p>
       ) : null}
       {data && !data.configured ? (
         <div className="community-empty">
@@ -302,6 +348,13 @@ export default function CommunityGallery({
                       </footer>
                     </div>
                   </button>
+                  <div className="community-card-reactions">
+                    <CommunityLikeButton
+                      build={{ ...build, ...likes[build.id] }}
+                      pending={likePending.has(build.id)}
+                      onClick={() => toggleLike(build)}
+                    />
+                  </div>
                 </article>
               ))}
             </div>
@@ -393,6 +446,12 @@ export default function CommunityGallery({
             alt={`${detail.title}の外観`}
           />
           <div className="community-detail-actions">
+            <CommunityLikeButton
+              build={{ ...detail, ...likes[detail.id] }}
+              pending={likePending.has(detail.id)}
+              disabled={busy}
+              onClick={() => toggleLike(detail)}
+            />
             <button
               className="button primary"
               onClick={tryBuild}
@@ -427,6 +486,11 @@ export default function CommunityGallery({
               </button>
             ) : null}
           </div>
+          {likeError ? (
+            <p className="community-error" role="alert">
+              {likeError}
+            </p>
+          ) : null}
           <p className="community-note">
             編集中のカスタムは、ライブラリに保存してから開きます。
           </p>

@@ -9,6 +9,7 @@ import {
   type CommunityBuild,
   type CommunityCard,
   type CommunitySubmission,
+  type CommunityLike,
 } from "./community.ts";
 
 export const communityConfigured = () => Boolean(process.env.DATABASE_URL);
@@ -33,6 +34,12 @@ async function database() {
     )`,
       sql`CREATE INDEX IF NOT EXISTS community_public_created ON community_builds (published, created_at DESC)`,
       sql`CREATE INDEX IF NOT EXISTS community_owner_created ON community_builds (owner_hash, created_at DESC)`,
+      sql`CREATE TABLE IF NOT EXISTS community_likes (
+        build_id text NOT NULL REFERENCES community_builds(id) ON DELETE CASCADE,
+        visitor_hash text NOT NULL,
+        created_at timestamptz NOT NULL DEFAULT now(),
+        PRIMARY KEY (build_id, visitor_hash)
+      )`,
     ])
     .catch((error) => {
       schema = undefined;
@@ -120,6 +127,8 @@ function card(row: Record<string, unknown>, owner: string): CommunityCard {
     createdAt: new Date(row.created_at as string).toISOString(),
     published: row.published as boolean,
     owned: row.owner_hash === owner,
+    likeCount: Number(row.like_count || 0),
+    liked: row.liked === true,
   };
 }
 export async function listCommunity(params: URLSearchParams, owner: string) {
@@ -136,12 +145,18 @@ export async function listCommunity(params: URLSearchParams, owner: string) {
       : 600_000_000;
   const page = Math.max(1, Math.min(200, Number(params.get("page")) || 1));
   const cheap = params.get("sort") === "budget";
+  const popular = params.get("sort") === "likes";
   const rows =
     await sql`SELECT id, owner_hash, title, author, description, gun_type, tags, preview,
-      base_name, budget, part_count, created_at, published FROM community_builds
+      base_name, budget, part_count, created_at, published,
+      COALESCE(l.like_count, 0) AS like_count,
+      EXISTS(SELECT 1 FROM community_likes WHERE build_id=b.id AND visitor_hash=${owner}) AS liked
+      FROM community_builds b
+      LEFT JOIN (SELECT build_id, count(*) AS like_count FROM community_likes GROUP BY build_id) l ON l.build_id=b.id
     WHERE (${mine} AND owner_hash = ${owner} OR NOT ${mine} AND published = true)
       AND search_text LIKE ${query} AND (${type} = '' OR gun_type = ${type}) AND budget <= ${max}
-    ORDER BY CASE WHEN ${cheap} THEN budget END ASC, created_at DESC, id DESC LIMIT 13 OFFSET ${(Math.floor(page) - 1) * 12}`;
+    ORDER BY CASE WHEN ${popular} THEN COALESCE(l.like_count, 0) END DESC,
+      CASE WHEN ${cheap} THEN budget END ASC, created_at DESC, id DESC LIMIT 13 OFFSET ${(Math.floor(page) - 1) * 12}`;
   return {
     items: rows.slice(0, 12).map((r) => card(r, owner)),
     hasMore: rows.length > 12,
@@ -181,8 +196,10 @@ export async function getCommunity(
   owner: string,
 ): Promise<CommunityBuild> {
   const sql = await database();
-  const rows =
-    await sql`SELECT * FROM community_builds WHERE id=${id} AND (published=true OR owner_hash=${owner})`;
+  const rows = await sql`SELECT b.*,
+      (SELECT count(*) FROM community_likes WHERE build_id=b.id) AS like_count,
+      EXISTS(SELECT 1 FROM community_likes WHERE build_id=b.id AND visitor_hash=${owner}) AS liked
+      FROM community_builds b WHERE id=${id} AND (published=true OR owner_hash=${owner})`;
   if (!rows.length)
     throw new CommunityError("このカスタムは公開されていません。", 404);
   return { ...card(rows[0], owner), project: rows[0].project };
@@ -201,4 +218,33 @@ export async function setCommunityPublished(
       403,
     );
   return getCommunity(id, owner);
+}
+
+export async function setCommunityLike(
+  id: string,
+  visitor: string,
+  liked: boolean,
+): Promise<CommunityLike> {
+  const sql = await database();
+  // Serialize with other likes and publication changes on this build. Explicit
+  // desired state + a unique key make retries and double clicks idempotent.
+  const result = await sql.transaction([
+    sql`SELECT id FROM community_builds WHERE id=${id} AND published=true FOR UPDATE`,
+    sql`INSERT INTO community_likes (build_id, visitor_hash)
+      SELECT id, ${visitor} FROM community_builds WHERE id=${id} AND published=true AND ${liked}
+      ON CONFLICT (build_id, visitor_hash) DO NOTHING`,
+    sql`DELETE FROM community_likes WHERE build_id=${id} AND visitor_hash=${visitor} AND NOT ${liked}
+      AND EXISTS(SELECT 1 FROM community_builds WHERE id=${id} AND published=true)`,
+    sql`SELECT id,
+      (SELECT count(*) FROM community_likes WHERE build_id=b.id) AS like_count,
+      EXISTS(SELECT 1 FROM community_likes WHERE build_id=b.id AND visitor_hash=${visitor}) AS liked
+      FROM community_builds b WHERE id=${id} AND published=true`,
+  ]);
+  const row = result[3][0];
+  if (!row) throw new CommunityError("このカスタムは公開されていません。", 404);
+  return {
+    id: row.id,
+    likeCount: Number(row.like_count),
+    liked: row.liked === true,
+  };
 }
