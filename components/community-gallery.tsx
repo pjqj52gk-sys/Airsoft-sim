@@ -8,6 +8,7 @@ import Dialog from "./dialog";
 import PurchaseLink from "./purchase-link";
 import LoadingOverlay from "./loading-overlay";
 import CommunityLikeButton from "./community-like-button";
+import { copyCommunityShoppingPlan } from "@/lib/shopping";
 import {
   gunTypes,
   type CommunityBuild,
@@ -154,7 +155,10 @@ export default function CommunityGallery({
         if (current.layers.length)
           await saveBuild({ id: uid(), savedAt: Date.now(), project: current });
       }
-      await writeDraft({ ...copy, name: `${detail.title} のコピー` });
+      await writeDraft({
+        ...copyCommunityShoppingPlan(copy),
+        name: `${detail.title} のコピー`,
+      });
       window.location.assign("/");
     } catch (error) {
       setNotice(message(error));

@@ -22,6 +22,7 @@ export type Layer = {
   visible: boolean;
   attachedToBase?: boolean;
   price: number;
+  owned?: boolean;
   url: string;
   category: string;
 };
@@ -183,6 +184,7 @@ export async function parseProject(value: unknown): Promise<Project> {
         visible: row.visible !== false,
         attachedToBase: index > 0 && row.attachedToBase === true,
         price: number(row.price, 0, 0, 10000000),
+        owned: row.owned === true,
         url: typeof row.url === "string" ? row.url.slice(0, 2000) : "",
         category:
           typeof row.category === "string"

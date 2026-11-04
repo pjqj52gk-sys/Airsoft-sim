@@ -10,6 +10,7 @@ import {
   type PlanKey,
 } from "@/lib/comparison-plans";
 import { saveBuild } from "@/lib/storage";
+import { shoppingSummary } from "@/lib/shopping";
 import "./plan-comparison.css";
 const yen = (value: number) => `¥${value.toLocaleString("ja-JP")}`;
 export default function PlanComparison({
@@ -31,6 +32,9 @@ export default function PlanComparison({
     : [plans.a, plans.b];
   const viewBox = comparisonBounds([a, b]);
   const difference = planTotal(plans.b) - planTotal(plans.a);
+  const additionalDifference =
+    shoppingSummary(plans.b).plannedTotal -
+    shoppingSummary(plans.a).plannedTotal;
   const rows =
     mode === "split"
       ? [
@@ -111,6 +115,16 @@ export default function PlanComparison({
                 <span>合計</span>
                 <strong>{yen(planTotal(project))}</strong>
               </div>
+              <div className="plan-price">
+                <span>購入予定のみ</span>
+                <strong>{yen(shoppingSummary(project).plannedTotal)}</strong>
+              </div>
+              {shoppingSummary(project).missingPrices > 0 && (
+                <p className="hint">
+                  購入予定に価格未登録 {shoppingSummary(project).missingPrices}
+                  点
+                </p>
+              )}
               <button
                 className="button secondary"
                 disabled={saving}
@@ -122,9 +136,17 @@ export default function PlanComparison({
           ))}
         </div>
         <div className="plan-difference" role="status">
-          {difference === 0
-            ? "価格差なし"
-            : `案Bは案Aより ${difference > 0 ? "+" : "−"}${yen(Math.abs(difference))}`}
+          <div>
+            {additionalDifference === 0
+              ? "追加費用の差なし"
+              : `購入予定：案Bは案Aより ${additionalDifference > 0 ? "+" : "−"}${yen(Math.abs(additionalDifference))}`}
+          </div>
+          <small>
+            構成全体：
+            {difference === 0
+              ? "価格差なし"
+              : `案Bは案Aより ${difference > 0 ? "+" : "−"}${yen(Math.abs(difference))}`}
+          </small>
         </div>
         <p className="hint">
           同じ縮尺で表示。合計は登録価格の合計です（本体・非表示パーツを含む）。未登録は0円として計算します。

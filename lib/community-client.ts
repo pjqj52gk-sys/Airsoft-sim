@@ -19,6 +19,7 @@ export async function preparePublicBuild(project: Project) {
       .getContext("2d")!
       .drawImage(image, 0, 0, canvas.width, canvas.height);
     const copy = { ...layer };
+    delete copy.owned;
     delete copy.originalSrc;
     delete copy.originalFrame;
     delete copy.referenceOptions;

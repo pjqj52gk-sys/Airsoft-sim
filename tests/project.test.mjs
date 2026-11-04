@@ -32,6 +32,7 @@ test("V2 round-trip preserves coordinates, visibility, rotation and purchase not
     rotation: 45,
     visible: false,
     price: 12000,
+    owned: true,
     url: "https://example.com/part",
     attachedToBase: true,
     referenceMm: 67,
@@ -49,6 +50,7 @@ test("V2 round-trip preserves coordinates, visibility, rotation and purchase not
   assert.equal(part.rotation, 45);
   assert.equal(part.visible, false);
   assert.equal(part.price, 12000);
+  assert.equal(part.owned, true);
   assert.equal(part.url, source.layers[1].url);
   assert.equal(part.attachedToBase, true);
   assert.equal(part.referenceMm, 67);

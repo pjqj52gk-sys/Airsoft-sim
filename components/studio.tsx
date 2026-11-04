@@ -8,6 +8,7 @@ import LoadingOverlay from "./loading-overlay";
 import type { EditMode } from "./image-editor";
 import Shelf from "./shelf";
 import PurchaseLink from "./purchase-link";
+import ShoppingList from "./shopping-list";
 import { purchaseLink, monetization } from "@/lib/commerce";
 import useFileDrop from "./use-file-drop";
 import type { DropTarget } from "./use-file-drop";
@@ -98,6 +99,7 @@ export default function Studio() {
   const [saved, setSaved] = useState("準備中");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [ownershipSaving, setOwnershipSaving] = useState(false);
   const [help, setHelp] = useState(false);
   const [clearDialog, setClearDialog] = useState(false);
   const [tolerance, setTolerance] = useState(28);
@@ -196,6 +198,26 @@ export default function Studio() {
       ...project,
       layers: updateLayer(project.layers, id, updates),
     });
+  async function changeOwnership(id: string, owned: boolean) {
+    if (ownershipSaving) return;
+    const next = {
+      ...current.current,
+      layers: updateLayer(current.current.layers, id, { owned }),
+    };
+    commit(next);
+    setOwnershipSaving(true);
+    setSaved("保存中…");
+    try {
+      await writeWorkspace(next, plans ? capturePlan(plans, next) : null);
+      setSaved("このブラウザーに保存済み");
+    } catch {
+      notify(
+        "所有状況を保存できませんでした。JSON保存でバックアップしてください。",
+      );
+    } finally {
+      setOwnershipSaving(false);
+    }
+  }
   const undo = () => {
     if (!history.past.length) return;
     setProject(history.past[history.past.length - 1]);
@@ -562,7 +584,6 @@ export default function Studio() {
       setBusy(false);
     }
   }
-  const total = project.layers.slice(1).reduce((sum, l) => sum + l.price, 0);
   const button = (
     name: string,
     title: string,
@@ -819,35 +840,12 @@ export default function Studio() {
                 </button>
               </>
             ) : (
-              <div className="shopping-list">
-                <p className="hint">
-                  選択したパーツに価格と商品URLを登録すると、購入候補をまとめられます。
-                </p>
-                {project.layers.slice(1).map((l) => (
-                  <div className="shopping-entry" key={l.id}>
-                    <button
-                      className="shopping-row"
-                      onClick={() => setSelected(l.id)}
-                    >
-                      <span>
-                        {l.name}
-                        <small>{l.category}</small>
-                      </span>
-                      <strong>{yen(l.price)}</strong>
-                    </button>
-                    <PurchaseLink url={l.url} label="購入先を見る" />
-                  </div>
-                ))}
-                <div className="shopping-total">
-                  <span>パーツ合計</span>
-                  <strong>{yen(total)}</strong>
-                </div>
-                <p className="hint">
-                  入力した参考価格の合計です。
-                  <br />
-                  非表示のパーツも含みます。
-                </p>
-              </div>
+              <ShoppingList
+                project={project}
+                select={setSelected}
+                setOwned={changeOwnership}
+                disabled={!ready || busy || ownershipSaving}
+              />
             )}
           </div>
         </aside>
@@ -1211,6 +1209,19 @@ export default function Studio() {
                 >
                   調整済みパーツを保存
                 </button>
+                <label className="field-label">
+                  所有状況
+                  <select
+                    value={layer.owned ? "owned" : "planned"}
+                    disabled={busy || ownershipSaving}
+                    onChange={(e) =>
+                      changeOwnership(layer.id, e.target.value === "owned")
+                    }
+                  >
+                    <option value="planned">購入予定</option>
+                    <option value="owned">所有済み</option>
+                  </select>
+                </label>
                 <NumberField
                   label="参考価格"
                   value={layer.price}

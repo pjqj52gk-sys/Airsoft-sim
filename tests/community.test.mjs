@@ -33,6 +33,7 @@ const layer = {
   url: "https://example.com/item",
   category: "本体",
   originalSrc: png,
+  owned: true,
   originalFrame: { width: 100, height: 100, offsetX: 0, offsetY: 0 },
 };
 const submission = () => ({
@@ -56,6 +57,7 @@ test("public builds omit hidden layers, original images, private frame and clien
   assert.equal(result.project.layers.length, 1);
   assert.equal(result.project.name, "Ｍ４ カスタム");
   assert.equal(result.project.layers[0].originalSrc, undefined);
+  assert.equal(result.project.layers[0].owned, undefined);
   assert.equal(result.project.layers[0].originalFrame, undefined);
   assert.equal(result.project.layers[0].id, "public-0");
   assert.equal(result.author, "ゲスト");

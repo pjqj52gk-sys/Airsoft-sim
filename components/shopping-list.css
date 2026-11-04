@@ -1,0 +1,32 @@
+.shopping-budget {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid #bae6fd;
+  background: #f0f9ff;
+  border-radius: 12px;
+  color: #0369a1;
+}
+.shopping-budget strong {
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+}
+.shopping-budget small {
+  color: #587085;
+}
+.shopping-filter,
+.shopping-entry-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 14px 0;
+}
+.shopping-filter .mini-button {
+  flex: 1;
+  padding: 8px 4px;
+  white-space: nowrap;
+}
+.shopping-entry-actions .mini-button {
+  min-height: 34px;
+}
