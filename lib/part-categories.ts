@@ -199,6 +199,34 @@ export const partCategoryGroups: PartCategoryGroup[] = [
     ],
   },
   {
+    id: "magazines",
+    label: "マガジン",
+    layerCategory: "外装",
+    children: [
+      { id: "magazine", label: "マガジン全般", keyword: "マガジン" },
+      {
+        id: "standard-magazine",
+        label: "ノーマルマガジン",
+        keyword: "ノーマルマガジン",
+      },
+      {
+        id: "high-cap-magazine",
+        label: "多弾マガジン",
+        keyword: "多弾マガジン",
+      },
+      {
+        id: "drum-magazine",
+        label: "ドラムマガジン",
+        keyword: "ドラムマガジン",
+      },
+      {
+        id: "short-magazine",
+        label: "ショートマガジン",
+        keyword: "ショートマガジン",
+      },
+    ],
+  },
+  {
     id: "lasers",
     label: "レーザーサイト",
     layerCategory: "光学機器",

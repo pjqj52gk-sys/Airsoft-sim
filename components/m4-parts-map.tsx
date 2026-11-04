@@ -6,7 +6,13 @@ const locations: Record<
   string,
   { x: number; y: number; point: [number, number]; line: string }
 > = {
-  guns: { x: 535, y: 393, point: [558, 203], line: "M535 372V330L558 203" },
+  guns: { x: 855, y: 310, point: [558, 203], line: "M855 289V265L558 203" },
+  magazines: {
+    x: 535,
+    y: 393,
+    point: [495, 280],
+    line: "M535 372V340L495 280",
+  },
   stocks: { x: 865, y: 72, point: [886, 214], line: "M865 93V150L886 214" },
   optics: { x: 600, y: 45, point: [560, 154], line: "M600 66V108L560 154" },
   mounts: { x: 405, y: 50, point: [470, 154], line: "M405 71V112L470 154" },
