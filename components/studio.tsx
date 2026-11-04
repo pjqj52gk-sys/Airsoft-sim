@@ -14,6 +14,7 @@ import type { DropTarget } from "./use-file-drop";
 import { updateLayer } from "@/lib/attachments";
 import PartSearch from "./part-search";
 import PerspectiveWorkbench from "./perspective-workbench";
+import { useImagePreparation } from "./image-preparation";
 import {
   download,
   emptyProject,
@@ -26,7 +27,7 @@ import {
   sampleProject,
   uid,
 } from "@/lib/project";
-import { readDraft, writeDraft } from "@/lib/storage";
+import { readDraft, writeDraft, savePart } from "@/lib/storage";
 import {
   prepareAddedLayer,
   trimTransparentLayer,
@@ -39,6 +40,7 @@ const yen = (n: number) =>
     maximumFractionDigits: 0,
   }).format(n);
 export default function Studio() {
+  const preparation = useImagePreparation();
   const [project, setProject] = useState<Project>(emptyProject);
   const current = useRef(project);
   current.current = project;
@@ -242,31 +244,31 @@ export default function Studio() {
       const replacingBase = target === "base" && project.layers.length > 0;
       if (project.layers.length + (replacingBase ? 0 : list.length) > 60)
         throw new Error("レイヤーは60件まで追加できます。");
-      const images = await Promise.all(
+      const originals: Layer[] = [];
+      const prepared = await Promise.all(
         list.map(async (file, i): Promise<Layer> => {
           const image = await readImage(file);
           const base = target === "base" || (!project.layers.length && i === 0);
-          return prepareAddedLayer(
-            {
-              ...image,
-              id: uid(),
-              name: file.name.replace(/\.[^.]+$/, ""),
-              mm: base ? 800 : 150,
-              x: base ? 120 : 430 + i * 25,
-              y: base ? 190 : 160 + i * 25,
-              rotation: 0,
-              flip: false,
-              visible: true,
-              attachedToBase: false,
-              price: 0,
-              url: "",
-              category: base ? "本体" : "その他",
-            },
-            base,
-            tolerance,
-          );
+          const original: Layer = {
+            ...image,
+            id: uid(),
+            name: file.name.replace(/\.[^.]+$/, ""),
+            mm: base ? 800 : 150,
+            x: base ? 120 : 430 + i * 25,
+            y: base ? 190 : 160 + i * 25,
+            rotation: 0,
+            flip: false,
+            visible: true,
+            attachedToBase: !base,
+            price: 0,
+            url: "",
+            category: base ? "本体" : "その他",
+          };
+          originals[i] = original;
+          return prepareAddedLayer(original, base, tolerance);
         }),
       );
+      const images = await preparation.review(originals, prepared);
       if (replacingBase) {
         const base = project.layers[0];
         const replacement = {
@@ -463,7 +465,7 @@ export default function Studio() {
       setBusy(false);
     }
   }
-  async function addStoredPart(stored: Layer) {
+  async function addStoredPart(stored: Layer, reuse = false) {
     if (project.layers.length >= 60) {
       notify("レイヤーは60件まで追加できます。");
       return false;
@@ -476,24 +478,28 @@ export default function Studio() {
         layers: [stored],
       });
       const isBase = project.layers.length === 0;
-      const part = await prepareAddedLayer(
-        {
-          ...validated.layers[0],
-          id: uid(),
-          x: isBase ? 120 : 430,
-          y: isBase ? 190 : 160,
-          rotation: 0,
-          visible: true,
-          attachedToBase: false,
-          category: isBase
-            ? "本体"
-            : stored.category === "本体"
-              ? "その他"
-              : stored.category,
-        },
-        isBase,
-        tolerance,
-      );
+      const original: Layer = {
+        ...validated.layers[0],
+        id: uid(),
+        x: isBase ? 120 : 430,
+        y: isBase ? 190 : 160,
+        rotation: 0,
+        visible: true,
+        attachedToBase: false,
+        category: isBase
+          ? "本体"
+          : stored.category === "本体"
+            ? "その他"
+            : stored.category,
+      };
+      const part = reuse
+        ? { ...original, attachedToBase: !isBase }
+        : (
+            await preparation.review(
+              [original],
+              [await prepareAddedLayer(original, isBase, tolerance)],
+            )
+          )[0];
       commit({ ...project, layers: [...project.layers, part] });
       setSelected(part.id);
       setShelf(null);
@@ -1086,9 +1092,22 @@ export default function Studio() {
                 <div className="section-label">購入メモ</div>
                 <button
                   className="mini-button full-width"
-                  onClick={() => setShelf("parts")}
+                  onClick={async () => {
+                    try {
+                      await savePart({
+                        id: layer.id,
+                        savedAt: Date.now(),
+                        layer: { ...layer },
+                      });
+                      notify(
+                        "調整済みパーツを保存しました。「登録パーツ」から再利用できます。",
+                      );
+                    } catch {
+                      notify("パーツを保存できませんでした。");
+                    }
+                  }}
                 >
-                  パーツライブラリに登録
+                  調整済みパーツを保存
                 </button>
                 <NumberField
                   label="参考価格"
@@ -1220,7 +1239,7 @@ export default function Studio() {
                 }
               : undefined
           }
-          add={async (part) => {
+          add={async (part, reuse) => {
             if (part.category === "本体") {
               const validated = await parseProject({
                 version: 2,
@@ -1228,22 +1247,26 @@ export default function Studio() {
                 layers: [part],
               });
               const base = project.layers[0];
-              const replacement = await prepareAddedLayer(
-                {
-                  ...validated.layers[0],
-                  id: base?.id || uid(),
-                  category: "本体",
-                  x: base?.x ?? 120,
-                  y: base?.y ?? 190,
-                  mm: base?.mm ?? 800,
-                  rotation: base?.rotation ?? 0,
-                  flip: base?.flip ?? false,
-                  visible: true,
-                  attachedToBase: false,
-                },
-                true,
-                tolerance,
-              );
+              const original: Layer = {
+                ...validated.layers[0],
+                id: base?.id || uid(),
+                category: "本体",
+                x: base?.x ?? 120,
+                y: base?.y ?? 190,
+                mm: base?.mm ?? 800,
+                rotation: base?.rotation ?? 0,
+                flip: base?.flip ?? false,
+                visible: true,
+                attachedToBase: false,
+              };
+              const replacement = reuse
+                ? original
+                : (
+                    await preparation.review(
+                      [original],
+                      [await prepareAddedLayer(original, true, tolerance)],
+                    )
+                  )[0];
               commit({
                 ...project,
                 layers: [replacement, ...project.layers.slice(1)],
@@ -1255,12 +1278,12 @@ export default function Studio() {
                   ? "本体画像を入れ替えました。実寸を確認してください。"
                   : "本体画像を追加しました。",
               );
-            } else if (!(await addStoredPart(part)))
+            } else if (!(await addStoredPart(part, reuse)))
               throw new Error(
                 "追加できません。レイヤー数と画像を確認してください。",
               );
             setSearch(null);
-            if (part.referenceMm || part.referenceOptions?.length)
+            if (!reuse && (part.referenceMm || part.referenceOptions?.length))
               setEditor("measure");
           }}
         />
@@ -1288,10 +1311,13 @@ export default function Studio() {
           initialTab={shelf}
           close={() => setShelf(null)}
           load={openBuild}
-          add={addStoredPart}
+          add={(part) => addStoredPart(part, true)}
         />
       )}
-      {busy && <LoadingOverlay label="画像を処理中…" />}
+      {preparation.dialog}
+      {busy && !preparation.reviewing && (
+        <LoadingOverlay label="画像を処理中…" />
+      )}
       {message && (
         <div role="status" className="toast">
           <Icon name="info" />

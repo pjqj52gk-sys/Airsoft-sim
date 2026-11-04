@@ -25,7 +25,7 @@ export default function PartSearch({
   initialScope = "parts",
 }: {
   close: () => void;
-  add: (part: Layer) => Promise<void>;
+  add: (part: Layer, reuse?: boolean) => Promise<void>;
   attachLink?: (url: string) => void;
   initialScope?: "parts" | "guns";
 }) {
@@ -44,7 +44,7 @@ export default function PartSearch({
     let cancelled = false;
     listParts()
       .then((rows) => {
-        if (!cancelled) setSaved(rows);
+        if (!cancelled) setSaved(rows.sort((a, b) => b.savedAt - a.savedAt));
       })
       .catch(() => {
         if (!cancelled) setError("登録パーツを読み込めません。");
@@ -397,7 +397,7 @@ export default function PartSearch({
                         setBusy(p.id);
                         setError("");
                         try {
-                          await add({ ...p.layer, referenceMm: undefined });
+                          await add(p.layer, true);
                         } catch (e) {
                           setError(
                             e instanceof Error
