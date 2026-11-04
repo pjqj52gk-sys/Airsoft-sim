@@ -1,5 +1,7 @@
 import type { Project, Layer } from "./project";
 import type { ComparisonPlans } from "./comparison-plans";
+import { createTaskQueue } from "./async-control.ts";
+const enqueueWorkspace = createTaskQueue();
 export type StoredPart = { id: string; savedAt: number; layer: Layer };
 export type StoredBuild = { id: string; savedAt: number; project: Project };
 function database(): Promise<IDBDatabase> {
@@ -68,7 +70,7 @@ async function write(store: string, key: string, value?: unknown) {
 }
 export const readDraft = () => read<unknown>("projects", "draft");
 export const readComparison = () => read<unknown>("projects", "comparison");
-export async function writeWorkspace(
+async function persistWorkspace(
   project: Project,
   comparison: ComparisonPlans | null,
 ) {
@@ -88,8 +90,12 @@ export async function writeWorkspace(
     };
   });
 }
+export const writeWorkspace = (
+  project: Project,
+  comparison: ComparisonPlans | null,
+) => enqueueWorkspace(() => persistWorkspace(project, comparison));
 export const writeDraft = (project: Project) =>
-  write("projects", "draft", project);
+  enqueueWorkspace(() => write("projects", "draft", project));
 export const listParts = () => read<StoredPart[]>("parts");
 export const listBuilds = () => read<StoredBuild[]>("builds");
 export const savePart = (part: StoredPart) => write("parts", part.id, part);

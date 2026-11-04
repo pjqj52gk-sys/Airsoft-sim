@@ -1,5 +1,6 @@
 "use client";
 import { ReactNode, useEffect, useRef } from "react";
+const modalStack: HTMLElement[] = [];
 export default function Dialog({
   label,
   close,
@@ -13,14 +14,19 @@ export default function Dialog({
 }) {
   const element = useRef<HTMLElement>(null);
   const closeRef = useRef(close);
-  closeRef.current = close;
+  useEffect(() => {
+    closeRef.current = close;
+  }, [close]);
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
     const root = element.current!;
+    modalStack.push(root);
     const selector =
       'button:not(:disabled), a[href], input:not(:disabled), textarea:not(:disabled), select:not(:disabled), [tabindex="0"]';
     root.querySelector<HTMLElement>(selector)?.focus();
     const key = (event: KeyboardEvent) => {
+      if (modalStack.at(-1) !== root || document.querySelector("dialog[open]"))
+        return;
       if (event.key === "Escape") {
         event.preventDefault();
         closeRef.current();
@@ -43,6 +49,8 @@ export default function Dialog({
     document.addEventListener("keydown", key);
     return () => {
       document.removeEventListener("keydown", key);
+      const index = modalStack.indexOf(root);
+      if (index >= 0) modalStack.splice(index, 1);
       previous?.focus();
     };
   }, []);

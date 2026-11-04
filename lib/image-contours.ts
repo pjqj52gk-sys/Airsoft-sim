@@ -149,14 +149,13 @@ export function estimateCylinderGuide(
     right = quantile(sorted, 0.995);
   const widths: number[] = [],
     centers: number[] = [];
+  const bins = Array.from({ length: 10 }, () => [] as number[]);
+  for (let i = 0; i < axial.length; i++) {
+    const bin = Math.floor(((axial[i] - left) * 10) / (right - left));
+    if (bin >= 1 && bin < 9) bins[bin].push(cross[i]);
+  }
   for (let bin = 1; bin < 9; bin++) {
-    const values = cross
-      .filter(
-        (_, i) =>
-          axial[i] >= left + ((right - left) * bin) / 10 &&
-          axial[i] < left + ((right - left) * (bin + 1)) / 10,
-      )
-      .sort((a, b) => a - b);
+    const values = bins[bin].sort((a, b) => a - b);
     if (values.length < 4) continue;
     const lo = quantile(values, 0.02),
       hi = quantile(values, 0.98);

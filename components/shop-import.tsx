@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import type { Layer } from "@/lib/project";
 import { readImage, uid } from "@/lib/project";
 import type { ShopProduct } from "@/lib/shop-product";
+import { referenceCatalogPrice } from "@/lib/catalog-price";
 import { shopUrl } from "@/lib/shop-url";
 import { catalogImageUrl } from "@/lib/catalog-image";
 import {
@@ -116,7 +117,7 @@ export default function ShopImport({
       flip: false,
       visible: true,
       attachedToBase: false,
-      price: 0,
+      price: referenceCatalogPrice(official?.price),
       url: sourceLink,
       category,
     });

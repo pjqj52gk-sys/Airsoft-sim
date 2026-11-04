@@ -1,5 +1,8 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import { mapConcurrent } from "@/lib/async-control";
 import Icon from "./icon";
 import Stage from "./stage";
 import Dialog from "./dialog";
@@ -13,7 +16,7 @@ import { purchaseLink, monetization } from "@/lib/commerce";
 import useFileDrop from "./use-file-drop";
 import type { DropTarget } from "./use-file-drop";
 import { updateLayer } from "@/lib/attachments";
-import PartSearch from "./part-search";
+const PartSearch = dynamic(() => import("./part-search"));
 import PerspectiveWorkbench from "./perspective-workbench";
 import { useImagePreparation } from "./image-preparation";
 import LogoCleanup from "./logo-cleanup";
@@ -174,18 +177,25 @@ export default function Studio() {
   }, []);
   useEffect(() => {
     if (!ready || (draftRecoveryFailed && project === emptyProject)) return;
+    let active = true;
     const t = setTimeout(() => {
       setSaved("保存中…");
       writeWorkspace(project, plans ? capturePlan(plans, project) : null)
-        .then(() => setSaved("このブラウザーに保存済み"))
+        .then(() => {
+          if (active) setSaved("このブラウザーに保存済み");
+        })
         .catch(() => {
+          if (!active) return;
           setSaved("自動保存できません");
           notify(
             "自動保存に失敗しました。「保存」でJSONをダウンロードしてください。",
           );
         });
     }, 700);
-    return () => clearTimeout(t);
+    return () => {
+      active = false;
+      clearTimeout(t);
+    };
   }, [project, plans, ready, draftRecoveryFailed]);
   useEffect(() => {
     if (!message) return;
@@ -212,7 +222,7 @@ export default function Studio() {
     setSaved("保存中…");
     try {
       await writeWorkspace(next, plans ? capturePlan(plans, next) : null);
-      setSaved("このブラウザーに保存済み");
+      if (current.current === next) setSaved("このブラウザーに保存済み");
     } catch {
       notify(
         "所有状況を保存できませんでした。JSON保存でバックアップしてください。",
@@ -320,8 +330,10 @@ export default function Studio() {
       if (project.layers.length + (replacingBase ? 0 : list.length) > 60)
         throw new Error("レイヤーは60件まで追加できます。");
       const originals: Layer[] = [];
-      const prepared = await Promise.all(
-        list.map(async (file, i): Promise<Layer> => {
+      const prepared = await mapConcurrent(
+        list,
+        3,
+        async (file, i): Promise<Layer> => {
           const image = await readImage(file);
           const base = target === "base" || (!project.layers.length && i === 0);
           const original: Layer = {
@@ -341,7 +353,7 @@ export default function Studio() {
           };
           originals[i] = original;
           return prepareAddedLayer(original, base, tolerance);
-        }),
+        },
       );
       const images = await preparation.review(originals, prepared);
       if (replacingBase) {
@@ -628,14 +640,14 @@ export default function Studio() {
         }}
       />
       <header className="topbar">
-        <a className="brand" href="/">
+        <Link className="brand" href="/">
           <span className="brand-mark">
             a<span>+</span>
           </span>
           <span>
             AIRSOFT<span className="brand-sub">CUSTOM STUDIO</span>
           </span>
-        </a>
+        </Link>
         <div className="header-divider" />
         <div className="project-heading">
           <input
@@ -1287,7 +1299,7 @@ export default function Studio() {
             >
               保存ビルドを開く・比較
             </button>
-            <a href="/legacy">旧エディターを開く ↗</a>
+            <Link href="/legacy">旧エディターを開く ↗</Link>
             <button
               className="text-button"
               onClick={() => setClearDialog(true)}
@@ -1563,8 +1575,7 @@ function NumberField({
   max?: number;
   unit: string;
 }) {
-  const [draft, setDraft] = useState(String(Math.round(value * 10) / 10));
-  useEffect(() => setDraft(String(Math.round(value * 10) / 10)), [value]);
+  const [draft, setDraft] = useState<string | null>(null);
   return (
     <label className="field-label">
       {label}
@@ -1572,18 +1583,19 @@ function NumberField({
         <input
           type="number"
           aria-label={label}
-          value={draft}
+          value={draft ?? String(Math.round(value * 10) / 10)}
           min={min}
           max={max}
           step="0.1"
           onChange={(e) => setDraft(e.target.value)}
           onBlur={() => {
-            const n = Number(draft);
-            if (draft.trim() && Number.isFinite(n)) {
+            const text = draft ?? String(value);
+            const n = Number(text);
+            if (text.trim() && Number.isFinite(n)) {
               const valid = Math.min(max, Math.max(min, n));
               onChange(valid);
-              setDraft(String(valid));
-            } else setDraft(String(value));
+            }
+            setDraft(null);
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();

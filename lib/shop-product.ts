@@ -26,6 +26,15 @@ export type ShopProduct = {
   notice?: string;
   officialMatch?: { product: CatalogProduct; method: "jan" | "model" | "name" };
 };
+function imageArea(value: unknown) {
+  return Array.isArray(value) &&
+    value.length >= 2 &&
+    value
+      .slice(0, 2)
+      .every((n) => typeof n === "number" && Number.isFinite(n) && n > 0)
+    ? value[0] * value[1]
+    : 0;
+}
 const decode = (s: string) =>
   s
     .replace(/&amp;/gi, "&")
@@ -102,13 +111,14 @@ export function extractShopProduct(html: string, source: string): ShopProduct {
   }
   const product = primaryProductMetadata(html, source);
   const images: string[] = [];
-  function addImage(value: any) {
+  function addImage(value: unknown) {
     if (Array.isArray(value)) {
       value.forEach(addImage);
       return;
     }
     if (value && typeof value === "object") {
-      addImage(value.contentUrl || value.url);
+      const image = value as Record<string, unknown>;
+      addImage(image.contentUrl || image.url);
       return;
     }
     if (typeof value !== "string") return;
@@ -163,7 +173,7 @@ export function extractShopProduct(html: string, source: string): ShopProduct {
       try {
         const variants = JSON.parse(a["data-a-dynamic-image"]);
         const largest = Object.entries(variants).sort(
-          (a: any, b: any) => b[1][0] * b[1][1] - a[1][0] * a[1][1],
+          (a, b) => imageArea(b[1]) - imageArea(a[1]),
         )[0];
         if (largest) addImage(largest[0]);
       } catch {}
@@ -223,6 +233,23 @@ export function extractShopProduct(html: string, source: string): ShopProduct {
         meta.get("og:title")?.[0] ||
         html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1],
     ).slice(0, 200) || "ショップのパーツ";
+  // Navigation/recommendation titles describe other products, not this item's measurements.
+  const detailsHtml = html.replace(
+    /<a\b([^>]*)>[\s\S]*?<\/a>/gi,
+    (link, attributes: string) => {
+      const href = attrs("<a " + attributes + ">").href;
+      if (!href) return link;
+      try {
+        const target = new URL(href, url);
+        return target.origin === url.origin &&
+          target.pathname.replace(/\/$/, "") === url.pathname.replace(/\/$/, "")
+          ? link
+          : " ";
+      } catch {
+        return " ";
+      }
+    },
+  );
   const dimensions: ShopDimension[] = [];
   function addDimension(label: unknown, value: unknown) {
     const l = text(label).replace(/[:：]\s*$/, ""),
@@ -249,10 +276,25 @@ export function extractShopProduct(html: string, source: string): ShopProduct {
           : "product",
       });
   }
-  const quantity = (v: any) =>
-    typeof v === "object" && v
-      ? `${v.value ?? ""} ${v.unitText || { MMT: "mm", CMT: "cm", MTR: "m", INH: "in" }[v.unitCode] || v.unitCode || ""}`
-      : v;
+  const quantity = (value: unknown) => {
+    if (!value || typeof value !== "object") return value;
+    const v = value as Record<string, unknown>;
+    const units: Record<string, string> = {
+      MMT: "mm",
+      CMT: "cm",
+      MTR: "m",
+      INH: "in",
+    };
+    const unit =
+      typeof v.unitText === "string"
+        ? v.unitText
+        : typeof v.unitCode === "string"
+          ? units[v.unitCode] || v.unitCode
+          : "";
+    return typeof v.value === "string" || typeof v.value === "number"
+      ? String(v.value) + " " + unit
+      : "";
+  };
   for (const [key, label] of [
     ["width", "幅"],
     ["height", "高さ"],
@@ -269,13 +311,13 @@ export function extractShopProduct(html: string, source: string): ShopProduct {
       p.name,
       p.unitText ? `${p.value} ${p.unitText}` : quantity(p.value),
     );
-  for (const row of html.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)) {
+  for (const row of detailsHtml.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)) {
     const cells = [
       ...row[1].matchAll(/<(?:th|td)\b[^>]*>([\s\S]*?)<\/(?:th|td)>/gi),
     ].map((m) => m[1]);
     if (cells.length >= 2) addDimension(cells[0], cells[1]);
   }
-  for (const item of html.matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/gi)) {
+  for (const item of detailsHtml.matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/gi)) {
     const plain = text(item[1]);
     const m = plain.match(
       /^(.{1,60}?(?:製品サイズ|商品サイズ|梱包サイズ|全長|寸法|Product Dimensions|Package Dimensions))\s*[:：]\s*(.{1,150})$/i,
@@ -283,7 +325,7 @@ export function extractShopProduct(html: string, source: string): ShopProduct {
     if (m) addDimension(m[1], m[2]);
   }
   for (const d of productDimensions(
-    `${typeof product?.description === "string" ? product.description : ""}\n${html}`,
+    `${typeof product?.description === "string" ? product.description : ""}\n${detailsHtml}`,
   )) {
     if (
       !dimensions.some(
@@ -302,7 +344,7 @@ export function extractShopProduct(html: string, source: string): ShopProduct {
     name,
     site: url.hostname,
     images,
-    identifiers: productIdentifiers(name, html, source),
+    identifiers: productIdentifiers(name, detailsHtml, source),
     dimensions,
     referenceMm:
       reference && reference > 0 && reference <= 5000 ? reference : undefined,

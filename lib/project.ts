@@ -1,3 +1,4 @@
+import { mapConcurrent } from "./async-control.ts";
 import type { ReferenceLengthOption } from "./product-specs.ts";
 export type Layer = {
   id: string;
@@ -122,79 +123,77 @@ export async function parseProject(value: unknown): Promise<Project> {
   const scale = base
     ? number(base.mm, 800, 1) / number(base.widthPx, 800, 1)
     : 1;
-  const layers = await Promise.all(
-    values.map(async (value, index) => {
-      const row = record(value);
-      const src = safeImage(row.src);
-      const image = await loadImage(src);
-      const frame = validOriginalFrame(row.originalFrame);
-      const pos = row.position ? record(row.position) : {};
-      const mm = number(row.mm, index ? 150 : 800, 1, 5000);
-      return {
-        id: uid(),
-        name:
-          typeof row.name === "string"
-            ? row.name.slice(0, 100)
-            : index
-              ? `パーツ ${index}`
-              : "本体",
-        src,
-        originalSrc:
-          row.originalSrc &&
-          typeof row.originalSrc === "string" &&
-          /^data:image\/(png|jpeg|webp|gif);base64,/.test(row.originalSrc)
-            ? safeImage(row.originalSrc)
-            : undefined,
-        originalFrame:
-          row.originalSrc &&
-          frame &&
-          frame.offsetX + image.naturalWidth <= frame.width &&
-          frame.offsetY + image.naturalHeight <= frame.height
-            ? frame
-            : undefined,
-        width: image.naturalWidth,
-        height: image.naturalHeight,
-        mm:
-          legacy && row.metricType === "height"
-            ? (mm * image.naturalWidth) / image.naturalHeight
-            : mm,
-        referenceMm:
-          typeof row.referenceMm === "number" &&
-          row.referenceMm > 0 &&
-          row.referenceMm <= 5000
-            ? row.referenceMm
-            : undefined,
-        referenceOptions: Array.isArray(row.referenceOptions)
-          ? row.referenceOptions.slice(0, 16).flatMap((o: unknown) => {
-              if (!o || typeof o !== "object") return [];
-              const option = o as Record<string, unknown>;
-              return typeof option.mm === "number" &&
-                Number.isFinite(option.mm) &&
-                option.mm > 0 &&
-                option.mm <= 5000 &&
-                typeof option.label === "string"
-                ? [{ mm: option.mm, label: option.label.slice(0, 120) }]
-                : [];
-            })
+  const layers = await mapConcurrent(values, 3, async (value, index) => {
+    const row = record(value);
+    const src = safeImage(row.src);
+    const image = await loadImage(src);
+    const frame = validOriginalFrame(row.originalFrame);
+    const pos = row.position ? record(row.position) : {};
+    const mm = number(row.mm, index ? 150 : 800, 1, 5000);
+    return {
+      id: uid(),
+      name:
+        typeof row.name === "string"
+          ? row.name.slice(0, 100)
+          : index
+            ? `パーツ ${index}`
+            : "本体",
+      src,
+      originalSrc:
+        row.originalSrc &&
+        typeof row.originalSrc === "string" &&
+        /^data:image\/(png|jpeg|webp|gif);base64,/.test(row.originalSrc)
+          ? safeImage(row.originalSrc)
           : undefined,
-        x: legacy ? 120 + number(pos.x, 0) * scale : number(row.x, 120),
-        y: legacy ? 190 + number(pos.y, 0) * scale : number(row.y, 190),
-        rotation: number(row.rotation, 0, -360, 360),
-        flip: row.flip === true,
-        visible: row.visible !== false,
-        attachedToBase: index > 0 && row.attachedToBase === true,
-        price: number(row.price, 0, 0, 10000000),
-        owned: row.owned === true,
-        url: typeof row.url === "string" ? row.url.slice(0, 2000) : "",
-        category:
-          typeof row.category === "string"
-            ? row.category.slice(0, 30)
-            : index
-              ? "その他"
-              : "本体",
-      };
-    }),
-  );
+      originalFrame:
+        row.originalSrc &&
+        frame &&
+        frame.offsetX + image.naturalWidth <= frame.width &&
+        frame.offsetY + image.naturalHeight <= frame.height
+          ? frame
+          : undefined,
+      width: image.naturalWidth,
+      height: image.naturalHeight,
+      mm:
+        legacy && row.metricType === "height"
+          ? (mm * image.naturalWidth) / image.naturalHeight
+          : mm,
+      referenceMm:
+        typeof row.referenceMm === "number" &&
+        row.referenceMm > 0 &&
+        row.referenceMm <= 5000
+          ? row.referenceMm
+          : undefined,
+      referenceOptions: Array.isArray(row.referenceOptions)
+        ? row.referenceOptions.slice(0, 16).flatMap((o: unknown) => {
+            if (!o || typeof o !== "object") return [];
+            const option = o as Record<string, unknown>;
+            return typeof option.mm === "number" &&
+              Number.isFinite(option.mm) &&
+              option.mm > 0 &&
+              option.mm <= 5000 &&
+              typeof option.label === "string"
+              ? [{ mm: option.mm, label: option.label.slice(0, 120) }]
+              : [];
+          })
+        : undefined,
+      x: legacy ? 120 + number(pos.x, 0) * scale : number(row.x, 120),
+      y: legacy ? 190 + number(pos.y, 0) * scale : number(row.y, 190),
+      rotation: number(row.rotation, 0, -360, 360),
+      flip: row.flip === true,
+      visible: row.visible !== false,
+      attachedToBase: index > 0 && row.attachedToBase === true,
+      price: number(row.price, 0, 0, 10000000),
+      owned: row.owned === true,
+      url: typeof row.url === "string" ? row.url.slice(0, 2000) : "",
+      category:
+        typeof row.category === "string"
+          ? row.category.slice(0, 30)
+          : index
+            ? "その他"
+            : "本体",
+    };
+  });
   return {
     version: 2,
     name:
@@ -267,7 +266,8 @@ export async function removeBackground(
     for (let i = 3; i < d.length; i += 4) if (d[i] < 255) return src;
   }
   const seen = new Uint8Array(c.width * c.height);
-  const queue: number[] = [];
+  const queue = new Int32Array(c.width * c.height);
+  let tail = 0;
   const color = [d[0], d[1], d[2]];
   const push = (p: number) => {
     if (seen[p]) return;
@@ -281,7 +281,7 @@ export async function removeBackground(
       ) <= tolerance ||
       d[i + 3] === 0
     )
-      queue.push(p);
+      queue[tail++] = p;
   };
   for (let x = 0; x < c.width; x++) {
     push(x);
@@ -291,7 +291,7 @@ export async function removeBackground(
     push(y * c.width);
     push(y * c.width + c.width - 1);
   }
-  for (let n = 0; n < queue.length; n++) {
+  for (let n = 0; n < tail; n++) {
     const p = queue[n];
     d[p * 4 + 3] = 0;
     if (p % c.width) push(p - 1);
@@ -299,7 +299,7 @@ export async function removeBackground(
     if (p >= c.width) push(p - c.width);
     if (p < c.width * (c.height - 1)) push(p + c.width);
   }
-  if (preserveTransparency && queue.length === c.width * c.height) return src;
+  if (preserveTransparency && tail === c.width * c.height) return src;
   ctx.putImageData(pixels, 0, 0);
   return c.toDataURL("image/png");
 }

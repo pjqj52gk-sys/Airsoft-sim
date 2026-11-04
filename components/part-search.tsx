@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Dialog from "./dialog";
 import ShopImport from "./shop-import";
 import RakutenSearch from "./rakuten-search";
@@ -8,7 +8,12 @@ import Icon from "./icon";
 import catalogData from "@/lib/parts-catalog.json";
 import type { CatalogProduct } from "@/lib/catalog-match";
 import { referenceCatalogPrice, catalogPriceLabel } from "@/lib/catalog-price";
-import { matchesPart } from "@/lib/part-search";
+import {
+  matchesPart,
+  matchesSearchText,
+  normalizeSearch,
+  searchTerms,
+} from "@/lib/part-search";
 import { catalogImageUrl } from "@/lib/catalog-image";
 import { listParts, type StoredPart } from "@/lib/storage";
 import { readImage, uid, type Layer } from "@/lib/project";
@@ -17,6 +22,19 @@ import {
   combinedReferenceLength,
 } from "@/lib/product-specs";
 const catalog = catalogData as CatalogProduct[];
+const searchableCatalog = catalog.map((p) =>
+  normalizeSearch(
+    [
+      p.name,
+      p.manufacturer,
+      p.category,
+      ...(p.janCodes || []),
+      ...(p.modelNumbers || []),
+      ...p.dimensions.map((d) => d.value),
+    ].join(" "),
+  ),
+);
+const manufacturers = [...new Set(catalog.map((p) => p.manufacturer))];
 
 export default function PartSearch({
   close,
@@ -29,6 +47,7 @@ export default function PartSearch({
   attachLink?: (url: string) => void;
   initialScope?: "parts" | "guns";
 }) {
+  const [visibleCount, setVisibleCount] = useState(48);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
   const [manufacturer, setManufacturer] = useState("");
@@ -53,24 +72,28 @@ export default function PartSearch({
       cancelled = true;
     };
   }, []);
-  const results = catalog.filter(
-    (p) =>
-      (!category || p.category === category) &&
-      (!manufacturer || p.manufacturer === manufacturer) &&
-      (!dimensionOnly || p.dimensions.length > 0) &&
-      matchesPart(query, [
-        p.name,
-        p.manufacturer,
-        p.category,
-        ...(p.janCodes || []),
-        ...(p.modelNumbers || []),
-        ...p.dimensions.map((d) => d.value),
-      ]),
+  const terms = useMemo(() => searchTerms(query), [query]);
+  const results = useMemo(
+    () =>
+      catalog.filter(
+        (p, index) =>
+          (initialScope !== "guns" || p.category === "本体") &&
+          (!category || p.category === category) &&
+          (!manufacturer || p.manufacturer === manufacturer) &&
+          (!dimensionOnly || p.dimensions.length > 0) &&
+          matchesSearchText(searchableCatalog[index], terms),
+      ),
+    [category, manufacturer, dimensionOnly, initialScope, terms],
   );
-  const stored = saved.filter(
-    (p) =>
-      (!category || p.layer.category === category) &&
-      matchesPart(query, [p.layer.name, p.layer.category]),
+  const stored = useMemo(
+    () =>
+      saved.filter(
+        (p) =>
+          (initialScope !== "guns" || p.layer.category === "本体") &&
+          (!category || p.layer.category === category) &&
+          matchesPart(query, [p.layer.name, p.layer.category]),
+      ),
+    [saved, category, query, initialScope],
   );
   async function importPart(item: (typeof catalog)[number]) {
     setBusy(item.id);
@@ -197,16 +220,17 @@ export default function PartSearch({
               <select
                 aria-label="メーカーで絞り込み"
                 value={manufacturer}
-                onChange={(e) => setManufacturer(e.target.value)}
+                onChange={(e) => {
+                  setManufacturer(e.target.value);
+                  setVisibleCount(48);
+                }}
               >
                 <option value="">すべてのメーカー</option>
-                {[...new Set(catalog.map((p) => p.manufacturer))].map(
-                  (name) => (
-                    <option key={name} value={name}>
-                      {name}
-                    </option>
-                  ),
-                )}
+                {manufacturers.map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
               </select>
             )}
             <input
@@ -214,12 +238,18 @@ export default function PartSearch({
               aria-label="パーツ名で検索"
               placeholder="パーツ名・メーカー・寸法"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setVisibleCount(48);
+              }}
             />
             <select
               aria-label="カテゴリーで絞り込み"
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={(e) => {
+                setCategory(e.target.value);
+                setVisibleCount(48);
+              }}
             >
               {[
                 "",
@@ -240,7 +270,10 @@ export default function PartSearch({
                 <input
                   type="checkbox"
                   checked={dimensionOnly}
-                  onChange={(e) => setDimensionOnly(e.target.checked)}
+                  onChange={(e) => {
+                    setDimensionOnly(e.target.checked);
+                    setVisibleCount(48);
+                  }}
                 />
                 寸法あり
               </label>
@@ -256,7 +289,7 @@ export default function PartSearch({
           </p>
           <div className="shelf-grid search-results">
             {source === "catalog"
-              ? results.map((p) => (
+              ? results.slice(0, visibleCount).map((p) => (
                   <article
                     className={`shelf-card ${expanded === p.id ? "photo-expanded-card" : ""}`}
                     key={p.id}
@@ -414,14 +447,23 @@ export default function PartSearch({
                   </article>
                 ))}
           </div>
+          {source === "catalog" && visibleCount < results.length && (
+            <button
+              className="button secondary"
+              disabled={!!busy}
+              onClick={() => setVisibleCount((count) => count + 48)}
+            >
+              さらに48件表示（{Math.min(visibleCount, results.length)} /{" "}
+              {results.length}件）
+            </button>
+          )}
           {(source === "catalog" ? results.length : stored.length) === 0 && (
             <p className="shelf-empty">該当するパーツがありません</p>
           )}
           {source === "catalog" && (
             <div className="search-footer">
               <span>
-                公式カタログ {catalog.length}件 ·{" "}
-                {new Set(catalog.map((p) => p.manufacturer)).size}メーカー
+                公式カタログ {catalog.length}件 · {manufacturers.length}メーカー
               </span>
               <div>
                 <a

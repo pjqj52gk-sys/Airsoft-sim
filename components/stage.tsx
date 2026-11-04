@@ -23,7 +23,9 @@ export default function Stage({
 }: Props) {
   const svg = useRef<SVGSVGElement>(null);
   const wheelHandler = useRef(wheel);
-  wheelHandler.current = wheel;
+  useEffect(() => {
+    wheelHandler.current = wheel;
+  }, [wheel]);
   const drag = useRef<{
     id: string;
     x: number;

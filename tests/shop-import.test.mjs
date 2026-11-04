@@ -141,3 +141,13 @@ test("purchase links keep product sources separate from the operator affiliate t
     false,
   );
 });
+
+test("linked recommendations do not lend dimensions to the current product", () => {
+  const p = extractShopProduct(
+    `<title>KM企画 LW155</title><h3>商品スペック</h3><p>●サイズ：全長155mm/外径40mm</p><p><a href="#spec">全長155mm</a></p><h3>関連商品</h3><ul><li><a href="/military-base/other/">全長110mm 外径35mm</a></li><li><a href="https://other.example.com/item">外径25mm 全長60mm</a></li></ul>`,
+    "https://item.rakuten.co.jp/military-base/h9523b155/",
+  );
+  assert.equal(p.referenceMm, 155);
+  assert.ok(p.dimensions.some((d) => d.value.includes("40")));
+  assert.ok(p.dimensions.every((d) => !/(?:110|35|25|60)/.test(d.value)));
+});

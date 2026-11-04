@@ -142,3 +142,36 @@ test("background removal preserves an enclosed matching-color region", async () 
   assert.equal(result[(2 * 5 + 2) * 4 + 3], 255); // Enclosed white detail is preserved.
   assert.equal(result[(1 * 5 + 1) * 4 + 3], 255); // Object boundary is preserved.
 });
+
+test("restoring a large project limits concurrent image decodes and preserves layer order", async () => {
+  const original = globalThis.Image;
+  let active = 0,
+    peak = 0;
+  globalThis.Image = class {
+    naturalWidth = 200;
+    naturalHeight = 100;
+    set src(value) {
+      peak = Math.max(peak, ++active);
+      setTimeout(() => {
+        active--;
+        this.onload();
+      }, 1);
+    }
+  };
+  try {
+    const result = await parseProject({
+      version: 2,
+      layers: Array.from({ length: 12 }, (_, i) => ({
+        src: png,
+        name: "part-" + i,
+      })),
+    });
+    assert.equal(peak, 3);
+    assert.deepEqual(
+      result.layers.map((layer) => layer.name),
+      Array.from({ length: 12 }, (_, i) => "part-" + i),
+    );
+  } finally {
+    globalThis.Image = original;
+  }
+});
