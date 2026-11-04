@@ -12,13 +12,18 @@ import {
 } from "@/lib/storage";
 import type { StoredBuild, StoredPart } from "@/lib/storage";
 import Dialog from "./dialog";
+import Wishlist from "./wishlist";
+import type { WishlistState } from "./use-wishlist";
+import CostBreakdown from "./cost-breakdown";
+import PurchaseLink from "./purchase-link";
 import Icon from "./icon";
 import BuildPreview from "./build-preview";
 import { comparisonBounds } from "@/lib/comparison";
 type Props = {
   project: Project;
   layer?: Layer;
-  initialTab: "builds" | "parts";
+  initialTab: "builds" | "parts" | "wishlist";
+  wishlist: WishlistState;
   close: () => void;
   load: (project: Project) => void;
   add: (layer: Layer) => void;
@@ -32,14 +37,12 @@ const date = (time: number) =>
     minute: "2-digit",
   }).format(time);
 const total = (p: Project) =>
-  p.layers
-    .slice(1)
-    .reduce((sum, l) => sum + l.price, 0)
-    .toLocaleString("ja-JP");
+  p.layers.reduce((sum, l) => sum + l.price, 0).toLocaleString("ja-JP");
 export default function Shelf({
   project,
   layer,
   initialTab,
+  wishlist,
   close,
   load,
   add,
@@ -51,6 +54,7 @@ export default function Shelf({
   const [busy, setBusy] = useState(true);
   const [message, setMessage] = useState("");
   const [confirm, setConfirm] = useState<string | null>(null);
+  const [details, setDetails] = useState<Project | null>(null);
   const [comparison, setComparison] = useState<StoredBuild | null>(null);
   async function refresh() {
     const [p, b] = await Promise.all([listParts(), listBuilds()]);
@@ -123,207 +127,253 @@ export default function Shelf({
           >
             登録したパーツ ({parts.length})
           </button>
-        </div>
-        <div className="shelf-save">
-          {tab === "builds" && (
-            <label className="field-label">
-              保存名
-              <input
-                value={buildName}
-                maxLength={100}
-                onChange={(e) => setBuildName(e.target.value)}
-              />
-            </label>
-          )}
           <button
-            className="button primary"
-            disabled={
-              busy || (tab === "builds" ? !project.layers.length : !layer)
-            }
-            onClick={() =>
-              action(
-                async () => {
-                  if (tab === "builds")
-                    await saveBuild({
-                      id: uid(),
-                      project: {
-                        ...project,
-                        name: buildName.trim() || project.name,
-                      },
-                      savedAt: Date.now(),
-                    });
-                  else if (layer)
-                    await savePart({
-                      id: layer.id,
-                      layer,
-                      savedAt: Date.now(),
-                    });
-                },
-                tab === "builds"
-                  ? "現在のビルドを保存しました。"
-                  : "選択パーツを登録しました。同じアイテムの再登録は更新になります。",
-              )
-            }
+            className={`mini-button ${tab === "wishlist" ? "toggled" : ""}`}
+            onClick={() => {
+              setTab("wishlist");
+              setComparison(null);
+            }}
           >
-            {tab === "builds"
-              ? "現在のビルドを別名保存"
-              : "選択アイテムをパーツ登録"}
+            ほしいものリスト ({wishlist.items.length})
           </button>
-          <p className="hint">
-            {tab === "builds"
-              ? `「${project.name}」を独立したスナップショットとして保存します。`
-              : "画像・実寸・価格・商品URLを再利用できます。登録するアイテムを先に選択してください。"}
-          </p>
         </div>
-        {message && (
-          <p role="status" className="shelf-message">
-            {message}
-          </p>
-        )}
-        {comparison && (
-          <section className="comparison">
-            <div className="section-label">
-              同じ縮尺で外観を比較
+        {tab === "wishlist" ? (
+          <Wishlist wishlist={wishlist} />
+        ) : (
+          <>
+            <div className="shelf-save">
+              {tab === "builds" && (
+                <label className="field-label">
+                  保存名
+                  <input
+                    value={buildName}
+                    maxLength={100}
+                    onChange={(e) => setBuildName(e.target.value)}
+                  />
+                </label>
+              )}
               <button
-                className="text-button"
-                onClick={() => setComparison(null)}
+                className="button primary"
+                disabled={
+                  busy || (tab === "builds" ? !project.layers.length : !layer)
+                }
+                onClick={() =>
+                  action(
+                    async () => {
+                      if (tab === "builds")
+                        await saveBuild({
+                          id: uid(),
+                          project: {
+                            ...project,
+                            name: buildName.trim() || project.name,
+                          },
+                          savedAt: Date.now(),
+                        });
+                      else if (layer)
+                        await savePart({
+                          id: layer.id,
+                          layer,
+                          savedAt: Date.now(),
+                        });
+                    },
+                    tab === "builds"
+                      ? "現在のビルドを保存しました。"
+                      : "選択パーツを登録しました。同じアイテムの再登録は更新になります。",
+                  )
+                }
               >
-                比較を閉じる
+                {tab === "builds"
+                  ? "現在のビルドを別名保存"
+                  : "選択アイテムをパーツ登録"}
               </button>
+              <p className="hint">
+                {tab === "builds"
+                  ? `「${project.name}」を独立したスナップショットとして保存します。`
+                  : "画像・実寸・価格・商品URLを再利用できます。登録するアイテムを先に選択してください。"}
+              </p>
             </div>
-            <div className="comparison-grid">
-              {[
-                { p: project, label: "編集中" },
-                { p: comparison.project, label: "保存済み" },
-              ].map(({ p, label }) => (
-                <article key={label}>
-                  <span className="eyebrow">{label}</span>
-                  <h3>{p.name}</h3>
-                  <BuildPreview project={p} viewBox={viewBox} />
-                  <p>
-                    パーツ {Math.max(0, p.layers.length - 1)} 点 · ¥{total(p)}
-                  </p>
-                </article>
-              ))}
+            {message && (
+              <p role="status" className="shelf-message">
+                {message}
+              </p>
+            )}
+            {comparison && (
+              <section className="comparison">
+                <div className="section-label">
+                  同じ縮尺で外観を比較
+                  <button
+                    className="text-button"
+                    onClick={() => setComparison(null)}
+                  >
+                    比較を閉じる
+                  </button>
+                </div>
+                <div className="comparison-grid">
+                  {[
+                    { p: project, label: "編集中" },
+                    { p: comparison.project, label: "保存済み" },
+                  ].map(({ p, label }) => (
+                    <article key={label}>
+                      <span className="eyebrow">{label}</span>
+                      <h3>{p.name}</h3>
+                      <BuildPreview project={p} viewBox={viewBox} />
+                      <p>
+                        パーツ {Math.max(0, p.layers.length - 1)} 点 · 総額 ¥
+                        {total(p)}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+                <p className="hint">
+                  入力した実寸で縮尺を統一しています。撮影角度・余白により見え方は異なります。
+                </p>
+              </section>
+            )}
+            <div className="shelf-grid">
+              {tab === "builds"
+                ? builds.map((build) => (
+                    <article className="shelf-card" key={build.id}>
+                      <BuildPreview project={build.project} />
+                      <h3>{build.project.name}</h3>
+                      <p>
+                        {date(build.savedAt)} · パーツ{" "}
+                        {Math.max(0, build.project.layers.length - 1)} 点
+                      </p>
+                      <p className="shelf-build-total">
+                        総額 ¥{total(build.project)}
+                      </p>
+                      <div className="shelf-card-actions">
+                        <button
+                          className="mini-button"
+                          onClick={() => setDetails(build.project)}
+                          aria-label={`詳細：${build.project.name}`}
+                        >
+                          詳細
+                        </button>
+                        <button
+                          className="mini-button"
+                          disabled={busy}
+                          onClick={() => load(build.project)}
+                        >
+                          開く
+                        </button>
+                        <button
+                          className="mini-button"
+                          disabled={busy || !project.layers.length}
+                          onClick={() => setComparison(build)}
+                        >
+                          比較
+                        </button>
+                        <button
+                          className="text-button"
+                          onClick={() =>
+                            exportJson(build.project, build.project.name)
+                          }
+                        >
+                          JSON保存
+                        </button>
+                      </div>
+                      <button
+                        className="text-button delete-saved"
+                        disabled={busy}
+                        onClick={() => {
+                          if (confirm === build.id) {
+                            void action(
+                              () => deleteBuild(build.id),
+                              "保存ビルドを削除しました。",
+                            );
+                            setConfirm(null);
+                            if (comparison?.id === build.id)
+                              setComparison(null);
+                          } else setConfirm(build.id);
+                        }}
+                      >
+                        {confirm === build.id
+                          ? "もう一度押すと削除"
+                          : "保存ビルドを削除"}
+                      </button>
+                    </article>
+                  ))
+                : parts.map((part) => (
+                    <article className="shelf-card" key={part.id}>
+                      <div className="shelf-part-image">
+                        <img src={part.layer.src} alt={part.layer.name} />
+                      </div>
+                      <h3>
+                        <PurchaseLink
+                          url={part.layer.url}
+                          label={part.layer.name}
+                        />
+                      </h3>
+                      <p>
+                        {part.layer.category} · {part.layer.mm.toFixed(1)} mm ·
+                        ¥{part.layer.price.toLocaleString("ja-JP")}
+                      </p>
+                      <div className="shelf-card-actions">
+                        <button
+                          className="mini-button"
+                          disabled={busy || project.layers.length >= 60}
+                          onClick={() => add(part.layer)}
+                        >
+                          ビルドに追加
+                        </button>
+                        <button
+                          className="text-button"
+                          onClick={() =>
+                            exportJson(
+                              { type: "part_data", part: part.layer },
+                              part.layer.name,
+                            )
+                          }
+                        >
+                          JSON保存
+                        </button>
+                      </div>
+                      <button
+                        className="text-button delete-saved"
+                        disabled={busy}
+                        onClick={() => {
+                          if (confirm === part.id) {
+                            void action(
+                              () => deletePart(part.id),
+                              "登録パーツを削除しました。",
+                            );
+                            setConfirm(null);
+                          } else setConfirm(part.id);
+                        }}
+                      >
+                        {confirm === part.id
+                          ? "もう一度押すと削除"
+                          : "登録パーツを削除"}
+                      </button>
+                    </article>
+                  ))}
             </div>
-            <p className="hint">
-              入力した実寸で縮尺を統一しています。撮影角度・余白により見え方は異なります。
-            </p>
-          </section>
+            {!busy && !(tab === "builds" ? builds.length : parts.length) && (
+              <div className="shelf-empty">
+                {tab === "builds"
+                  ? "まだビルドが保存されていません。上のボタンから現在の状態を保存できます。"
+                  : "まだパーツが登録されていません。選択アイテムを登録して使い回せます。"}
+              </div>
+            )}
+          </>
         )}
-        <div className="shelf-grid">
-          {tab === "builds"
-            ? builds.map((build) => (
-                <article className="shelf-card" key={build.id}>
-                  <BuildPreview project={build.project} />
-                  <h3>{build.project.name}</h3>
-                  <p>
-                    {date(build.savedAt)} · パーツ{" "}
-                    {Math.max(0, build.project.layers.length - 1)} 点
-                  </p>
-                  <div className="shelf-card-actions">
-                    <button
-                      className="mini-button"
-                      disabled={busy}
-                      onClick={() => load(build.project)}
-                    >
-                      開く
-                    </button>
-                    <button
-                      className="mini-button"
-                      disabled={busy || !project.layers.length}
-                      onClick={() => setComparison(build)}
-                    >
-                      比較
-                    </button>
-                    <button
-                      className="text-button"
-                      onClick={() =>
-                        exportJson(build.project, build.project.name)
-                      }
-                    >
-                      JSON保存
-                    </button>
-                  </div>
-                  <button
-                    className="text-button delete-saved"
-                    disabled={busy}
-                    onClick={() => {
-                      if (confirm === build.id) {
-                        void action(
-                          () => deleteBuild(build.id),
-                          "保存ビルドを削除しました。",
-                        );
-                        setConfirm(null);
-                        if (comparison?.id === build.id) setComparison(null);
-                      } else setConfirm(build.id);
-                    }}
-                  >
-                    {confirm === build.id
-                      ? "もう一度押すと削除"
-                      : "保存ビルドを削除"}
-                  </button>
-                </article>
-              ))
-            : parts.map((part) => (
-                <article className="shelf-card" key={part.id}>
-                  <div className="shelf-part-image">
-                    <img src={part.layer.src} alt={part.layer.name} />
-                  </div>
-                  <h3>{part.layer.name}</h3>
-                  <p>
-                    {part.layer.category} · {part.layer.mm.toFixed(1)} mm · ¥
-                    {part.layer.price.toLocaleString("ja-JP")}
-                  </p>
-                  <div className="shelf-card-actions">
-                    <button
-                      className="mini-button"
-                      disabled={busy || project.layers.length >= 60}
-                      onClick={() => add(part.layer)}
-                    >
-                      ビルドに追加
-                    </button>
-                    <button
-                      className="text-button"
-                      onClick={() =>
-                        exportJson(
-                          { type: "part_data", part: part.layer },
-                          part.layer.name,
-                        )
-                      }
-                    >
-                      JSON保存
-                    </button>
-                  </div>
-                  <button
-                    className="text-button delete-saved"
-                    disabled={busy}
-                    onClick={() => {
-                      if (confirm === part.id) {
-                        void action(
-                          () => deletePart(part.id),
-                          "登録パーツを削除しました。",
-                        );
-                        setConfirm(null);
-                      } else setConfirm(part.id);
-                    }}
-                  >
-                    {confirm === part.id
-                      ? "もう一度押すと削除"
-                      : "登録パーツを削除"}
-                  </button>
-                </article>
-              ))}
-        </div>
-        {!busy && !(tab === "builds" ? builds.length : parts.length) && (
-          <div className="shelf-empty">
-            {tab === "builds"
-              ? "まだビルドが保存されていません。上のボタンから現在の状態を保存できます。"
-              : "まだパーツが登録されていません。選択アイテムを登録して使い回せます。"}
-          </div>
+        {details && (
+          <Dialog wide label="カスタムの内訳" close={() => setDetails(null)}>
+            <button
+              className="modal-close icon-button"
+              aria-label="内訳を閉じる"
+              onClick={() => setDetails(null)}
+            >
+              <Icon name="close" />
+            </button>
+            <CostBreakdown project={details} />
+          </Dialog>
         )}
         <p className="hint">
-          ライブラリはこのブラウザー・URL内に保存されます。JSON保存でバックアップできます。ビルドを開く前の編集状態は「元に戻す」で復元できます。
+          {tab === "wishlist"
+            ? "ほしいものリストはこのブラウザーに保存されます。"
+            : "ライブラリはこのブラウザー・URL内に保存されます。JSON保存でバックアップできます。ビルドを開く前の編集状態は「元に戻す」で復元できます。"}
         </p>
       </div>
     </Dialog>

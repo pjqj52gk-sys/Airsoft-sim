@@ -1,5 +1,8 @@
 "use client";
+import WishButton from "./wish-button";
+import type { WishlistState } from "./use-wishlist";
 import { useEffect, useMemo, useState } from "react";
+import PurchaseLink from "./purchase-link";
 import Dialog from "./dialog";
 import ShopImport from "./shop-import";
 import RakutenSearch from "./rakuten-search";
@@ -40,11 +43,13 @@ export default function PartSearch({
   close,
   add,
   attachLink,
+  wishlist,
   initialScope = "parts",
 }: {
   close: () => void;
   add: (part: Layer, reuse?: boolean) => Promise<void>;
   attachLink?: (url: string) => void;
+  wishlist?: WishlistState;
   initialScope?: "parts" | "guns";
 }) {
   const [visibleCount, setVisibleCount] = useState(48);
@@ -159,6 +164,7 @@ export default function PartSearch({
         <Icon name="close" />
       </button>
       <h2>{initialScope === "guns" ? "本体を検索" : "パーツ検索"}</h2>
+      {wishlist?.error && <p role="alert">{wishlist.error}</p>}
       <div className="shelf-tabs" role="tablist" aria-label="検索対象">
         <button
           role="tab"
@@ -202,6 +208,7 @@ export default function PartSearch({
       </div>
       {source === "rakuten" ? (
         <RakutenSearch
+          wishlist={wishlist}
           initialScope={initialScope}
           add={add}
           attachLink={attachLink}
@@ -209,6 +216,7 @@ export default function PartSearch({
         />
       ) : source === "shop" ? (
         <ShopImport
+          wishlist={wishlist}
           add={add}
           attachLink={attachLink}
           onBusy={(value) => setBusy(value ? "shop" : null)}
@@ -370,7 +378,9 @@ export default function PartSearch({
                     <small>
                       {p.manufacturer} · {p.category}
                     </small>
-                    <h3>{p.name}</h3>
+                    <h3>
+                      <PurchaseLink url={p.url} label={p.name} />
+                    </h3>
                     <p
                       className="hint"
                       title={`公式掲載価格・${p.checkedAt}確認`}
@@ -392,15 +402,17 @@ export default function PartSearch({
                         </div>
                       )}
                     </dl>
+                    <WishButton
+                      wishlist={wishlist}
+                      item={{
+                        name: p.name,
+                        url: p.url,
+                        price: referenceCatalogPrice(p.price),
+                        category: p.category,
+                        image: catalogImageUrl(p),
+                      }}
+                    />
                     <div className="shelf-card-actions">
-                      <a
-                        className="mini-button"
-                        href={p.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        公式ページ ↗
-                      </a>
                       <button
                         className="mini-button toggled"
                         disabled={!!busy || !p.images.length}
@@ -416,7 +428,9 @@ export default function PartSearch({
                     <div className="shelf-part-image">
                       <img src={p.layer.src} alt={p.layer.name} />
                     </div>
-                    <h3>{p.layer.name}</h3>
+                    <h3>
+                      <PurchaseLink url={p.layer.url} label={p.layer.name} />
+                    </h3>
                     <dl className="part-dimensions">
                       <div>
                         <dt>画像横幅</dt>

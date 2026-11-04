@@ -1,4 +1,7 @@
 "use client";
+import WishButton from "./wish-button";
+import type { WishlistState } from "./use-wishlist";
+import PurchaseLink from "./purchase-link";
 import { useEffect, useRef, useState } from "react";
 import type { RakutenItem, RakutenResults } from "@/lib/rakuten";
 import { readImage, uid, type Layer } from "@/lib/project";
@@ -24,11 +27,13 @@ const catalog = catalogData as CatalogProduct[];
 
 export default function RakutenSearch({
   attachLink,
+  wishlist,
   add,
   onBusy,
   initialScope = "parts",
 }: {
   attachLink?: (url: string) => void;
+  wishlist?: WishlistState;
   add: (layer: Layer) => Promise<void>;
   onBusy: (busy: boolean) => void;
   initialScope?: "parts" | "guns";
@@ -305,7 +310,13 @@ export default function RakutenSearch({
           >
             ← 検索結果に戻る
           </button>
-          <h3>{selected.name}</h3>
+          <h3>
+            <PurchaseLink
+              url={selected.url}
+              label={selected.name}
+              sponsored={selected.sponsored}
+            />
+          </h3>
           {selectedOfficial && (
             <div className="catalog-match-info">
               <a
@@ -437,6 +448,16 @@ export default function RakutenSearch({
               ))}
             </div>
           )}
+          <WishButton
+            wishlist={wishlist}
+            item={{
+              name: selected.name,
+              url: selected.url,
+              price: selected.price,
+              category: selectedLayerCategory,
+              image: images[photo],
+            }}
+          />
           <button
             className="button primary"
             disabled={imageBusy}
@@ -446,17 +467,6 @@ export default function RakutenSearch({
               ? "この画像を本体に使う"
               : "この画像を追加"}
           </button>
-          <a
-            href={selected.url}
-            target="_blank"
-            rel={
-              selected.sponsored
-                ? "sponsored noopener noreferrer"
-                : "noopener noreferrer"
-            }
-          >
-            楽天市場で見る ↗{selected.sponsored && "（広告）"}
-          </a>
         </section>
       ) : (
         <>
@@ -567,6 +577,17 @@ export default function RakutenSearch({
                       />
                       <span>{item.name}</span>
                     </a>
+                    <WishButton
+                      wishlist={wishlist}
+                      item={{
+                        name: item.name,
+                        url: item.url,
+                        price: item.price,
+                        category:
+                          submitted.scope === "guns" ? "本体" : "その他",
+                        image: item.image,
+                      }}
+                    />
                     <button
                       className="button primary"
                       onClick={() => void chooseImages(item)}
@@ -606,17 +627,7 @@ export default function RakutenSearch({
                       )}
                     <small>{item.shop}</small>
                     <strong>¥{item.price.toLocaleString()}</strong>
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel={
-                        item.sponsored
-                          ? "sponsored noopener noreferrer"
-                          : "noopener noreferrer"
-                      }
-                    >
-                      楽天市場で見る ↗{item.sponsored && "（広告）"}
-                    </a>
+
                     {attachLink && (
                       <button
                         className="mini-button"

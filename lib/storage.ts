@@ -1,3 +1,4 @@
+import type { WishItem } from "./wishlist.ts";
 import type { Project, Layer } from "./project";
 import type { ComparisonPlans } from "./comparison-plans";
 import { createTaskQueue } from "./async-control.ts";
@@ -7,9 +8,9 @@ export type StoredBuild = { id: string; savedAt: number; project: Project };
 function database(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     let abandoned = false;
-    const request = indexedDB.open("airsoft-studio", 2);
+    const request = indexedDB.open("airsoft-studio", 3);
     request.onupgradeneeded = () => {
-      for (const store of ["projects", "parts", "builds"])
+      for (const store of ["projects", "parts", "builds", "wishlist"])
         if (!request.result.objectStoreNames.contains(store))
           request.result.createObjectStore(store);
     };
@@ -103,3 +104,7 @@ export const saveBuild = (build: StoredBuild) =>
   write("builds", build.id, build);
 export const deletePart = (id: string) => write("parts", id);
 export const deleteBuild = (id: string) => write("builds", id);
+
+export const listWishes = () => read<WishItem[]>("wishlist");
+export const saveWish = (item: WishItem) => write("wishlist", item.id, item);
+export const deleteWish = (id: string) => write("wishlist", id);

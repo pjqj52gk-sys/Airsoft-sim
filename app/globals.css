@@ -2252,3 +2252,21 @@ p {
 .catalog-match-summary > span { color:#087fa8; }
 .sourced-dimensions small { color:#6c8297;font-size:10px; }
 .retail-dimension-summary { line-height:1.5; }
+/* Product names carry the destination throughout the app. */
+.product-link { display: inline; font-size: inherit; margin: 0; line-height: inherit; overflow-wrap: anywhere; }
+.product-link:hover { text-decoration: underline; }
+.shopping-row > span { flex: 1; }
+.shopping-row .product-link { font-weight: 500; }
+.shopping-entry-actions label { display: flex; align-items: center; gap: 5px; color: var(--muted); }
+.shelf-build-total { font-size: 16px; font-weight: 700; color: #0369a1; font-variant-numeric: tabular-nums; }
+.wishlist-entry { display: flex; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--line); align-items: center; }
+.wishlist-entry img { object-fit: contain; flex-shrink: 0; }
+.wishlist-entry > div { flex: 1; min-width: 0; }
+.wishlist-entry h3 { margin: 0 0 6px; font-size: 14px; }
+.wishlist-entry small, .wishlist-entry strong { display: block; margin-top: 4px; }
+.cost-breakdown { padding: 0; list-style: none; }
+.cost-breakdown li { display: flex; justify-content: space-between; gap: 20px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.cost-breakdown li > div { min-width: 0; }
+.cost-breakdown small { display: block; color: var(--muted); margin-bottom: 5px; }
+.cost-breakdown strong { white-space: nowrap; }
+.product-link .ad-label { display: inline-block; width: auto; margin: 0 0 0 6px; font-size: 10px; vertical-align: middle; }

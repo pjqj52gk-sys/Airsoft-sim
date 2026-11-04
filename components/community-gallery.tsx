@@ -537,8 +537,9 @@ export default function CommunityGallery({
                 />
                 <div>
                   <small>{index ? "パーツ" : "本体"}</small>
-                  <strong>{layer.name}</strong>
-                  <PurchaseLink url={layer.url} />
+                  <strong>
+                    <PurchaseLink url={layer.url} label={layer.name} />
+                  </strong>
                 </div>
                 <span>{layer.price ? yen(layer.price) : "価格未登録"}</span>
               </li>

@@ -116,12 +116,12 @@ export default function PlanComparison({
                 <strong>{yen(planTotal(project))}</strong>
               </div>
               <div className="plan-price">
-                <span>購入予定のみ</span>
+                <span>未所有分</span>
                 <strong>{yen(shoppingSummary(project).plannedTotal)}</strong>
               </div>
               {shoppingSummary(project).missingPrices > 0 && (
                 <p className="hint">
-                  購入予定に価格未登録 {shoppingSummary(project).missingPrices}
+                  未所有分に価格未登録 {shoppingSummary(project).missingPrices}
                   点
                 </p>
               )}
@@ -139,7 +139,7 @@ export default function PlanComparison({
           <div>
             {additionalDifference === 0
               ? "追加費用の差なし"
-              : `購入予定：案Bは案Aより ${additionalDifference > 0 ? "+" : "−"}${yen(Math.abs(additionalDifference))}`}
+              : `未所有分：案Bは案Aより ${additionalDifference > 0 ? "+" : "−"}${yen(Math.abs(additionalDifference))}`}
           </div>
           <small>
             構成全体：

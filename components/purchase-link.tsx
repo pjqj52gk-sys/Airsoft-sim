@@ -1,23 +1,24 @@
 import { purchaseLink } from "@/lib/commerce";
 export default function PurchaseLink({
   url,
-  label = "商品ページを開く",
+  label,
+  sponsored = false,
 }: {
   url: string;
-  label?: string;
+  label: string;
+  sponsored?: boolean;
 }) {
   const link = purchaseLink(url);
-  if (!link) return null;
+  if (!link) return <span>{label}</span>;
+  const promoted = sponsored || link.sponsored;
   return (
     <a
       className="product-link"
       href={link.href}
       target="_blank"
-      rel={
-        link.sponsored ? "sponsored noopener noreferrer" : "noopener noreferrer"
-      }
+      rel={promoted ? "sponsored noopener noreferrer" : "noopener noreferrer"}
     >
-      {label} ↗{link.sponsored && <small className="ad-label">広告</small>}
+      {label} ↗{promoted && <span className="ad-label">広告</span>}
     </a>
   );
 }

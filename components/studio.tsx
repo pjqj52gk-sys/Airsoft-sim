@@ -11,6 +11,7 @@ import LoadingOverlay from "./loading-overlay";
 import type { EditMode } from "./image-editor";
 import Shelf from "./shelf";
 import PurchaseLink from "./purchase-link";
+import useWishlist from "./use-wishlist";
 import ShoppingList from "./shopping-list";
 import { purchaseLink, monetization } from "@/lib/commerce";
 import useFileDrop from "./use-file-drop";
@@ -59,6 +60,7 @@ const yen = (n: number) =>
     maximumFractionDigits: 0,
   }).format(n);
 export default function Studio() {
+  const wishlist = useWishlist();
   const [project, setProject] = useState<Project>(emptyProject);
   const [plans, setPlans] = useState<ComparisonPlans | null>(null);
   const [logoCleanup, setLogoCleanup] = useState(false);
@@ -107,7 +109,9 @@ export default function Studio() {
   const [clearDialog, setClearDialog] = useState(false);
   const [tolerance, setTolerance] = useState(28);
   const [editor, setEditor] = useState<EditMode | null>(null);
-  const [shelf, setShelf] = useState<"builds" | "parts" | null>(null);
+  const [shelf, setShelf] = useState<"builds" | "parts" | "wishlist" | null>(
+    null,
+  );
   const fileInput = useRef<HTMLInputElement>(null);
   const projectInput = useRef<HTMLInputElement>(null);
   const dragStart = useRef<Project | null>(null);
@@ -734,7 +738,7 @@ export default function Studio() {
               className={tab === "list" ? "active" : ""}
               onClick={() => setTab("list")}
             >
-              購入リスト
+              アイテム
             </button>
           </div>
           <div className="library-content">
@@ -852,6 +856,8 @@ export default function Studio() {
               </>
             ) : (
               <ShoppingList
+                wishlist={wishlist}
+                openWishlist={() => setShelf("wishlist")}
                 project={project}
                 select={setSelected}
                 setOwned={changeOwnership}
@@ -1236,7 +1242,7 @@ export default function Studio() {
                       changeOwnership(layer.id, e.target.value === "owned")
                     }
                   >
-                    <option value="planned">購入予定</option>
+                    <option value="planned">未所有</option>
                     <option value="owned">所有済み</option>
                   </select>
                 </label>
@@ -1258,7 +1264,25 @@ export default function Studio() {
                     onChange={(e) => update(layer.id, { url: e.target.value })}
                   />
                 </label>
-                <PurchaseLink url={layer.url} />
+                <PurchaseLink url={layer.url} label={layer.name} />
+                <button
+                  className="mini-button full-width"
+                  disabled={!wishlist.ready || wishlist.pending}
+                  onClick={() =>
+                    void wishlist.toggle({
+                      name: layer.name,
+                      url: layer.url,
+                      price: layer.price,
+                      category: layer.category,
+                      image: layer.src,
+                    })
+                  }
+                >
+                  {wishlist.has(layer)
+                    ? "✓ ほしいものリストに追加済み"
+                    : "ほしいものリストに追加"}
+                </button>
+                {wishlist.error && <p role="alert">{wishlist.error}</p>}
               </div>
               {project.layers[0]?.id === layer.id && (
                 <button
@@ -1359,6 +1383,7 @@ export default function Studio() {
       )}
       {search && (
         <PartSearch
+          wishlist={wishlist}
           initialScope={search}
           close={() => setSearch(null)}
           attachLink={
@@ -1433,6 +1458,7 @@ export default function Studio() {
           project={project}
           layer={layer}
           initialTab={shelf}
+          wishlist={wishlist}
           close={() => setShelf(null)}
           load={openBuild}
           add={(part) => addStoredPart(part, true)}

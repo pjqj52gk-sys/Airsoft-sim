@@ -1,4 +1,7 @@
 "use client";
+import WishButton from "./wish-button";
+import type { WishlistState } from "./use-wishlist";
+import PurchaseLink from "./purchase-link";
 import { useRef, useState } from "react";
 import type { Layer } from "@/lib/project";
 import { readImage, uid } from "@/lib/project";
@@ -15,10 +18,12 @@ export default function ShopImport({
   add,
   onBusy,
   attachLink,
+  wishlist,
 }: {
   add: (layer: Layer) => Promise<void>;
   onBusy: (value: boolean) => void;
   attachLink?: (url: string) => void;
+  wishlist?: WishlistState;
 }) {
   const [url, setUrl] = useState("");
   const [product, setProduct] = useState<ShopProduct | null>(null);
@@ -191,16 +196,6 @@ export default function ShopImport({
           {busy ? "取得中…" : "画像を取得"}
         </button>
       </form>
-      {sourceLink && (
-        <a
-          className="product-link"
-          href={sourceLink}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          商品ページを開く ↗
-        </a>
-      )}
       {error && (
         <p className="editor-error" role="alert">
           {error}
@@ -208,8 +203,20 @@ export default function ShopImport({
       )}
       {product && (
         <div className="shop-product-info">
-          <h3>{product.name}</h3>
+          <h3>
+            <PurchaseLink url={sourceLink} label={name} />
+          </h3>
           <small>{product.site}</small>
+          <WishButton
+            wishlist={wishlist}
+            item={{
+              name,
+              url: sourceLink,
+              price: referenceCatalogPrice(official?.price),
+              category,
+              image: photos[photo],
+            }}
+          />
           {product.notice && <p className="hint">{product.notice}</p>}
           {sourceLink && (
             <button
