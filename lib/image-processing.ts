@@ -69,8 +69,9 @@ export async function rectifyImage(
   layer: Layer,
   points: Point[],
   aspectRatio?: number,
+  surfaceMap?: (u: number, v: number) => Point,
 ): Promise<Partial<Layer>> {
-  const map = quadMap(points);
+  const map = surfaceMap || quadMap(points);
   const image = await loadImage(layer.src);
   const source = document.createElement("canvas");
   source.width = image.naturalWidth;

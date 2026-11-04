@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Dialog from "./dialog";
 import Icon from "./icon";
 import LoadingOverlay from "./loading-overlay";
+import CylinderWorkbench from "./cylinder-workbench";
 import type { Layer } from "@/lib/project";
 import type { Point, Rect } from "@/lib/image-edit";
 import {
@@ -36,14 +37,33 @@ const faces = [
 const names = ["Y字の中心", "幅の点", "奥行きの点", "高さの点"];
 const labels = ["＋", "幅", "奥", "高"];
 const axisColors = ["#0369a1", "#0891b2", "#1d4ed8", "#0f766e"];
-export default function PerspectiveWorkbench({
+type WorkbenchProps = {
+  layer: Layer;
+  close: () => void;
+  apply: (patch: Partial<Layer>) => void;
+};
+export default function PerspectiveWorkbench(props: WorkbenchProps) {
+  const [mode, setMode] = useState(() =>
+    /サプレッサー|サイレンサー|suppressor|silencer/i.test(props.layer.name)
+      ? "cylinder"
+      : "cube",
+  );
+  return mode === "cylinder" ? (
+    <CylinderWorkbench {...props} useCube={() => setMode("cube")} />
+  ) : (
+    <CubeWorkbench {...props} useCylinder={() => setMode("cylinder")} />
+  );
+}
+function CubeWorkbench({
   layer,
   close,
   apply,
+  useCylinder,
 }: {
   layer: Layer;
   close: () => void;
   apply: (patch: Partial<Layer>) => void;
+  useCylinder: () => void;
 }) {
   const [template] = useState(() =>
     makeGuide(
@@ -279,6 +299,18 @@ export default function PerspectiveWorkbench({
         <Icon name="close" />
       </button>
       <h2>パース合わせ</h2>
+      <div className="shelf-tabs" aria-label="パーツの形状">
+        <button className="mini-button toggled" aria-pressed="true">
+          箱型・平面
+        </button>
+        <button
+          className="mini-button"
+          disabled={busy || turning}
+          onClick={useCylinder}
+        >
+          円筒・サプレッサー
+        </button>
+      </div>
       <ol className="perspective-steps">
         {["面を合わせる", "一緒に回す", "平面化"].map((label, i) => (
           <li key={label} aria-current={step === i ? "step" : undefined}>
