@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Dialog from "./dialog";
 import LoadingOverlay from "./loading-overlay";
+import useCylinderPreview from "./use-cylinder-preview";
 import {
   initialCylinderGuide,
   cylinderGeometry,
@@ -38,7 +39,14 @@ export default function CylinderWorkbench({
   const [ellipseRatio, setEllipseRatio] = useState(0.22);
   const [tapered, setTapered] = useState(false);
   const [excludeEnd, setExcludeEnd] = useState<CylinderEnd>("end");
-  const [result, setResult] = useState<Partial<Layer> | null>(null);
+  const [showOriginal, setShowOriginal] = useState(false);
+  const live = useCylinderPreview(
+    layer,
+    guide,
+    lengthScale,
+    ellipseRatio,
+    excludeEnd,
+  );
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   const svg = useRef<SVGSVGElement>(null);
@@ -93,7 +101,7 @@ export default function CylinderWorkbench({
     };
     root.addEventListener("wheel", wheel, { passive: false });
     return () => root.removeEventListener("wheel", wheel);
-  }, [layer.width, result]);
+  }, [layer.width]);
   function begin(e: React.PointerEvent<SVGElement>, index: number) {
     if (busy) return;
     e.preventDefault();
@@ -190,7 +198,7 @@ export default function CylinderWorkbench({
           円筒・サプレッサー
         </button>
       </div>
-      {!result ? (
+      {
         <>
           <p className="editor-instructions">
             軸の両端で長さ・角度を合わせ、太さと端面の開きを調整
@@ -224,147 +232,181 @@ export default function CylinderWorkbench({
             </button>
             <span>余白をドラッグで移動 · ホイールでズーム</span>
           </div>
-          <div className="image-edit-surface cylinder-surface">
-            <svg
-              ref={svg}
-              viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`}
-              role="img"
-              aria-label="円筒の軸と太さを画像に合わせる"
-              style={{ touchAction: "none" }}
-              onPointerDown={(e) => begin(e, -2)}
-              onPointerMove={(e) => {
-                const d = drag.current;
-                if (!d) return;
-                const p = point(e.clientX, e.clientY),
-                  dx = p.x - d.point.x,
-                  dy = p.y - d.point.y;
-                if (d.index === -2)
-                  setView({
-                    ...d.view,
-                    x: d.view.x - (e.clientX - d.client.x) * d.unit,
-                    y: d.view.y - (e.clientY - d.client.y) * d.unit,
-                  });
-                else {
-                  try {
-                    adjustHandle(d.guide, d.index, dx, dy, d.ellipseRatio);
-                    setError("");
-                  } catch {
-                    /* Keep current controls until the axis is valid. */
+          <div className="cylinder-live-workspace">
+            <div className="image-edit-surface cylinder-surface">
+              <svg
+                ref={svg}
+                viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`}
+                role="img"
+                aria-label="円筒の軸と太さを画像に合わせる"
+                style={{ touchAction: "none" }}
+                onPointerDown={(e) => begin(e, -2)}
+                onPointerMove={(e) => {
+                  const d = drag.current;
+                  if (!d) return;
+                  const p = point(e.clientX, e.clientY),
+                    dx = p.x - d.point.x,
+                    dy = p.y - d.point.y;
+                  if (d.index === -2)
+                    setView({
+                      ...d.view,
+                      x: d.view.x - (e.clientX - d.client.x) * d.unit,
+                      y: d.view.y - (e.clientY - d.client.y) * d.unit,
+                    });
+                  else {
+                    try {
+                      adjustHandle(d.guide, d.index, dx, dy, d.ellipseRatio);
+                      setError("");
+                    } catch {
+                      /* Keep current controls until the axis is valid. */
+                    }
                   }
-                }
-              }}
-              onPointerUp={(e) => {
-                drag.current = null;
-                if (e.currentTarget.hasPointerCapture(e.pointerId))
-                  e.currentTarget.releasePointerCapture(e.pointerId);
-              }}
-              onPointerCancel={() => {
-                drag.current = null;
-              }}
-            >
-              <image
-                href={layer.src}
-                width={layer.width}
-                height={layer.height}
-                pointerEvents="none"
-              />
-              {geometry && (
-                <>
-                  <polygon
-                    points={geometry.corners
-                      .map((p) => `${p.x},${p.y}`)
-                      .join(" ")}
-                    fill="#38bdf826"
-                    stroke="#0284c7"
-                    strokeWidth={radius / 7}
-                    onPointerDown={(e) => begin(e, -1)}
-                    style={{ cursor: "move" }}
-                  />
-                  {[guide.start, guide.end].map((p, i) => (
-                    <ellipse
-                      key={i}
-                      cx={p.x}
-                      cy={p.y}
-                      rx={
-                        (i ? guide.endRadius : guide.startRadius) * ellipseRatio
-                      }
-                      ry={i ? guide.endRadius : guide.startRadius}
-                      transform={`rotate(${(Math.atan2(guide.end.y - guide.start.y, guide.end.x - guide.start.x) * 180) / Math.PI} ${p.x} ${p.y})`}
-                      fill={
-                        excludeEnd === "both" ||
-                        excludeEnd === (i ? "end" : "start")
-                          ? "#f9731633"
-                          : "none"
-                      }
-                      stroke={i ? "#0f766e" : "#0369a1"}
+                }}
+                onPointerUp={(e) => {
+                  drag.current = null;
+                  if (e.currentTarget.hasPointerCapture(e.pointerId))
+                    e.currentTarget.releasePointerCapture(e.pointerId);
+                }}
+                onPointerCancel={() => {
+                  drag.current = null;
+                }}
+              >
+                <image
+                  href={layer.src}
+                  width={layer.width}
+                  height={layer.height}
+                  pointerEvents="none"
+                />
+                {geometry && (
+                  <>
+                    <polygon
+                      points={geometry.corners
+                        .map((p) => `${p.x},${p.y}`)
+                        .join(" ")}
+                      fill="#38bdf826"
+                      stroke="#0284c7"
                       strokeWidth={radius / 7}
+                      onPointerDown={(e) => begin(e, -1)}
+                      style={{ cursor: "move" }}
+                    />
+                    {[guide.start, guide.end].map((p, i) => (
+                      <ellipse
+                        key={i}
+                        cx={p.x}
+                        cy={p.y}
+                        rx={
+                          (i ? guide.endRadius : guide.startRadius) *
+                          ellipseRatio
+                        }
+                        ry={i ? guide.endRadius : guide.startRadius}
+                        transform={`rotate(${(Math.atan2(guide.end.y - guide.start.y, guide.end.x - guide.start.x) * 180) / Math.PI} ${p.x} ${p.y})`}
+                        fill={
+                          excludeEnd === "both" ||
+                          excludeEnd === (i ? "end" : "start")
+                            ? "#f9731633"
+                            : "none"
+                        }
+                        stroke={i ? "#0f766e" : "#0369a1"}
+                        strokeWidth={radius / 7}
+                        pointerEvents="none"
+                      />
+                    ))}
+                    <line
+                      x1={guide.start.x}
+                      y1={guide.start.y}
+                      x2={guide.end.x}
+                      y2={guide.end.y}
+                      stroke="#0369a1"
+                      strokeWidth={radius / 6}
+                      strokeDasharray={`${radius} ${radius / 2}`}
                       pointerEvents="none"
                     />
-                  ))}
-                  <line
-                    x1={guide.start.x}
-                    y1={guide.start.y}
-                    x2={guide.end.x}
-                    y2={guide.end.y}
-                    stroke="#0369a1"
-                    strokeWidth={radius / 6}
-                    strokeDasharray={`${radius} ${radius / 2}`}
-                    pointerEvents="none"
-                  />
-                </>
-              )}
-              {handles.map(({ point: p, index: i }) => (
-                <g
-                  key={i}
-                  onPointerDown={(e) => begin(e, i)}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={names[i]}
-                  style={{ cursor: "move" }}
-                  onKeyDown={(e) => {
-                    const delta: Record<string, [number, number]> = {
-                      ArrowLeft: [-1, 0],
-                      ArrowRight: [1, 0],
-                      ArrowUp: [0, -1],
-                      ArrowDown: [0, 1],
-                    };
-                    if (!delta[e.key]) return;
-                    e.preventDefault();
-                    const [dx, dy] = delta[e.key];
-                    try {
-                      adjustHandle(
-                        guide,
-                        i,
-                        dx * (e.shiftKey ? 10 : 1),
-                        dy * (e.shiftKey ? 10 : 1),
-                      );
-                    } catch {
-                      /* Move an endpoint to restore the axis. */
-                    }
-                  }}
-                >
-                  <circle
-                    cx={p.x}
-                    cy={p.y}
-                    r={radius}
-                    fill={i < 2 ? "#0369a1" : "white"}
-                    stroke="#0ea5e9"
-                    strokeWidth={radius / 6}
-                  />
-                  <text
-                    x={p.x}
-                    y={p.y}
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    fontSize={radius * 0.8}
-                    fill={i < 2 ? "white" : "#0369a1"}
-                    pointerEvents="none"
+                  </>
+                )}
+                {handles.map(({ point: p, index: i }) => (
+                  <g
+                    key={i}
+                    onPointerDown={(e) => begin(e, i)}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={names[i]}
+                    style={{ cursor: "move" }}
+                    onKeyDown={(e) => {
+                      const delta: Record<string, [number, number]> = {
+                        ArrowLeft: [-1, 0],
+                        ArrowRight: [1, 0],
+                        ArrowUp: [0, -1],
+                        ArrowDown: [0, 1],
+                      };
+                      if (!delta[e.key]) return;
+                      e.preventDefault();
+                      const [dx, dy] = delta[e.key];
+                      try {
+                        adjustHandle(
+                          guide,
+                          i,
+                          dx * (e.shiftKey ? 10 : 1),
+                          dy * (e.shiftKey ? 10 : 1),
+                        );
+                      } catch {
+                        /* Move an endpoint to restore the axis. */
+                      }
+                    }}
                   >
-                    {["根", "先", "太", "太", "太", "面"][i]}
-                  </text>
-                </g>
-              ))}
-            </svg>
+                    <circle
+                      cx={p.x}
+                      cy={p.y}
+                      r={radius}
+                      fill={i < 2 ? "#0369a1" : "white"}
+                      stroke="#0ea5e9"
+                      strokeWidth={radius / 6}
+                    />
+                    <text
+                      x={p.x}
+                      y={p.y}
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      fontSize={radius * 0.8}
+                      fill={i < 2 ? "white" : "#0369a1"}
+                      pointerEvents="none"
+                    >
+                      {["根", "先", "太", "太", "太", "面"][i]}
+                    </text>
+                  </g>
+                ))}
+              </svg>
+            </div>
+            <aside
+              className="cylinder-live-preview"
+              aria-label="リアルタイムプレビュー"
+              aria-busy={live.updating}
+            >
+              <div className="cylinder-preview-heading">
+                <strong>{showOriginal ? "補正前" : "補正後"}</strong>
+                <span>{live.updating ? "更新中…" : "自動更新"}</span>
+              </div>
+              <div className="cylinder-live-image">
+                {showOriginal ? (
+                  <img src={layer.src} alt="補正前の円筒パーツ" />
+                ) : live.preview?.src ? (
+                  <img src={live.preview.src} alt="補正後の円筒パーツ" />
+                ) : (
+                  <p>{live.error || "プレビューを準備中…"}</p>
+                )}
+              </div>
+              <button
+                className="mini-button"
+                aria-pressed={showOriginal}
+                onClick={() => setShowOriginal(!showOriginal)}
+              >
+                {showOriginal ? "補正後を見る" : "補正前を見る"}
+              </button>
+              {live.error && (
+                <p className="error-text" role="status">
+                  {live.error}
+                </p>
+              )}
+            </aside>
           </div>
           <div className="cylinder-dimensions">
             {[
@@ -487,71 +529,52 @@ export default function CylinderWorkbench({
             軸の両端をドラッグすると長さと角度が変わります。「太」で直径、「面」で端面の楕円を調整します。除く端面では、楕円の内側の輪郭に沿って側面だけを補正します。隠れた側面や模様は復元しません。適用後に実寸を確認してください。
           </details>
         </>
-      ) : (
-        <div className="cylinder-results">
-          <figure>
-            <img src={layer.src} alt="補正前の円筒パーツ" />
-            <figcaption>補正前</figcaption>
-          </figure>
-          <figure>
-            <img src={result.src} alt="補正後の円筒パーツ" />
-            <figcaption>補正後</figcaption>
-          </figure>
-        </div>
-      )}
+      }
       {error && (
         <p role="alert" className="error-text">
           {error}
         </p>
       )}
       <div className="cylinder-actions">
-        {result ? (
-          <>
-            <button
-              className="button secondary"
-              onClick={() => setResult(null)}
-            >
-              調整に戻る
-            </button>
-            <button className="button primary" onClick={() => apply(result)}>
-              補正を適用
-            </button>
-          </>
-        ) : (
-          <button
-            className="button primary"
-            disabled={busy || !geometry}
-            onClick={async () => {
-              if (!geometry) return;
-              setBusy(true);
-              setError("");
-              try {
-                const surface = cylinderSideSurface(
-                  guide,
-                  lengthScale,
-                  ellipseRatio,
-                  excludeEnd,
-                );
-                setResult(
-                  await rectifyImage(
-                    layer,
-                    surface.corners,
-                    surface.aspect,
-                    surface.map,
-                  ),
-                );
-              } catch (e) {
-                setError(
-                  e instanceof Error ? e.message : "補正できませんでした。",
-                );
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            補正をプレビュー
-          </button>
-        )}
+        <button
+          className="button primary"
+          disabled={
+            busy || !geometry || !live.preview || live.updating || !!live.error
+          }
+          onClick={async () => {
+            setBusy(true);
+            setError("");
+            try {
+              await new Promise<void>((resolve) =>
+                requestAnimationFrame(() =>
+                  requestAnimationFrame(() => resolve()),
+                ),
+              );
+              const surface = cylinderSideSurface(
+                guide,
+                lengthScale,
+                ellipseRatio,
+                excludeEnd,
+              );
+              const full = await rectifyImage(
+                layer,
+                surface.corners,
+                surface.aspect,
+                surface.map,
+                { pixels: live.pixels },
+              );
+              await apply(full);
+            } catch (e) {
+              setError(
+                e instanceof Error ? e.message : "補正できませんでした。",
+              );
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          {busy ? "適用中…" : "補正を適用"}
+        </button>
       </div>
       {busy && <LoadingOverlay label="円筒パーツを補正中…" />}
     </Dialog>

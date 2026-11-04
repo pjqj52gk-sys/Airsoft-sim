@@ -1,11 +1,11 @@
-import { loadImage } from "./project";
+import { loadImage } from "./project.ts";
 import type { Layer } from "./project";
 import {
   croppedPlacement,
   quadMap,
   distance,
   lassoPolygon,
-} from "./image-edit";
+} from "./image-edit.ts";
 import type { Rect, Point } from "./image-edit";
 export async function eraseImage(
   layer: Layer,
@@ -65,20 +65,25 @@ export async function cropImage(
     originalFrame: undefined,
   };
 }
+export async function readImagePixels(src: string): Promise<ImageData> {
+  const image = await loadImage(src);
+  const canvas = document.createElement("canvas");
+  canvas.width = image.naturalWidth;
+  canvas.height = image.naturalHeight;
+  const context = canvas.getContext("2d")!;
+  context.drawImage(image, 0, 0);
+  return context.getImageData(0, 0, canvas.width, canvas.height);
+}
 export async function rectifyImage(
   layer: Layer,
   points: Point[],
   aspectRatio?: number,
   surfaceMap?: (u: number, v: number) => Point,
+  options?: { maxEdge?: number; pixels?: ImageData },
 ): Promise<Partial<Layer>> {
   const map = surfaceMap || quadMap(points);
-  const image = await loadImage(layer.src);
-  const source = document.createElement("canvas");
-  source.width = image.naturalWidth;
-  source.height = image.naturalHeight;
-  const sourceCtx = source.getContext("2d")!;
-  sourceCtx.drawImage(image, 0, 0);
-  const src = sourceCtx.getImageData(0, 0, source.width, source.height).data;
+  const source = options?.pixels || (await readImagePixels(layer.src));
+  const src = source.data;
   let w = (distance(points[0], points[1]) + distance(points[3], points[2])) / 2;
   let h = (distance(points[0], points[3]) + distance(points[1], points[2])) / 2;
   if (aspectRatio !== undefined) {
@@ -88,7 +93,10 @@ export async function rectifyImage(
     w = Math.sqrt(area * aspectRatio);
     h = Math.sqrt(area / aspectRatio);
   }
-  const scale = Math.min(1, 2000 / Math.max(w, h));
+  const maxEdge = options?.maxEdge ?? 2000;
+  if (!Number.isFinite(maxEdge) || maxEdge < 32 || maxEdge > 2000)
+    throw new Error("補正画像のサイズを確認してください。");
+  const scale = Math.min(1, maxEdge / Math.max(w, h));
   w = Math.max(2, Math.round(w * scale));
   h = Math.max(2, Math.round(h * scale));
   const c = document.createElement("canvas");
