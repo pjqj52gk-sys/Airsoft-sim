@@ -15,6 +15,14 @@ import { updateLayer } from "@/lib/attachments";
 import PartSearch from "./part-search";
 import PerspectiveWorkbench from "./perspective-workbench";
 import { useImagePreparation } from "./image-preparation";
+import PlanComparison from "./plan-comparison";
+import {
+  createComparisonPlans,
+  capturePlan,
+  parseComparisonPlans,
+  type ComparisonPlans,
+  type PlanKey,
+} from "@/lib/comparison-plans";
 import {
   download,
   emptyProject,
@@ -27,7 +35,14 @@ import {
   sampleProject,
   uid,
 } from "@/lib/project";
-import { readDraft, writeDraft, savePart } from "@/lib/storage";
+import {
+  readDraft,
+  writeDraft,
+  savePart,
+  saveBuild,
+  readComparison,
+  writeWorkspace,
+} from "@/lib/storage";
 import {
   prepareAddedLayer,
   trimTransparentLayer,
@@ -42,6 +57,29 @@ const yen = (n: number) =>
 export default function Studio() {
   const preparation = useImagePreparation();
   const [project, setProject] = useState<Project>(emptyProject);
+  const [plans, setPlans] = useState<ComparisonPlans | null>(null);
+  const [comparisonOpen, setComparisonOpen] = useState(false);
+  const livePlans = plans ? capturePlan(plans, project) : null;
+  function switchPlan(key: PlanKey) {
+    if (!livePlans || key === livePlans.active) {
+      setComparisonOpen(false);
+      return;
+    }
+    setPlans({ ...livePlans, active: key });
+    setProject(livePlans[key]);
+    setHistory({ past: [], future: [] });
+    setSelected(null);
+    setCompare(false);
+    setComparisonOpen(false);
+  }
+  function openComparison() {
+    if (!plans) {
+      const next = createComparisonPlans(project, uid(), uid());
+      setPlans(next);
+      setProject(next.a);
+    }
+    setComparisonOpen(true);
+  }
   const current = useRef(project);
   current.current = project;
   const [selected, setSelected] = useState<string | null>(null);
@@ -78,6 +116,7 @@ export default function Studio() {
       !editor &&
       !shelf &&
       !search &&
+      !comparisonOpen &&
       !addDialog &&
       !help &&
       !clearDialog,
@@ -93,14 +132,23 @@ export default function Studio() {
   });
   useEffect(() => {
     let cancelled = false;
-    readDraft()
-      .then(async (value) => {
+    Promise.all([readDraft(), readComparison()])
+      .then(async ([value, comparison]) => {
         if (value) {
           const draft = await parseProject(value);
           if (!cancelled) {
             setProject(draft);
             setSelected(draft.layers[0]?.id ?? null);
           }
+        }
+        try {
+          const restored = await parseComparisonPlans(comparison);
+          if (!cancelled) setPlans(restored);
+        } catch {
+          if (!cancelled)
+            notify(
+              "比較案を復元できませんでした。編集データは保持しています。",
+            );
         }
       })
       .catch(() => {
@@ -123,7 +171,7 @@ export default function Studio() {
     if (!ready || (draftRecoveryFailed && project === emptyProject)) return;
     const t = setTimeout(() => {
       setSaved("保存中…");
-      writeDraft(project)
+      writeWorkspace(project, plans ? capturePlan(plans, project) : null)
         .then(() => setSaved("このブラウザーに保存済み"))
         .catch(() => {
           setSaved("自動保存できません");
@@ -133,7 +181,7 @@ export default function Studio() {
         });
     }, 700);
     return () => clearTimeout(t);
-  }, [project, ready, draftRecoveryFailed]);
+  }, [project, plans, ready, draftRecoveryFailed]);
   useEffect(() => {
     if (!message) return;
     const t = setTimeout(() => setMessage(""), 6000);
@@ -189,6 +237,7 @@ export default function Studio() {
         shelf ||
         search ||
         addDialog ||
+        comparisonOpen ||
         busy
       )
         return;
@@ -818,6 +867,12 @@ export default function Studio() {
             </div>
             <div className="view-tabs">
               <button
+                onClick={openComparison}
+                disabled={!ready || busy || !project.layers.length}
+              >
+                案A・Bを比較
+              </button>
+              <button
                 className={!compare ? "active" : ""}
                 onClick={() => setCompare(false)}
               >
@@ -835,6 +890,53 @@ export default function Studio() {
               使い方
             </button>
           </div>
+          {plans && (
+            <div className="plan-shortcuts" aria-label="比較案を編集">
+              {(["a", "b"] as const).map((key) => (
+                <button
+                  key={key}
+                  className={`mini-button ${plans.active === key ? "toggled" : ""}`}
+                  aria-pressed={plans.active === key}
+                  disabled={!ready || busy}
+                  onClick={() => switchPlan(key)}
+                >
+                  案{key.toUpperCase()}
+                  {plans.active === key ? "を編集中" : "を編集"}
+                </button>
+              ))}
+              <button
+                className="text-button"
+                disabled={busy}
+                onClick={async () => {
+                  if (!livePlans) return;
+                  setBusy(true);
+                  try {
+                    const savedAt = Date.now();
+                    await Promise.all([
+                      saveBuild({
+                        id: livePlans.idA,
+                        savedAt,
+                        project: livePlans.a,
+                      }),
+                      saveBuild({
+                        id: livePlans.idB,
+                        savedAt,
+                        project: livePlans.b,
+                      }),
+                    ]);
+                    setPlans(null);
+                    notify("両案をライブラリに保存して比較を終了しました。");
+                  } catch {
+                    notify("保存できませんでした。比較案は保持しています。");
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              >
+                比較を保存して終了
+              </button>
+            </div>
+          )}
           <div className="canvas-wrap">
             <Stage
               layers={project.layers}
@@ -1315,6 +1417,13 @@ export default function Studio() {
         />
       )}
       {preparation.dialog}
+      {comparisonOpen && livePlans && (
+        <PlanComparison
+          plans={livePlans}
+          close={() => setComparisonOpen(false)}
+          edit={switchPlan}
+        />
+      )}
       {busy && !preparation.reviewing && (
         <LoadingOverlay label="画像を処理中…" />
       )}

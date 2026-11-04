@@ -1,4 +1,5 @@
 import type { Project, Layer } from "./project";
+import type { ComparisonPlans } from "./comparison-plans";
 export type StoredPart = { id: string; savedAt: number; layer: Layer };
 export type StoredBuild = { id: string; savedAt: number; project: Project };
 function database(): Promise<IDBDatabase> {
@@ -66,6 +67,27 @@ async function write(store: string, key: string, value?: unknown) {
   });
 }
 export const readDraft = () => read<unknown>("projects", "draft");
+export const readComparison = () => read<unknown>("projects", "comparison");
+export async function writeWorkspace(
+  project: Project,
+  comparison: ComparisonPlans | null,
+) {
+  const db = await database();
+  return new Promise<void>((resolve, reject) => {
+    const tx = db.transaction("projects", "readwrite");
+    const store = tx.objectStore("projects");
+    store.put(project, "draft");
+    store.put(comparison, "comparison");
+    tx.oncomplete = () => {
+      db.close();
+      resolve();
+    };
+    tx.onabort = tx.onerror = () => {
+      db.close();
+      reject(tx.error);
+    };
+  });
+}
 export const writeDraft = (project: Project) =>
   write("projects", "draft", project);
 export const listParts = () => read<StoredPart[]>("parts");
