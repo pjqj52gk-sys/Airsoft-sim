@@ -5,24 +5,19 @@ import Icon from "./icon";
 import LoadingOverlay from "./loading-overlay";
 import type { Layer } from "@/lib/project";
 import { removeBackground } from "@/lib/project";
-import { cropRect, measuredWidth, distance } from "@/lib/image-edit";
-import { cropImage, rectifyImage, eraseImage } from "@/lib/image-processing";
+import { restoreLayerImage } from "@/lib/layer-image";
+import { measuredWidth, distance } from "@/lib/image-edit";
+import { rectifyImage, eraseImage } from "@/lib/image-processing";
 import type { Point } from "@/lib/image-edit";
-export type EditMode =
-  | "crop"
-  | "erase"
-  | "perspective"
-  | "measure"
-  | "background";
+export type EditMode = "erase" | "perspective" | "measure" | "background";
 const titles = {
-  crop: "画像を切り出す",
-  erase: "フリーハンドで消す",
+  erase: "範囲を消す",
   perspective: "パースを補正",
   measure: "2点で実寸合わせ",
   background: "背景を透過",
 };
 export default function ImageEditor({
-  layer,
+  layer: sourceLayer,
   mode,
   close,
   apply,
@@ -30,8 +25,12 @@ export default function ImageEditor({
   layer: Layer;
   mode: EditMode;
   close: () => void;
-  apply: (updates: Partial<Layer>, extract: boolean) => void;
+  apply: (updates: Partial<Layer>) => void | Promise<void>;
 }) {
+  const layer =
+    mode === "background"
+      ? { ...sourceLayer, ...restoreLayerImage(sourceLayer) }
+      : sourceLayer;
   const [points, setPoints] = useState<Point[]>([]);
   const [length, setLength] = useState(
     layer.referenceMm
@@ -44,7 +43,7 @@ export default function ImageEditor({
   );
   const [tolerance, setTolerance] = useState(28);
   const [preview, setPreview] = useState(layer.src);
-  const [extract, setExtract] = useState(false);
+  const [eraseOutside, setEraseOutside] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [eraseHistory, setEraseHistory] = useState<string[]>([]);
@@ -67,7 +66,7 @@ export default function ImageEditor({
     setBusy(true);
     setError("");
     try {
-      const updates = await eraseImage(layer, points, preview);
+      const updates = await eraseImage(layer, points, preview, eraseOutside);
       setEraseHistory((history) => [...history, preview].slice(-20));
       setPreview(updates.src!);
       setPoints([]);
@@ -98,16 +97,11 @@ export default function ImageEditor({
           mm: measuredWidth(layer.width, points, Number(length)),
           referenceMm: Number(length),
         };
-      else if (mode === "crop")
-        updates = await cropImage(
-          layer,
-          cropRect(points, layer.width, layer.height),
-        );
       else if (mode === "perspective")
         updates = await rectifyImage(layer, points);
       else if (mode === "erase") {
         if (points.length >= 3)
-          updates = await eraseImage(layer, points, preview);
+          updates = await eraseImage(layer, points, preview, eraseOutside);
         else if (changed)
           updates = {
             src: preview,
@@ -117,24 +111,19 @@ export default function ImageEditor({
       } else {
         if (!changed)
           throw new Error("「透過をプレビュー」で結果を確認してください。");
-        updates = { src: preview, originalSrc: layer.originalSrc || layer.src };
+        updates = {
+          ...layer,
+          src: preview,
+          originalSrc: layer.originalSrc || layer.src,
+        };
       }
-      apply(updates, mode === "crop" && extract);
+      await apply(updates);
     } catch (e) {
       setError(e instanceof Error ? e.message : "処理に失敗しました。");
     } finally {
       setBusy(false);
     }
   }
-  const crop =
-    mode === "crop" && points.length === 2
-      ? {
-          x: Math.min(points[0].x, points[1].x),
-          y: Math.min(points[0].y, points[1].y),
-          w: Math.abs(points[0].x - points[1].x),
-          h: Math.abs(points[0].y - points[1].y),
-        }
-      : null;
   return (
     <Dialog
       wide
@@ -155,17 +144,17 @@ export default function ImageEditor({
         <span className="eyebrow">IMAGE WORKBENCH</span>
         <h2>{titles[mode]}</h2>
         <p className="editor-instructions">
-          {mode === "crop"
-            ? "残したい範囲の対角2点をクリック。丸い点をドラッグして調整できます。"
-            : mode === "erase"
-              ? "ドラッグで消したい部分を囲んでください。"
-              : mode === "perspective"
-                ? "画像を平面の長方形に補正します。左上 → 右上 → 右下 → 左下の順に4点を選択。"
-                : mode === "measure"
-                  ? layer.referenceOptions?.length
-                    ? "取得した寸法を選び、画像上の対応する2点を選択してください。"
-                    : "長さが分かる区間の両端を選び、その区間の実寸を入力してください。"
-                  : "左上の色を基準に外周の背景を透過します。許容差を変えて確認できます。"}
+          {mode === "erase"
+            ? eraseOutside
+              ? "ドラッグで残したい部分を囲んでください。"
+              : "ドラッグで消したい部分を囲んでください。"
+            : mode === "perspective"
+              ? "画像を平面の長方形に補正します。左上 → 右上 → 右下 → 左下の順に4点を選択。"
+              : mode === "measure"
+                ? layer.referenceOptions?.length
+                  ? "取得した寸法を選び、画像上の対応する2点を選択してください。"
+                  : "長さが分かる区間の両端を選び、その区間の実寸を入力してください。"
+                : "左上の色を基準に外周の背景を透過します。許容差を変えて確認できます。"}
         </p>
         <div className="image-edit-surface">
           <svg
@@ -236,27 +225,26 @@ export default function ImageEditor({
             }}
           >
             <image href={preview} width={layer.width} height={layer.height} />
-            {crop && (
-              <rect
-                x={crop.x}
-                y={crop.y}
-                width={crop.w}
-                height={crop.h}
-                fill={mode === "erase" ? "#fb718544" : "#38bdf833"}
-                stroke={mode === "erase" ? "#e11d48" : "#0284c7"}
-                strokeWidth={handleSize / 5}
-              />
-            )}
             {mode === "erase" && points.length > 1 && (
-              <polygon
-                points={points.map((p) => `${p.x},${p.y}`).join(" ")}
-                fill="#fb718544"
-                fillRule="evenodd"
-                stroke="#e11d48"
-                strokeWidth={handleSize / 5}
-                strokeLinejoin="round"
-                pointerEvents="none"
-              />
+              <g>
+                {eraseOutside && (
+                  <path
+                    d={`M0 0H${layer.width}V${layer.height}H0Z M${points.map((p) => `${p.x} ${p.y}`).join("L")}Z`}
+                    fill="#fb718544"
+                    fillRule="evenodd"
+                    pointerEvents="none"
+                  />
+                )}
+                <polygon
+                  points={points.map((p) => `${p.x},${p.y}`).join(" ")}
+                  fill={eraseOutside ? "none" : "#fb718544"}
+                  fillRule="evenodd"
+                  stroke="#e11d48"
+                  strokeWidth={handleSize / 5}
+                  strokeLinejoin="round"
+                  pointerEvents="none"
+                />
+              </g>
             )}
             {mode === "perspective" && points.length > 1 && (
               <polygon
@@ -376,19 +364,26 @@ export default function ImageEditor({
             </button>
           </>
         )}
-        {mode === "crop" && (
-          <label className="extract-option">
-            <input
-              type="checkbox"
-              checked={extract}
-              disabled={busy}
-              onChange={(e) => setExtract(e.target.checked)}
-            />
-            元画像を残し、新しいパーツとして切り出す
-          </label>
-        )}
         {mode === "erase" && (
           <div className="erase-actions">
+            <div role="group" aria-label="消す範囲" className="erase-mode">
+              <button
+                className={`mini-button ${!eraseOutside ? "toggled" : ""}`}
+                aria-pressed={!eraseOutside}
+                disabled={busy}
+                onClick={() => setEraseOutside(false)}
+              >
+                内側を消す
+              </button>
+              <button
+                className={`mini-button ${eraseOutside ? "toggled" : ""}`}
+                aria-pressed={eraseOutside}
+                disabled={busy}
+                onClick={() => setEraseOutside(true)}
+              >
+                外側を消す
+              </button>
+            </div>
             <button
               className="button secondary"
               disabled={busy || points.length < 3}

@@ -917,9 +917,17 @@ p {
   display: flex;
   justify-content: space-between;
   border-top: 1px solid var(--line);
-  margin-top: 22px;
+  margin-top: 12px;
   padding-top: 14px;
 }
+.erase-mode {
+  display: flex;
+  gap: 6px;
+}
+.add-source-dialog { padding: 32px; }
+.add-source-dialog h2 { margin: 0 0 24px; font-size: 20px; }
+.add-source-options { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+.add-source-options .button { min-height: 112px; flex-direction: column; gap: 14px; white-space: normal; }
 .product-link {
   display: block;
   font-size: 10px;

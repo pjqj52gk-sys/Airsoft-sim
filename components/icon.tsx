@@ -1,5 +1,6 @@
 const paths: Record<string, string> = {
   plus: "M12 5v14M5 12h14",
+  search: "M10.5 3a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15ZM16 16l5 5",
   upload: "M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5",
   download: "M12 3v13m-5-5 5 5 5-5M4 17v4h16v-4",
   layers: "m12 3 10 5-10 5L2 8l10-5Zm-10 10 10 5 10-5M2 18l10 5 10-5",

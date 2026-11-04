@@ -11,6 +11,7 @@ export async function eraseImage(
   layer: Layer,
   points: Point[],
   source = layer.src,
+  outside = false,
 ): Promise<Partial<Layer>> {
   const polygon = lassoPolygon(points);
   const image = await loadImage(source);
@@ -21,6 +22,7 @@ export async function eraseImage(
   ctx.drawImage(image, 0, 0);
   ctx.globalCompositeOperation = "destination-out";
   ctx.beginPath();
+  if (outside) ctx.rect(0, 0, layer.width, layer.height);
   ctx.moveTo(polygon[0].x, polygon[0].y);
   polygon.slice(1).forEach((p) => ctx.lineTo(p.x, p.y));
   ctx.closePath();
@@ -60,6 +62,7 @@ export async function cropImage(
     height: rect.h,
     ...placement,
     originalSrc: undefined,
+    originalFrame: undefined,
   };
 }
 export async function rectifyImage(
@@ -133,5 +136,6 @@ export async function rectifyImage(
     height: h,
     mm: layer.mm,
     originalSrc: undefined,
+    originalFrame: undefined,
   };
 }

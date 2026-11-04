@@ -4,6 +4,12 @@ export type Layer = {
   name: string;
   src: string;
   originalSrc?: string;
+  originalFrame?: {
+    width: number;
+    height: number;
+    offsetX: number;
+    offsetY: number;
+  };
   width: number;
   height: number;
   mm: number;
@@ -71,7 +77,7 @@ export function sampleProject(): Project {
         mm: 150,
         x: 430,
         y: 188,
-        attachedToBase: false,
+        attachedToBase: true,
         category: "光学機器",
       },
     ],
@@ -120,6 +126,7 @@ export async function parseProject(value: unknown): Promise<Project> {
       const row = record(value);
       const src = safeImage(row.src);
       const image = await loadImage(src);
+      const frame = validOriginalFrame(row.originalFrame);
       const pos = row.position ? record(row.position) : {};
       const mm = number(row.mm, index ? 150 : 800, 1, 5000);
       return {
@@ -136,6 +143,13 @@ export async function parseProject(value: unknown): Promise<Project> {
           typeof row.originalSrc === "string" &&
           /^data:image\/(png|jpeg|webp|gif);base64,/.test(row.originalSrc)
             ? safeImage(row.originalSrc)
+            : undefined,
+        originalFrame:
+          row.originalSrc &&
+          frame &&
+          frame.offsetX + image.naturalWidth <= frame.width &&
+          frame.offsetY + image.naturalHeight <= frame.height
+            ? frame
             : undefined,
         width: image.naturalWidth,
         height: image.naturalHeight,
@@ -237,6 +251,7 @@ export async function readImage(
 export async function removeBackground(
   src: string,
   tolerance: number,
+  preserveTransparency = false,
 ): Promise<string> {
   const image = await loadImage(src);
   const c = document.createElement("canvas");
@@ -246,6 +261,9 @@ export async function removeBackground(
   ctx.drawImage(image, 0, 0);
   const pixels = ctx.getImageData(0, 0, c.width, c.height);
   const d = pixels.data;
+  if (preserveTransparency) {
+    for (let i = 3; i < d.length; i += 4) if (d[i] < 255) return src;
+  }
   const seen = new Uint8Array(c.width * c.height);
   const queue: number[] = [];
   const color = [d[0], d[1], d[2]];
@@ -279,8 +297,37 @@ export async function removeBackground(
     if (p >= c.width) push(p - c.width);
     if (p < c.width * (c.height - 1)) push(p + c.width);
   }
+  if (preserveTransparency && queue.length === c.width * c.height) return src;
   ctx.putImageData(pixels, 0, 0);
   return c.toDataURL("image/png");
+}
+function validOriginalFrame(value: unknown): Layer["originalFrame"] {
+  if (!value || typeof value !== "object") return undefined;
+  const f = value as Record<string, unknown>;
+  if (
+    !["width", "height", "offsetX", "offsetY"].every(
+      (k) =>
+        typeof f[k] === "number" &&
+        Number.isFinite(f[k]) &&
+        Number.isInteger(f[k]) &&
+        Number(f[k]) >= 0 &&
+        Number(f[k]) <= 20000,
+    )
+  )
+    return undefined;
+  if (
+    Number(f.width) < 1 ||
+    Number(f.height) < 1 ||
+    Number(f.offsetX) >= Number(f.width) ||
+    Number(f.offsetY) >= Number(f.height)
+  )
+    return undefined;
+  return {
+    width: Number(f.width),
+    height: Number(f.height),
+    offsetX: Number(f.offsetX),
+    offsetY: Number(f.offsetY),
+  };
 }
 export async function exportPng(project: Project) {
   const layers = project.layers.filter((l) => l.visible);

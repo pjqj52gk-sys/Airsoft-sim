@@ -27,6 +27,11 @@ import {
   uid,
 } from "@/lib/project";
 import { readDraft, writeDraft } from "@/lib/storage";
+import {
+  prepareAddedLayer,
+  trimTransparentLayer,
+  restoreLayerImage,
+} from "@/lib/layer-image";
 const yen = (n: number) =>
   new Intl.NumberFormat("ja-JP", {
     style: "currency",
@@ -40,6 +45,7 @@ export default function Studio() {
   const [selected, setSelected] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
   const [search, setSearch] = useState<"parts" | "guns" | null>(null);
+  const [addDialog, setAddDialog] = useState<"base" | "part" | null>(null);
   const [grid, setGrid] = useState(true);
   const [compare, setCompare] = useState(false);
   const [tab, setTab] = useState("layers");
@@ -65,7 +71,14 @@ export default function Studio() {
   const notify = (text: string) => setMessage(text);
   const fileDrop = useFileDrop({
     enabled:
-      ready && !busy && !editor && !shelf && !search && !help && !clearDialog,
+      ready &&
+      !busy &&
+      !editor &&
+      !shelf &&
+      !search &&
+      !addDialog &&
+      !help &&
+      !clearDialog,
     add: (files, target) => {
       void addFiles(files, target);
     },
@@ -173,6 +186,7 @@ export default function Studio() {
         editor ||
         shelf ||
         search ||
+        addDialog ||
         busy
       )
         return;
@@ -231,22 +245,26 @@ export default function Studio() {
       const images = await Promise.all(
         list.map(async (file, i): Promise<Layer> => {
           const image = await readImage(file);
-          const base = !project.layers.length && i === 0;
-          return {
-            ...image,
-            id: uid(),
-            name: file.name.replace(/\.[^.]+$/, ""),
-            mm: base ? 800 : 150,
-            x: base ? 120 : 430 + i * 25,
-            y: base ? 190 : 160 + i * 25,
-            rotation: 0,
-            flip: false,
-            visible: true,
-            attachedToBase: false,
-            price: 0,
-            url: "",
-            category: base ? "本体" : "その他",
-          };
+          const base = target === "base" || (!project.layers.length && i === 0);
+          return prepareAddedLayer(
+            {
+              ...image,
+              id: uid(),
+              name: file.name.replace(/\.[^.]+$/, ""),
+              mm: base ? 800 : 150,
+              x: base ? 120 : 430 + i * 25,
+              y: base ? 190 : 160 + i * 25,
+              rotation: 0,
+              flip: false,
+              visible: true,
+              attachedToBase: false,
+              price: 0,
+              url: "",
+              category: base ? "本体" : "その他",
+            },
+            base,
+            tolerance,
+          );
         }),
       );
       if (replacingBase) {
@@ -254,7 +272,8 @@ export default function Studio() {
         const replacement = {
           ...base,
           src: images[0].src,
-          originalSrc: undefined,
+          originalSrc: images[0].originalSrc,
+          originalFrame: images[0].originalFrame,
           width: images[0].width,
           height: images[0].height,
           name: images[0].name,
@@ -297,13 +316,17 @@ export default function Studio() {
           baseImg: data.part,
           parts: [],
         });
-        const part = {
-          ...imported.layers[0],
-          attachedToBase: false,
-          category: project.layers.length ? "その他" : "本体",
-          x: project.layers.length ? 430 : 120,
-          y: project.layers.length ? 160 : 190,
-        };
+        const part = await prepareAddedLayer(
+          {
+            ...imported.layers[0],
+            attachedToBase: false,
+            category: project.layers.length ? "その他" : "本体",
+            x: project.layers.length ? 430 : 120,
+            y: project.layers.length ? 160 : 190,
+          },
+          !project.layers.length,
+          tolerance,
+        );
         commit({ ...project, layers: [...project.layers, part] });
         setSelected(part.id);
         notify("パーツデータを追加しました。");
@@ -339,7 +362,8 @@ export default function Studio() {
       name: `${layer.name} のコピー`,
       x: layer.x + 20,
       y: layer.y + 20,
-      attachedToBase: false,
+      attachedToBase: true,
+      category: layer.id === project.layers[0]?.id ? "その他" : layer.category,
     };
     commit({ ...project, layers: [...project.layers, copy] });
     setSelected(copy.id);
@@ -355,14 +379,36 @@ export default function Studio() {
   }
   async function background() {
     if (!layer) return;
-    const target = layer;
+    const target = { ...layer, ...restoreLayerImage(layer) };
     setBusy(true);
     try {
       const src = await removeBackground(target.src, tolerance);
-      update(target.id, { src, originalSrc: target.originalSrc || target.src });
+      const trimmed = await trimTransparentLayer({
+        ...target,
+        src,
+        originalSrc: target.originalSrc || target.src,
+      });
+      update(target.id, trimmed);
       notify("画像の外周につながる背景色を透過しました。");
     } catch {
       notify("背景を透過できませんでした。");
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function trimMargins() {
+    if (!layer || busy) return;
+    setBusy(true);
+    try {
+      const trimmed = await trimTransparentLayer(layer);
+      if (trimmed.src === layer.src)
+        notify("詰められる透明な余白はありません。");
+      else {
+        update(layer.id, trimmed);
+        notify("透明な余白を詰めました。");
+      }
+    } catch {
+      notify("余白を処理できませんでした。");
     } finally {
       setBusy(false);
     }
@@ -392,25 +438,13 @@ export default function Studio() {
     );
     notify("画像を含むJSONを保存しました。");
   }
-  function applyImage(updates: Partial<Layer>, extract: boolean) {
+  async function applyImage(updates: Partial<Layer>) {
     if (!layer) return;
-    if (extract) {
-      if (project.layers.length >= 60) {
-        notify("レイヤーは60件まで追加できます。");
-        return;
-      }
-      const part = {
-        ...layer,
-        ...updates,
-        id: uid(),
-        name: `${layer.name} / 切り出し`,
-        category: "その他",
-        attachedToBase: false,
-        visible: true,
-      };
-      commit({ ...project, layers: [...project.layers, part] });
-      setSelected(part.id);
-    } else update(layer.id, updates);
+    const next =
+      updates.src && editor !== "perspective"
+        ? await trimTransparentLayer({ ...layer, ...updates })
+        : updates;
+    update(layer.id, next);
     setEditor(null);
     notify("画像の編集を適用しました。");
   }
@@ -442,20 +476,24 @@ export default function Studio() {
         layers: [stored],
       });
       const isBase = project.layers.length === 0;
-      const part = {
-        ...validated.layers[0],
-        id: uid(),
-        x: isBase ? 120 : 430,
-        y: isBase ? 190 : 160,
-        rotation: 0,
-        visible: true,
-        attachedToBase: false,
-        category: isBase
-          ? "本体"
-          : stored.category === "本体"
-            ? "その他"
-            : stored.category,
-      };
+      const part = await prepareAddedLayer(
+        {
+          ...validated.layers[0],
+          id: uid(),
+          x: isBase ? 120 : 430,
+          y: isBase ? 190 : 160,
+          rotation: 0,
+          visible: true,
+          attachedToBase: false,
+          category: isBase
+            ? "本体"
+            : stored.category === "本体"
+              ? "その他"
+              : stored.category,
+        },
+        isBase,
+        tolerance,
+      );
       commit({ ...project, layers: [...project.layers, part] });
       setSelected(part.id);
       setShelf(null);
@@ -615,21 +653,14 @@ export default function Studio() {
                   <button
                     className={`upload-card ${fileDrop.target === "base" ? "drop-active" : ""}`}
                     data-drop-target="base"
-                    onClick={() => choose("base")}
+                    onClick={() => setAddDialog("base")}
                     disabled={!ready || busy}
                   >
                     <Icon name="upload" />
-                    <strong>本体の画像を追加</strong>
+                    <strong>本体を追加</strong>
                     <small>ここに画像をドロップしても追加できます</small>
                   </button>
                 )}
-                <button
-                  className="button secondary full-width"
-                  onClick={() => setSearch("guns")}
-                  disabled={!ready || busy}
-                >
-                  本体を検索
-                </button>
                 <div className="section-label parts-label">
                   パーツ{" "}
                   <span>
@@ -669,21 +700,46 @@ export default function Studio() {
                       </div>
                     ))}
                 </div>
+                {layer && (
+                  <div
+                    className="layer-actions"
+                    role="toolbar"
+                    aria-label="レイヤーの操作"
+                  >
+                    {button(
+                      "copy",
+                      "複製",
+                      duplicate,
+                      project.layers.length >= 60,
+                    )}
+                    {button(
+                      "up",
+                      "前面へ",
+                      () => reorder(1),
+                      project.layers.indexOf(layer) === 0 ||
+                        project.layers.indexOf(layer) ===
+                          project.layers.length - 1,
+                    )}
+                    {button(
+                      "down",
+                      "背面へ",
+                      () => reorder(-1),
+                      project.layers.indexOf(layer) <= 1,
+                    )}
+                    {button("eye", "表示を切り替え", () =>
+                      update(layer.id, { visible: !layer.visible }),
+                    )}
+                    {button("trash", "選択アイテムを削除", remove)}
+                  </div>
+                )}
                 <button
                   className={`add-part ${fileDrop.target === "part" ? "drop-active" : ""}`}
                   data-drop-target="part"
-                  onClick={() => choose("part")}
+                  onClick={() => setAddDialog("part")}
                   disabled={!ready || busy}
                 >
                   <Icon name="plus" />
-                  パーツ画像を追加
-                </button>
-                <button
-                  className="button secondary full-width"
-                  onClick={() => setSearch("parts")}
-                  disabled={!ready || busy}
-                >
-                  パーツを検索
+                  パーツを追加
                 </button>
               </>
             ) : (
@@ -778,22 +834,15 @@ export default function Studio() {
             />
             {!project.layers.length && (
               <div className="empty-state">
-                <h1>本体画像を追加</h1>
-                <p>画像をドロップ、またはファイルを選択</p>
+                <h1>本体を追加</h1>
+                <p>画像をドロップしても追加できます</p>
                 <button
                   className="button primary"
-                  onClick={() => choose("base")}
+                  onClick={() => setAddDialog("base")}
                   disabled={!ready || busy}
                 >
                   <Icon name="plus" />
-                  画像を選択
-                </button>
-                <button
-                  className="button secondary"
-                  onClick={() => setSearch("guns")}
-                  disabled={!ready || busy}
-                >
-                  本体を検索して追加
+                  本体を追加
                 </button>
                 <button
                   className="demo-button"
@@ -961,12 +1010,6 @@ export default function Studio() {
                 <div className="edit-tool-grid">
                   <button
                     className="mini-button"
-                    onClick={() => setEditor("crop")}
-                  >
-                    切り出し
-                  </button>
-                  <button
-                    className="mini-button"
                     onClick={() => setEditor("erase")}
                   >
                     範囲を消す
@@ -1002,15 +1045,17 @@ export default function Studio() {
                   <Icon name="wand" size={15} />
                   外周の背景を透過
                 </button>
+                <button
+                  className="mini-button full-width"
+                  onClick={trimMargins}
+                  disabled={busy}
+                >
+                  透明な余白を詰める
+                </button>
                 {layer.originalSrc && (
                   <button
                     className="text-button"
-                    onClick={() =>
-                      update(layer.id, {
-                        src: layer.originalSrc!,
-                        originalSrc: undefined,
-                      })
-                    }
+                    onClick={() => update(layer.id, restoreLayerImage(layer))}
                   >
                     元の画像に戻す
                   </button>
@@ -1044,29 +1089,12 @@ export default function Studio() {
                 </label>
                 <PurchaseLink url={layer.url} />
               </div>
-              <div className="layer-actions">
-                {button("copy", "複製", duplicate, project.layers.length >= 60)}
-                {button(
-                  "up",
-                  "前面へ",
-                  () => reorder(1),
-                  project.layers.indexOf(layer) === 0 ||
-                    project.layers.indexOf(layer) === project.layers.length - 1,
-                )}
-                {button(
-                  "down",
-                  "背面へ",
-                  () => reorder(-1),
-                  project.layers.indexOf(layer) <= 1,
-                )}
-                {button("eye", "表示を切り替え", () =>
-                  update(layer.id, { visible: !layer.visible }),
-                )}
-                {button("trash", "選択アイテムを削除", remove)}
-              </div>
               {project.layers[0]?.id === layer.id && (
-                <button className="text-button" onClick={() => choose("base")}>
-                  本体画像を変更
+                <button
+                  className="text-button"
+                  onClick={() => setAddDialog("base")}
+                >
+                  本体を変更
                 </button>
               )}
             </div>
@@ -1118,6 +1146,46 @@ export default function Studio() {
           AIRSOFT CUSTOM STUDIO <small>V0.5</small>
         </span>
       </footer>
+      {addDialog && (
+        <Dialog
+          label={addDialog === "base" ? "本体を追加" : "パーツを追加"}
+          close={() => setAddDialog(null)}
+        >
+          <div className="add-source-dialog">
+            <button
+              className="modal-close icon-button"
+              aria-label="閉じる"
+              onClick={() => setAddDialog(null)}
+            >
+              <Icon name="close" />
+            </button>
+            <h2>{addDialog === "base" ? "本体を追加" : "パーツを追加"}</h2>
+            <div className="add-source-options">
+              <button
+                className="button secondary"
+                onClick={() => {
+                  setSearch(addDialog === "base" ? "guns" : "parts");
+                  setAddDialog(null);
+                }}
+              >
+                <Icon name="search" />
+                検索して追加
+              </button>
+              <button
+                className="button secondary"
+                onClick={() => {
+                  const target = addDialog;
+                  setAddDialog(null);
+                  choose(target);
+                }}
+              >
+                <Icon name="upload" />
+                自分の画像を使う
+              </button>
+            </div>
+          </div>
+        </Dialog>
+      )}
       {search && (
         <PartSearch
           initialScope={search}
@@ -1139,18 +1207,22 @@ export default function Studio() {
                 layers: [part],
               });
               const base = project.layers[0];
-              const replacement = {
-                ...validated.layers[0],
-                id: base?.id || uid(),
-                category: "本体",
-                x: base?.x ?? 120,
-                y: base?.y ?? 190,
-                mm: base?.mm ?? 800,
-                rotation: base?.rotation ?? 0,
-                flip: base?.flip ?? false,
-                visible: true,
-                attachedToBase: false,
-              };
+              const replacement = await prepareAddedLayer(
+                {
+                  ...validated.layers[0],
+                  id: base?.id || uid(),
+                  category: "本体",
+                  x: base?.x ?? 120,
+                  y: base?.y ?? 190,
+                  mm: base?.mm ?? 800,
+                  rotation: base?.rotation ?? 0,
+                  flip: base?.flip ?? false,
+                  visible: true,
+                  attachedToBase: false,
+                },
+                true,
+                tolerance,
+              );
               commit({
                 ...project,
                 layers: [replacement, ...project.layers.slice(1)],
@@ -1176,7 +1248,7 @@ export default function Studio() {
         <PerspectiveWorkbench
           layer={layer}
           close={() => setEditor(null)}
-          apply={(updates) => applyImage(updates, false)}
+          apply={applyImage}
         />
       )}
       {editor && editor !== "perspective" && layer && (
