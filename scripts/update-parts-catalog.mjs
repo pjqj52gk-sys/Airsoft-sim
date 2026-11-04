@@ -2,6 +2,7 @@
 import fs from "node:fs/promises";
 import { productPhotos } from "../lib/catalog-photos.mjs";
 import { maruiPrice } from "../lib/catalog-price.ts";
+import { productIdentifiers, referenceLengthMm } from "../lib/product-specs.ts";
 const origin = "https://www.tokyo-marui.co.jp";
 const decode = (text) =>
   text
@@ -57,9 +58,6 @@ for (const path of [...paths].sort()) {
   ]
     .map((m) => ({ label: clean(m[1]), value: clean(m[2]) }))
     .filter((d) => /全長|寸法|サイズ|全幅|全高|直径|外径/.test(d.label));
-  const length = dimensions
-    .find((d) => d.label === "全長")
-    ?.value.match(/^([\d.]+)\s*mm/);
   const images = productPhotos(text);
   const category = name.includes("グリップ")
     ? "グリップ"
@@ -78,7 +76,10 @@ for (const path of [...paths].sort()) {
     url: origin + path,
     dimensions,
     price: maruiPrice(text),
-    lengthMm: length ? Number(length[1]) : null,
+    ...productIdentifiers(name, text, origin + path),
+    lengthMm:
+      referenceLengthMm(dimensions.map((d) => ({ ...d, kind: "product" }))) ??
+      null,
     checkedAt: new Date().toISOString().slice(0, 10),
   });
 }

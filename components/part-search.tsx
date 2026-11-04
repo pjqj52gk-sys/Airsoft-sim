@@ -62,6 +62,8 @@ export default function PartSearch({
         p.name,
         p.manufacturer,
         p.category,
+        ...(p.janCodes || []),
+        ...(p.modelNumbers || []),
         ...p.dimensions.map((d) => d.value),
       ]),
   );

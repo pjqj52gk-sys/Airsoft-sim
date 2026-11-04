@@ -1,6 +1,7 @@
 import type { ProductIdentifiers } from "./product-specs.ts";
 import type { CatalogPrice } from "./catalog-price.ts";
 import { normalizeModelNumber } from "./product-metadata.ts";
+import { normalizeGtin } from "./product-specs.ts";
 export type CatalogProduct = {
   id: string;
   name: string;
@@ -14,6 +15,7 @@ export type CatalogProduct = {
   price?: CatalogPrice | null;
   janCodes?: string[];
   modelNumbers?: string[];
+  nameAliases?: string[];
   series?: string;
 };
 // Shared vocabulary, rather than per-retailer titles. Keep generation, size,
@@ -23,6 +25,7 @@ const vocabulary: [RegExp, string][] = [
   [/NOVEL\s*ARMS|ノーベルアームズ/gi, "NOVELARMS"],
   [/VECTOR\s*OPTICS|ベクターオプティクス/gi, "VECTOROPTICS"],
   [/LAYLAX|ライラクス/gi, "LAYLAX"],
+  [/KRYTAC|クライタック/gi, "KRYTAC"],
   [/SOPMOD/gi, "ソップモッド"],
   [/DELTA\s*CUSTOM/gi, "デルタカスタム"],
   [/GLOCK/gi, "グロック"],
@@ -55,10 +58,14 @@ function colors(s: string) {
   const value = s.normalize("NFKC").toUpperCase();
   return [
     /ブラック|\b(?:BK|BLACK)\b/.test(value) ? "black" : "",
-    /\b(?:FDE|DE|TAN)\b|フラットダークアース|タンカラー/.test(value)
+    /\b(?:FDE|DE|TAN|DARK EARTH|FLAT DARK EARTH)\b|フラットダークアース|タンカラー/.test(
+      value,
+    )
       ? "fde"
       : "",
     /ホワイト|\b(?:WHITE|WH)\b/.test(value) ? "white" : "",
+    /グレー|グレイ|\b(?:GREY|GRAY)\b/.test(value) ? "grey" : "",
+    /オリーブドラブ|\b(?:OD|ODG|OLIVE DRAB)\b/.test(value) ? "od" : "",
   ].filter(Boolean);
 }
 function seriesKind(s: string) {
@@ -123,14 +130,32 @@ export function matchCatalog(
   if (/レプリカ|互換|社外/.test(text)) return null;
   for (const method of ["jan", "model"] as const) {
     const values =
-      method === "jan" ? identifiers?.janCodes : identifiers?.modelNumbers;
+      method === "jan"
+        ? identifiers?.janCodes
+            .map(normalizeGtin)
+            .filter((s): s is string => !!s)
+        : identifiers?.modelNumbers;
     const hits = catalog.filter(
       (product) =>
+        // Explicit variant conflicts must not inherit another variant's image.
+        !(
+          colors(product.name).length &&
+          actual.length &&
+          actual.some((c) => !colors(product.name).includes(c))
+        ) &&
+        !(
+          method === "model" &&
+          identifiers?.janCodes.length &&
+          product.janCodes?.length &&
+          identifiers.janCodes.some(
+            (c) => !product.janCodes!.includes(normalizeGtin(c) || c),
+          )
+        ) &&
         !/(?:セット|キット)/.test(title.replace(product.name, "")) &&
         (method === "jan" ? product.janCodes : product.modelNumbers)?.some(
           (code) =>
             method === "jan"
-              ? values?.includes(code)
+              ? values?.includes(normalizeGtin(code) || code)
               : !compatibleCode(title, code) &&
                 (values?.some(
                   (value) =>
@@ -151,6 +176,23 @@ export function matchCatalog(
   }
   const candidates: { product: CatalogProduct; score: number }[] = [];
   for (const product of catalog) {
+    if (
+      product.janCodes?.length &&
+      identifiers?.janCodes.some(
+        (code) => !product.janCodes!.includes(normalizeGtin(code) || code),
+      )
+    )
+      continue;
+    if (
+      product.modelNumbers?.length &&
+      identifiers?.modelNumbers.some(
+        (code) =>
+          !product.modelNumbers!.some(
+            (mpn) => normalizeModelNumber(mpn) === normalizeModelNumber(code),
+          ),
+      )
+    )
+      continue;
     // A published-looking model in the title must pass identifier matching.
     // Falling back to a shorter family name could substitute a different color
     // or generation (e.g. SCRD-F19II vs SCRD-19II).
@@ -212,6 +254,19 @@ export function matchCatalog(
       if (!/NOVELARMS|ノーベルアームズ/.test(text)) continue;
     } else if (product.manufacturer === "Vector Optics") {
       if (!/VECTOROPTICS|VICTOPTICS|ビクトオプティクス/.test(text)) continue;
+    } else if (product.manufacturer === "KRYTAC") {
+      if (!/KRYTAC/.test(text)) continue;
+    } else if (product.manufacturer === "PTS") {
+      if (!/\bPTS\b/i.test(title)) continue;
+      const expectedGas = /\bGBB\b/.test(product.name);
+      const expectedElectric = /\bAEG\b|\bERG\b/.test(product.name);
+      const actualGas = /\bGBB\b|ガスブロ|ガスガン/i.test(title);
+      const actualElectric = /\bAEG\b|\bERG\b|電動/i.test(title);
+      if (
+        (expectedGas && (!actualGas || actualElectric)) ||
+        (expectedElectric && (!actualElectric || actualGas))
+      )
+        continue;
     } else continue;
     const expected = colors(product.name);
     if (
@@ -225,6 +280,7 @@ export function matchCatalog(
     const names = [
       normalize(stem),
       ...(aliases[product.id] || []).map(normalize),
+      ...(product.nameAliases || []).map(normalize),
     ];
     let score = 0;
     for (const name of names) {
@@ -235,7 +291,20 @@ export function matchCatalog(
         .replace(/\d+(?:才|歳)(?:以上)?用|あす楽対応/g, "")
         .replace(/東京マルイ製|TOKYOMARUI製/g, "");
       if (/用|対応|適合|互換|専用|[A-Z0-9]{2,}製/.test(prefix)) continue;
+      const publishedAlias = product.nameAliases?.some(
+        (alias) => normalize(alias) === name,
+      );
       if (
+        publishedAlias &&
+        (!/^[A-Z0-9]+$/.test(name) ||
+          !new RegExp(
+            `(?:^|[^A-Z0-9])${[...name].join("[\\s-]*")}(?![A-Z0-9-])`,
+            "i",
+          ).test(title.normalize("NFKC")))
+      )
+        continue;
+      if (
+        !publishedAlias &&
         /^[A-Z0-9]{1,5}$/.test(name) &&
         (/[A-Z0-9]/.test(text[index - 1] || "") ||
           /[A-Z0-9]/.test(text[index + name.length] || ""))
@@ -285,4 +354,59 @@ export function strongestCatalogMatch(
   )
     return null;
   return rank[page.method] > rank[initial.method] ? page : initial;
+}
+
+// Search captions and the current shop page often provide different parts of
+// the evidence. Combine them without retaining a stale name-only match when
+// the page publishes a conflicting barcode or manufacturer part number.
+export function resolveCatalogMatch(
+  initial: { name: string; identifiers?: ProductIdentifiers },
+  page: { name: string; identifiers?: ProductIdentifiers },
+  catalog: CatalogProduct[],
+) {
+  const identifiers: ProductIdentifiers = {
+    janCodes: [
+      ...new Set(
+        [
+          ...(initial.identifiers?.janCodes || []),
+          ...(page.identifiers?.janCodes || []),
+        ]
+          .map(normalizeGtin)
+          .filter((s): s is string => !!s),
+      ),
+    ],
+    modelNumbers: [
+      ...new Set([
+        ...(initial.identifiers?.modelNumbers || []),
+        ...(page.identifiers?.modelNumbers || []),
+      ]),
+    ],
+  };
+  const separate = strongestCatalogMatch(
+    matchCatalog(initial.name, catalog, initial.identifiers),
+    matchCatalog(page.name, catalog, page.identifiers),
+  );
+  const combined = matchCatalog(initial.name, catalog, identifiers);
+  const chosen =
+    combined?.method !== "name"
+      ? strongestCatalogMatch(separate, combined)
+      : separate;
+  if (!chosen) return null;
+  const product = chosen.product;
+  if (
+    product.janCodes?.length &&
+    identifiers.janCodes.some((code) => !product.janCodes!.includes(code))
+  )
+    return null;
+  if (
+    product.modelNumbers?.length &&
+    identifiers.modelNumbers.some(
+      (code) =>
+        !product.modelNumbers!.some(
+          (mpn) => normalizeModelNumber(mpn) === normalizeModelNumber(code),
+        ),
+    )
+  )
+    return null;
+  return chosen;
 }

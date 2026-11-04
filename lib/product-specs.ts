@@ -13,6 +13,14 @@ export function validJan(code: string) {
   );
   return (10 - (total % 10)) % 10 === Number(code[12]);
 }
+// UPC-A and a zero-prefixed GTIN-14 identify the same retail unit as EAN-13.
+// Non-zero GTIN-14 prefixes can describe packaging and are not interchangeable.
+export function normalizeGtin(value: string) {
+  let code = value.normalize("NFKC").trim();
+  if (/^\d{12}$/.test(code)) code = `0${code}`;
+  if (/^0\d{13}$/.test(code)) code = code.slice(1);
+  return validJan(code) ? code : null;
+}
 export function productText(input: string) {
   return input
     .slice(0, 150000)
@@ -39,7 +47,7 @@ export function productIdentifiers(
     name = productText(title);
   const codes = [...name.matchAll(/(?<!\d)(\d{13})(?!\d)/g)].map((m) => m[1]);
   for (const m of text.matchAll(
-    /(?:JAN(?:コード)?(?:\s*\/\s*UPC)?|EAN|GTIN)\s*[:：]?\s*(\d{13})(?!\d)/gi,
+    /(?:JAN(?:コード)?(?:\s*\/\s*UPC)?|EAN|UPC|GTIN(?:-?(?:12|13|14))?)\s*[:：]?\s*(\d{12,14})(?!\d)/gi,
   ))
     if (
       !/(?:対応|互換|参考)[^。\n]{0,20}$/.test(
@@ -49,16 +57,16 @@ export function productIdentifiers(
       codes.push(m[1]);
   const models = [
     ...text.matchAll(
-      /(?:メーカー\s*)?(?:型番|品番|MPN)\s*[:：]?\s*([A-Z0-9][A-Z0-9._\/-]{2,39})/gi,
+      /(?:メーカー\s*)?(?:型番|品番|型式|製品番号|MPN|Model\s*(?:No\.?|Number)|Part\s*(?:No\.?|Number)|Product\s*Code)\s*[:：]?\s*([A-Z0-9][A-Z0-9._\/-]{2,39})/gi,
     ),
   ].map((m) => m[1].toUpperCase());
   const primary = primaryProductMetadata(description, source);
   const structuredCodes: string[] = [],
     structuredModels: string[] = [];
   if (primary) {
-    for (const key of ["gtin13", "gtin", "ean"]) {
-      const code = String(primary[key] || "").normalize("NFKC");
-      if (validJan(code)) structuredCodes.push(code);
+    for (const key of ["gtin13", "gtin12", "gtin14", "gtin", "ean", "upc"]) {
+      const code = normalizeGtin(String(primary[key] || ""));
+      if (code) structuredCodes.push(code);
     }
     if (
       typeof primary.mpn === "string" &&
@@ -76,15 +84,19 @@ export function productIdentifiers(
       ]),
     );
     if (
-      /^(?:gtin13|gtin|ean)$/i.test(attributes.itemprop || "") &&
-      validJan(attributes.content || "")
+      /^(?:gtin12|gtin13|gtin14|gtin|ean|upc)$/i.test(
+        attributes.itemprop || "",
+      ) &&
+      normalizeGtin(attributes.content || "")
     )
       codes.push(attributes.content);
   }
   return {
     janCodes: [
       ...new Set(
-        structuredCodes.length ? structuredCodes : codes.filter(validJan),
+        structuredCodes.length
+          ? structuredCodes
+          : codes.map(normalizeGtin).filter((code): code is string => !!code),
       ),
     ].slice(0, 12),
     modelNumbers: [
@@ -101,13 +113,13 @@ export function productDimensions(description: string): ProductDimension[] {
   let section: ProductDimension["kind"] = "product";
   for (const line of text.split(/\n/)) {
     if (
-      /^\s*[■●・【]?\s*(?:梱包|パッケージ|外箱)\s*(?:サイズ|寸法|情報)\s*[:：】]?/.test(
+      /^\s*[■●・【]?\s*(?:(?:梱包|パッケージ|外箱)\s*(?:サイズ|寸法|情報)|(?:package|packaging|shipping)\s*(?:size|dimensions?))\s*[:：】]?/i.test(
         line,
       )
     )
       section = "package";
     else if (
-      /^\s*[■●・]?\s*(?:商品仕様|製品仕様|本体サイズ|製品サイズ|商品サイズ|サイズ)\s*[:：]/.test(
+      /^\s*[■●・]?\s*(?:商品仕様|製品仕様|本体サイズ|製品サイズ|商品サイズ|サイズ|product\s*(?:size|dimensions?))\s*[:：–—-]/i.test(
         line,
       )
     )
@@ -129,6 +141,7 @@ export function productDimensions(description: string): ProductDimension[] {
       )
         kind = "compatibility";
       let value = match[3].trim();
+      const condition = match[0].match(/\(([^)]{1,40})\)/)?.[1];
       const after = line.slice(match.index! + match[0].length);
       if (/^\s*(?:の)?(?:マウント)?(?:レイル|レール)/.test(after))
         kind = "compatibility";
@@ -137,12 +150,55 @@ export function productDimensions(description: string): ProductDimension[] {
       );
       if (range) value += range[0];
       else value += after.match(/^\s*\([^)]{1,40}\)/)?.[0] || "";
+      if (condition) value += ` (${condition})`;
       const label = (match[1] || "") + match[2];
       if (
         !dimensions.some(
           (d) => d.label === label && d.value === value && d.kind === kind,
         ) &&
         dimensions.length < 12
+      )
+        dimensions.push({ label, value, kind });
+    }
+    // English manufacturer specifications. Do not mistake barrel lengths,
+    // mounting/rail standards or package measurements for overall dimensions.
+    const english =
+      /\b(?:(Package|Packaging|Shipping|Product|Overall)\s+)?(Length|Width|Height|Depth|Diameter|Dimensions?|Size)\s*(?:\((mm|cm|in(?:ches)?|inch)\))?\s*[:：]?\s*((?:(?:\d+(?:\.\d+)?\s*(?:mm|cm|inches|inch|in|\")?\s*[x×*/~–—-]\s*)*\d+(?:\.\d+)?\s*(?:mm|cm|inches|inch|in|\")?))/gi;
+    for (const m of line.matchAll(english)) {
+      const prefix = line.slice(Math.max(0, m.index! - 50), m.index).trim();
+      if (
+        /(?:barrel|bore|rail|mount|thread|lens|tube|compatible|compatibility|fits?)\s*[:：]?\s*$/i.test(
+          prefix,
+        )
+      )
+        continue;
+      let value = m[4].trim();
+      if (!/(?:mm|cm|inches|inch|in|\")$/i.test(value)) {
+        if (!m[3]) continue;
+        value += ` ${m[3]}`;
+      }
+      value = value.replace(/inches|\"/gi, "in");
+      const after = line.slice(m.index! + m[0].length);
+      value += after.match(/^\s*\([^)]{1,40}\)/)?.[0] || "";
+      const label = (
+        {
+          length: "全長",
+          width: "幅",
+          height: "高さ",
+          depth: "奥行き",
+          diameter: "直径",
+          dimension: "寸法",
+          dimensions: "寸法",
+          size: "サイズ",
+        } as Record<string, string>
+      )[m[2].toLowerCase()];
+      const kind = /package|packaging|shipping/i.test(m[1] || "")
+        ? "package"
+        : section;
+      if (
+        !dimensions.some(
+          (d) => d.label === label && d.value === value && d.kind === kind,
+        )
       )
         dimensions.push({ label, value, kind });
     }
@@ -167,6 +223,49 @@ function explicitAxisDimensions(
 ): { label: string; value: string }[] {
   const plain = value.normalize("NFKC");
   if (!/[×x*]/i.test(plain)) return [];
+  const postfix = [
+    ...plain.matchAll(
+      /(\d+(?:\.\d+)?)\s*(mm|cm|in|inch)?\s*\(\s*([LWDH])\s*\)/gi,
+    ),
+  ];
+  const postfixUnit =
+    plain.match(/\)\s*(mm|cm|inch|in)\b/i)?.[1] || postfix.at(-1)?.[2];
+  if (
+    postfix.length >= 2 &&
+    postfix.length <= 3 &&
+    postfixUnit &&
+    new Set(postfix.map((m) => m[3].toUpperCase())).size === postfix.length
+  ) {
+    const names: Record<string, string> = {
+      L: "長さ",
+      W: "幅",
+      H: "高さ",
+      D: "奥行き",
+    };
+    return postfix.map((m) => ({
+      label: names[m[3].toUpperCase()],
+      value: `${m[1]}${m[2] || postfixUnit}`,
+    }));
+  }
+  // Only infer axis order when the publisher explicitly states it.
+  const ordered = plain.match(
+    /(\d+(?:\.\d+)?)\s*[×x*]\s*(\d+(?:\.\d+)?)\s*[×x*]\s*(\d+(?:\.\d+)?)\s*(mm|cm|in|inch)\s*\(\s*([LWDH])\s*[×x*]\s*([LWDH])\s*[×x*]\s*([LWDH])\s*\)/i,
+  );
+  if (
+    ordered &&
+    new Set(ordered.slice(5, 8).map((s) => s.toUpperCase())).size === 3
+  ) {
+    const names: Record<string, string> = {
+      L: "長さ",
+      W: "幅",
+      H: "高さ",
+      D: "奥行き",
+    };
+    return [0, 1, 2].map((i) => ({
+      label: names[ordered[i + 5].toUpperCase()],
+      value: `${ordered[i + 1]}${ordered[4]}`,
+    }));
+  }
   const axes = [
     ...plain.matchAll(
       /(?:^|[\s(×x*,:：])(?:(幅|横|高さ|縦|奥行き?|長さ|W|H|D|L))\s*[):：]?\s*(\d+(?:\.\d+)?)\s*(mm|cm|ミリ|センチ)?/gi,
@@ -203,9 +302,11 @@ export function referenceLengthMm(dimensions: ProductDimension[]) {
         ),
     )
     .map((d) => {
-      const m = d.value.match(
-        /^(?:約\s*)?(\d+(?:\.\d+)?)\s*(mm|cm|m|in(?:ch)?|インチ|ミリ|センチ)$/i,
-      );
+      const m = d.value
+        .replace(/\s*\((?:本体のみ|本体|製品本体)\)\s*$/, "")
+        .match(
+          /^(?:約\s*)?(\d+(?:\.\d+)?)\s*(mm|cm|m|in(?:ch)?|インチ|ミリ|センチ)$/i,
+        );
       const factor = m
         ? (
             {
@@ -270,15 +371,26 @@ export function referenceLengthOptions(
     const plain = value.replace(/\([^)]*\)/g, "");
     if (/[×x*]/i.test(plain)) continue;
     const inherited = plain.replace(
-      /(\d+(?:\.\d+)?)\s*([/〜~～-])\s*(\d+(?:\.\d+)?)\s*(mm|cm|ミリ|センチ)/gi,
+      /(\d+(?:\.\d+)?)\s*([/〜~～–—-])\s*(\d+(?:\.\d+)?)\s*(mm|cm|inch|in|インチ|ミリ|センチ)/gi,
       "$1$4 $2 $3$4",
     );
     const values = [
-      ...inherited.matchAll(/(\d+(?:\.\d+)?)\s*(mm|cm|ミリ|センチ)/gi),
+      ...inherited.matchAll(
+        /(\d+(?:\.\d+)?)\s*(mm|cm|inch|in|インチ|ミリ|センチ)/gi,
+      ),
     ];
     const note = value.match(/\(([^)]*)\)\s*$/)?.[1];
     for (const [i, m] of values.entries()) {
-      const mm = Number(m[1]) * (/cm|センチ/i.test(m[2]) ? 10 : 1);
+      const mm =
+        Math.round(
+          Number(m[1]) *
+            (/cm|センチ/i.test(m[2])
+              ? 10
+              : /in|インチ/i.test(m[2])
+                ? 25.4
+                : 1) *
+            1000,
+        ) / 1000;
       if (mm <= 0 || mm > 5000 || options.some((o) => o.mm === mm)) continue;
       options.push({
         mm,
@@ -302,7 +414,11 @@ const dimensionKey = (s: string) => {
     .replace(/^(本体|製品|商品)/, "")
     .replace(/\s/g, "")
     .toLowerCase();
-  return /^(?:全長|長さ|length|overalllength)$/.test(key) ? "全長" : key;
+  if (/^(?:全長|長さ|length|overalllength)$/.test(key)) return "全長";
+  if (/^(?:全幅|幅|width)$/.test(key)) return "幅";
+  if (/^(?:全高|高さ|height)$/.test(key)) return "高さ";
+  if (/^(?:奥行|奥行き|depth)$/.test(key)) return "奥行き";
+  return key;
 };
 const dimensionValue = (s: string) =>
   s
@@ -311,6 +427,10 @@ const dimensionValue = (s: string) =>
     .replace(/センチ/gi, "cm")
     .replace(/ミリ/gi, "mm")
     .replace(/(\d+(?:\.\d+)?)cm/gi, (_, n) => `${Number(n) * 10}mm`)
+    .replace(
+      /(\d+(?:\.\d+)?)(?:inches|inch|in|インチ)/gi,
+      (_, n) => `${Math.round(Number(n) * 25.4 * 1000) / 1000}mm`,
+    )
     .replace(/\d+(?:\.\d+)?/g, (n) => String(Number(n)));
 export function mergeDimensions(
   official: ProductDimension[],
@@ -353,6 +473,14 @@ export function combinedReferenceLength(
     )
   )
     return undefined;
+  // A retailer's single value cannot choose the pose of an official adjustable
+  // stock or collapse an official range to one unverified reference length.
+  if (
+    official.some(
+      (d) => d.kind === "product" && dimensionKey(d.label) === "全長",
+    )
+  )
+    return referenceLengthMm(official);
   if (
     published &&
     Number.isFinite(published) &&

@@ -7,7 +7,7 @@ import CategoryBrowser from "./category-browser";
 import catalogData from "@/lib/parts-catalog.json";
 import {
   matchCatalog,
-  strongestCatalogMatch,
+  resolveCatalogMatch,
   type CatalogProduct,
 } from "@/lib/catalog-match";
 import { catalogImageUrl } from "@/lib/catalog-image";
@@ -136,8 +136,13 @@ export default function RakutenSearch({
       });
       if (!response.ok) throw new Error();
       const product: ShopProduct = await response.json();
-      const pageMatch = product.officialMatch;
-      const chosenMatch = strongestCatalogMatch(matched, pageMatch || null);
+      const chosenMatch = resolveCatalogMatch(
+        item,
+        product,
+        submitted.scope === "guns"
+          ? catalog.filter((p) => p.category === "本体")
+          : catalog,
+      );
       const chosenOfficial = chosenMatch?.product;
       const chosenDimensions = (chosenOfficial?.dimensions || []).map((d) => ({
         ...d,

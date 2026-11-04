@@ -22,9 +22,12 @@ export async function GET(request: Request) {
       (url.pathname.startsWith("/appimg/option/") ||
         (item.category === "本体" &&
           url.pathname.startsWith("/appimg/product/")))) ||
-    (item.manufacturer === "LAYLAX" &&
+    (["LAYLAX", "KRYTAC"].includes(item.manufacturer) &&
       url.hostname === "cdn.shopify.com" &&
       url.pathname.startsWith("/s/files/1/0843/1095/0186/")) ||
+    (item.manufacturer === "PTS" &&
+      url.hostname === "cdn.shopify.com" &&
+      url.pathname.startsWith("/s/files/1/0592/0368/2494/")) ||
     (item.manufacturer === "NOVEL ARMS" &&
       url.hostname === "novelarms.co.jp" &&
       url.pathname.startsWith("/wp-content/uploads/")) ||
