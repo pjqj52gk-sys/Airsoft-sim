@@ -83,9 +83,54 @@ export function moveCylinderHandle(
     return { ...guide, [key]: { x: guide[key].x + dx, y: guide[key].y + dy } };
   }
   const { normal } = cylinderGeometry(guide);
+  if (index === 4) {
+    const radius = Math.max(
+      1,
+      (guide.startRadius + guide.endRadius) / 2 - dx * normal.x - dy * normal.y,
+    );
+    return { ...guide, startRadius: radius, endRadius: radius };
+  }
   const key = index === 2 ? "startRadius" : "endRadius";
   return {
     ...guide,
     [key]: Math.max(1, guide[key] - dx * normal.x - dy * normal.y),
   };
+}
+
+export function setCylinderDimensions(
+  guide: CylinderGuide,
+  values: { length?: number; diameter?: number; angle?: number },
+): CylinderGuide {
+  const current = cylinderGeometry(guide);
+  const length = values.length ?? current.length;
+  const angle =
+    ((values.angle ??
+      (Math.atan2(guide.end.y - guide.start.y, guide.end.x - guide.start.x) *
+        180) /
+        Math.PI) *
+      Math.PI) /
+    180;
+  const cx = (guide.start.x + guide.end.x) / 2,
+    cy = (guide.start.y + guide.end.y) / 2;
+  const next = {
+    ...guide,
+    start: {
+      x: cx - (Math.cos(angle) * length) / 2,
+      y: cy - (Math.sin(angle) * length) / 2,
+    },
+    end: {
+      x: cx + (Math.cos(angle) * length) / 2,
+      y: cy + (Math.sin(angle) * length) / 2,
+    },
+    ...(values.diameter !== undefined
+      ? { startRadius: values.diameter / 2, endRadius: values.diameter / 2 }
+      : {}),
+  };
+  cylinderGeometry(next);
+  return next;
+}
+export function cylinderEndRatio(extent: number, radius: number) {
+  if (!Number.isFinite(extent) || !Number.isFinite(radius) || radius < 1)
+    throw new Error("端面の太さを確認してください。");
+  return Math.max(0, Math.min(1, extent / radius));
 }

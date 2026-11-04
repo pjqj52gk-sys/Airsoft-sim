@@ -6,6 +6,8 @@ import {
   initialCylinderGuide,
   cylinderGeometry,
   moveCylinderHandle,
+  setCylinderDimensions,
+  cylinderEndRatio,
   type CylinderGuide,
 } from "@/lib/cylinder-guide";
 import { fitImageViewport, zoomViewport } from "@/lib/edit-viewport";
@@ -31,6 +33,8 @@ export default function CylinderWorkbench({
     fitImageViewport(layer.width, layer.height),
   );
   const [lengthScale, setLengthScale] = useState(1);
+  const [ellipseRatio, setEllipseRatio] = useState(0.22);
+  const [tapered, setTapered] = useState(false);
   const [result, setResult] = useState<Partial<Layer> | null>(null);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
@@ -42,6 +46,7 @@ export default function CylinderWorkbench({
     view: Rect;
     client: Point;
     unit: number;
+    ellipseRatio: number;
   } | null>(null);
   let geometry: ReturnType<typeof cylinderGeometry> | null = null;
   try {
@@ -97,10 +102,63 @@ export default function CylinderWorkbench({
       view,
       client: { x: e.clientX, y: e.clientY },
       unit: 1 / svg.current!.getScreenCTM()!.a,
+      ellipseRatio,
     };
     svg.current!.setPointerCapture(e.pointerId);
   }
-  const names = ["根元の中心", "先端の中心", "根元の太さ", "先端の太さ"];
+  const names = [
+    "根元の中心",
+    "先端の中心",
+    "根元の太さ",
+    "先端の太さ",
+    "円筒の太さ",
+    "端面の開き",
+  ];
+  const indices = tapered ? [0, 1, 2, 3, 5] : [0, 1, 4, 5];
+  const handles = indices.flatMap((index) => {
+    if (!geometry)
+      return index < 2
+        ? [{ index, point: index ? guide.end : guide.start }]
+        : [];
+    const point =
+      index === 4
+        ? geometry.map(0.5, 0)
+        : index === 5
+          ? {
+              x:
+                guide.end.x +
+                ((guide.end.x - guide.start.x) / geometry.length) *
+                  (guide.endRadius * ellipseRatio +
+                    (Math.max(view.w, view.h) / 65) * 3),
+              y:
+                guide.end.y +
+                ((guide.end.y - guide.start.y) / geometry.length) *
+                  (guide.endRadius * ellipseRatio +
+                    (Math.max(view.w, view.h) / 65) * 3),
+            }
+          : geometry.handles[index];
+    return [{ index, point }];
+  });
+  function adjustHandle(
+    source: CylinderGuide,
+    index: number,
+    dx: number,
+    dy: number,
+    initialRatio = ellipseRatio,
+  ) {
+    if (index === 5) {
+      const g = cylinderGeometry(source);
+      setEllipseRatio(
+        cylinderEndRatio(
+          source.endRadius * initialRatio +
+            (dx * (source.end.x - source.start.x) +
+              dy * (source.end.y - source.start.y)) /
+              g.length,
+          source.endRadius,
+        ),
+      );
+    } else setGuide(moveCylinderHandle(source, index, dx, dy));
+  }
   const radius = Math.max(view.w, view.h) / 65;
   return (
     <Dialog
@@ -132,7 +190,7 @@ export default function CylinderWorkbench({
       {!result ? (
         <>
           <p className="editor-instructions">
-            両端の中心と、左右の太さを輪郭に合わせる
+            軸の両端で長さ・角度を合わせ、太さと端面の開きを調整
           </p>
           <div className="perspective-viewport-tools">
             <button
@@ -153,6 +211,9 @@ export default function CylinderWorkbench({
               className="text-button"
               onClick={() => {
                 setGuide(initialCylinderGuide(layer.width, layer.height));
+                setEllipseRatio(0.22);
+                setTapered(false);
+                setLengthScale(1);
                 setError("");
               }}
             >
@@ -182,7 +243,7 @@ export default function CylinderWorkbench({
                   });
                 else {
                   try {
-                    setGuide(moveCylinderHandle(d.guide, d.index, dx, dy));
+                    adjustHandle(d.guide, d.index, dx, dy, d.ellipseRatio);
                     setError("");
                   } catch {
                     /* Keep current controls until the axis is valid. */
@@ -221,7 +282,9 @@ export default function CylinderWorkbench({
                       key={i}
                       cx={p.x}
                       cy={p.y}
-                      rx={(i ? guide.endRadius : guide.startRadius) * 0.22}
+                      rx={
+                        (i ? guide.endRadius : guide.startRadius) * ellipseRatio
+                      }
                       ry={i ? guide.endRadius : guide.startRadius}
                       transform={`rotate(${(Math.atan2(guide.end.y - guide.start.y, guide.end.x - guide.start.x) * 180) / Math.PI} ${p.x} ${p.y})`}
                       fill="none"
@@ -242,7 +305,7 @@ export default function CylinderWorkbench({
                   />
                 </>
               )}
-              {(geometry?.handles || [guide.start, guide.end]).map((p, i) => (
+              {handles.map(({ point: p, index: i }) => (
                 <g
                   key={i}
                   onPointerDown={(e) => begin(e, i)}
@@ -261,13 +324,11 @@ export default function CylinderWorkbench({
                     e.preventDefault();
                     const [dx, dy] = delta[e.key];
                     try {
-                      setGuide(
-                        moveCylinderHandle(
-                          guide,
-                          i,
-                          dx * (e.shiftKey ? 10 : 1),
-                          dy * (e.shiftKey ? 10 : 1),
-                        ),
+                      adjustHandle(
+                        guide,
+                        i,
+                        dx * (e.shiftKey ? 10 : 1),
+                        dy * (e.shiftKey ? 10 : 1),
                       );
                     } catch {
                       /* Move an endpoint to restore the axis. */
@@ -291,12 +352,98 @@ export default function CylinderWorkbench({
                     fill={i < 2 ? "white" : "#0369a1"}
                     pointerEvents="none"
                   >
-                    {["根", "先", "太", "太"][i]}
+                    {["根", "先", "太", "太", "太", "面"][i]}
                   </text>
                 </g>
               ))}
             </svg>
           </div>
+          <div className="cylinder-dimensions">
+            {[
+              {
+                label: "軸の長さ",
+                key: "length" as const,
+                value: geometry?.length || 4,
+                unit: "px",
+                min: 4,
+                max: Math.max(layer.width, layer.height) * 4,
+              },
+              {
+                label: "太さ",
+                key: "diameter" as const,
+                value: guide.startRadius + guide.endRadius,
+                unit: "px",
+                min: 2,
+                max: Math.max(layer.width, layer.height) * 4,
+              },
+              {
+                label: "角度",
+                key: "angle" as const,
+                value:
+                  (Math.atan2(
+                    guide.end.y - guide.start.y,
+                    guide.end.x - guide.start.x,
+                  ) *
+                    180) /
+                  Math.PI,
+                unit: "°",
+                min: -180,
+                max: 180,
+              },
+            ].map(({ label, key, value, unit, min, max }) => (
+              <label key={key}>
+                {label}
+                <div>
+                  <input
+                    type="number"
+                    value={Math.round(value * 10) / 10}
+                    min={min}
+                    max={max}
+                    step="1"
+                    onChange={(e) => {
+                      const n = e.target.valueAsNumber;
+                      if (!Number.isFinite(n) || n < min || n > max) return;
+                      try {
+                        setGuide(setCylinderDimensions(guide, { [key]: n }));
+                        if (key === "diameter") setTapered(false);
+                      } catch {
+                        /* Keep valid guide. */
+                      }
+                    }}
+                  />
+                  {unit}
+                </div>
+              </label>
+            ))}
+          </div>
+          <label className="cylinder-length">
+            端面の開き{" "}
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step=".01"
+              value={ellipseRatio}
+              onChange={(e) => setEllipseRatio(Number(e.target.value))}
+            />
+            <output>{Math.round(ellipseRatio * 100)}%</output>
+          </label>
+          <label className="cylinder-taper">
+            <input
+              type="checkbox"
+              checked={tapered}
+              onChange={(e) => {
+                setTapered(e.target.checked);
+                if (!e.target.checked)
+                  setGuide(
+                    setCylinderDimensions(guide, {
+                      diameter: guide.startRadius + guide.endRadius,
+                    }),
+                  );
+              }}
+            />
+            先細りを個別に合わせる
+          </label>
           <label className="cylinder-length">
             長さの補正{" "}
             <input
@@ -314,7 +461,7 @@ export default function CylinderWorkbench({
           </button>
           <details className="hint">
             <summary>合わせ方</summary>
-            根元と先端の中心を側面の両端に、太さの点を側面の輪郭に合わせます。斜め撮影で短く見える場合は長さを調整してください。端面や隠れた面、実際の長さは写真だけでは復元できません。適用後に実寸を確認してください。
+            軸の両端をドラッグすると長さと角度が変わります。「太」で直径、「面」で端面の楕円を調整します。端面の開きはガイドの見え方で、写真自体の長さは「長さの補正」で調整します。隠れた面や実際の寸法は復元しません。適用後に実寸を確認してください。
           </details>
         </>
       ) : (

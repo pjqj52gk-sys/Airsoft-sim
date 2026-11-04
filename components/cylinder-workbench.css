@@ -64,3 +64,34 @@
     height: 180px;
   }
 }
+.cylinder-dimensions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.cylinder-dimensions label {
+  min-width: 0;
+  font-size: 13px;
+}
+.cylinder-dimensions label > div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+.cylinder-dimensions input {
+  min-width: 0;
+  width: 100%;
+  border: 1px solid #d6e8f3;
+  border-radius: 8px;
+  padding: 8px;
+  background: white;
+}
+.cylinder-taper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 13px;
+}

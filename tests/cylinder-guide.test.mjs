@@ -61,3 +61,36 @@ test("handles can move beyond the image, change taper independently, and reject 
   assert.throws(() => cylinderGeometry({ ...guide, startRadius: 0 }));
   assert.throws(() => cylinderGeometry(guide, Infinity));
 });
+
+test("axis length, diameter and angle can be set independently around the same center", async () => {
+  const { setCylinderDimensions, cylinderEndRatio } = await import(
+    "../lib/cylinder-guide.ts"
+  );
+  const source = initialCylinderGuide(601, 101);
+  const edited = setCylinderDimensions(source, {
+    length: 300,
+    diameter: 40,
+    angle: 30,
+  });
+  near(cylinderGeometry(edited).length, 300);
+  near((edited.start.x + edited.end.x) / 2, 300);
+  near((edited.start.y + edited.end.y) / 2, 50);
+  near(
+    (Math.atan2(edited.end.y - edited.start.y, edited.end.x - edited.start.x) *
+      180) /
+      Math.PI,
+    30,
+  );
+  assert.equal(edited.startRadius, 20);
+  assert.equal(edited.endRadius, 20);
+  const thick = moveCylinderHandle(source, 4, 0, -10);
+  assert.equal(thick.startRadius, 60);
+  assert.equal(thick.endRadius, 60);
+  assert.deepEqual(thick.start, source.start);
+  assert.deepEqual(thick.end, source.end);
+  assert.equal(cylinderEndRatio(0, 50), 0);
+  assert.equal(cylinderEndRatio(25, 50), 0.5);
+  assert.equal(cylinderEndRatio(50, 50), 1);
+  assert.equal(cylinderEndRatio(100, 50), 1);
+  assert.throws(() => setCylinderDimensions(source, { length: 0 }));
+});
