@@ -568,6 +568,27 @@ export default function Studio() {
         <div className="header-actions">
           <button
             className="button secondary"
+            aria-label="みんなのカスタム"
+            title="みんなのカスタム"
+            disabled={!ready || busy || draftRecoveryFailed}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                await writeDraft(current.current);
+                window.location.assign("/community");
+              } catch {
+                notify(
+                  "カスタムを保存できませんでした。保存し直してからお試しください。",
+                );
+                setBusy(false);
+              }
+            }}
+          >
+            <Icon name="users" />
+            みんなのカスタム
+          </button>
+          <button
+            className="button secondary"
             onClick={() => setShelf("builds")}
             disabled={!ready || busy}
           >

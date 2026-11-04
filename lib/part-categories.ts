@@ -3,6 +3,7 @@ export type PartCategory = {
   label: string;
   keyword: string;
   genreId?: string;
+  layerCategory?: string;
 };
 export type PartCategoryGroup = {
   id: string;
@@ -97,7 +98,7 @@ export const partCategoryGroups: PartCategoryGroup[] = [
   },
   {
     id: "grips",
-    label: "フォアグリップ",
+    label: "グリップ・バイポッド",
     layerCategory: "グリップ",
     children: [
       { id: "foregrip", label: "フォアグリップ", keyword: "フォアグリップ" },
@@ -107,17 +108,22 @@ export const partCategoryGroups: PartCategoryGroup[] = [
         keyword: "アングルグリップ",
       },
       { id: "hand-stop", label: "ハンドストップ", keyword: "ハンドストップ" },
-    ],
-  },
-  {
-    id: "pistol-grips",
-    label: "ピストルグリップ",
-    layerCategory: "グリップ",
-    children: [
       {
         id: "pistol-grip",
         label: "ピストルグリップ",
         keyword: "ピストルグリップ",
+      },
+      {
+        id: "bipod",
+        label: "バイポッド",
+        keyword: "バイポッド",
+        layerCategory: "外装",
+      },
+      {
+        id: "bipod-adapter",
+        label: "バイポッドアダプター",
+        keyword: "バイポッド アダプター",
+        layerCategory: "外装",
       },
     ],
   },
@@ -165,7 +171,7 @@ export const partCategoryGroups: PartCategoryGroup[] = [
   },
   {
     id: "lights",
-    label: "ライト",
+    label: "ライト・レーザー",
     layerCategory: "外装",
     children: [
       {
@@ -183,18 +189,17 @@ export const partCategoryGroups: PartCategoryGroup[] = [
         label: "リモートスイッチ",
         keyword: "リモートスイッチ",
       },
-    ],
-  },
-  {
-    id: "bipods",
-    label: "バイポッド",
-    layerCategory: "外装",
-    children: [
-      { id: "bipod", label: "バイポッド", keyword: "バイポッド" },
       {
-        id: "bipod-adapter",
-        label: "バイポッドアダプター",
-        keyword: "バイポッド アダプター",
+        id: "laser-sight",
+        label: "レーザーサイト",
+        keyword: "レーザーサイト",
+        layerCategory: "光学機器",
+      },
+      {
+        id: "laser-light",
+        label: "レーザーライト",
+        keyword: "レーザー ライト",
+        layerCategory: "光学機器",
       },
     ],
   },
@@ -231,19 +236,6 @@ export const partCategoryGroups: PartCategoryGroup[] = [
       },
     ],
   },
-  {
-    id: "lasers",
-    label: "レーザーサイト",
-    layerCategory: "光学機器",
-    children: [
-      { id: "laser-sight", label: "レーザーサイト", keyword: "レーザーサイト" },
-      {
-        id: "laser-light",
-        label: "レーザーライト",
-        keyword: "レーザー ライト",
-      },
-    ],
-  },
 ];
 export function partCategory(id: string) {
   for (const group of partCategoryGroups) {
@@ -252,7 +244,7 @@ export function partCategory(id: string) {
       return {
         ...category,
         group: group.label,
-        layerCategory: group.layerCategory,
+        layerCategory: category.layerCategory ?? group.layerCategory,
       };
   }
   return undefined;

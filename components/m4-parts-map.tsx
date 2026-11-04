@@ -4,7 +4,13 @@ import { useId } from "react";
 
 const locations: Record<
   string,
-  { x: number; y: number; point: [number, number]; line: string }
+  {
+    x: number;
+    y: number;
+    point: [number, number];
+    line: string;
+    extra?: { point: [number, number]; line: string }[];
+  }
 > = {
   guns: { x: 855, y: 310, point: [558, 203], line: "M855 289V265L558 203" },
   magazines: {
@@ -16,9 +22,13 @@ const locations: Record<
   stocks: { x: 865, y: 72, point: [886, 214], line: "M865 93V150L886 214" },
   optics: { x: 600, y: 45, point: [560, 154], line: "M600 66V108L560 154" },
   mounts: { x: 405, y: 50, point: [470, 154], line: "M405 71V112L470 154" },
-  lights: { x: 260, y: 75, point: [307, 192], line: "M260 96V155L307 192" },
-  lasers: { x: 90, y: 65, point: [330, 170], line: "M90 86V124L330 170" },
-  bipods: { x: 170, y: 390, point: [250, 201], line: "M170 369V312L250 201" },
+  lights: {
+    x: 185,
+    y: 75,
+    point: [307, 192],
+    line: "M185 96V140L307 192",
+    extra: [{ point: [330, 170], line: "M185 96V120L330 170" }],
+  },
   muzzle: { x: 100, y: 322, point: [111, 180], line: "M100 301V260L111 180" },
   handguards: {
     x: 250,
@@ -26,12 +36,15 @@ const locations: Record<
     point: [350, 189],
     line: "M250 282V252L350 189",
   },
-  grips: { x: 365, y: 390, point: [360, 201], line: "M365 369V318L360 201" },
-  "pistol-grips": {
-    x: 745,
-    y: 391,
-    point: [620, 265],
-    line: "M745 370V339L620 265",
+  grips: {
+    x: 270,
+    y: 390,
+    point: [360, 201],
+    line: "M270 369V345L360 201",
+    extra: [
+      { point: [250, 201], line: "M270 369V323L250 201" },
+      { point: [620, 265], line: "M270 369V351H675V310L620 265" },
+    ],
   },
 };
 
@@ -85,14 +98,18 @@ export default function M4PartsMap({
             const point = locations[group.id];
             return (
               <g key={group.id} className={open === group.id ? "active" : ""}>
-                <path d={point.line} />
-                <circle cx={point.point[0]} cy={point.point[1]} r="5" />
-                <circle
-                  className="map-hotspot-ring"
-                  cx={point.point[0]}
-                  cy={point.point[1]}
-                  r="10"
-                />
+                {[point, ...(point.extra ?? [])].map((marker, index) => (
+                  <g key={index}>
+                    <path d={marker.line} />
+                    <circle cx={marker.point[0]} cy={marker.point[1]} r="5" />
+                    <circle
+                      className="map-hotspot-ring"
+                      cx={marker.point[0]}
+                      cy={marker.point[1]}
+                      r="10"
+                    />
+                  </g>
+                ))}
               </g>
             );
           })}

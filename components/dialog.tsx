@@ -18,7 +18,7 @@ export default function Dialog({
     const previous = document.activeElement as HTMLElement | null;
     const root = element.current!;
     const selector =
-      'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), [tabindex="0"]';
+      'button:not(:disabled), a[href], input:not(:disabled), textarea:not(:disabled), select:not(:disabled), [tabindex="0"]';
     root.querySelector<HTMLElement>(selector)?.focus();
     const key = (event: KeyboardEvent) => {
       if (event.key === "Escape") {

@@ -23,7 +23,7 @@ test("category shortcuts have unique IDs, valid search terms and supported edito
       );
       assert.equal(
         partCategory(category.id).layerCategory,
-        group.layerCategory,
+        category.layerCategory ?? group.layerCategory,
       );
     }
   }
@@ -36,10 +36,10 @@ test("optics and muzzle shortcuts search the requested subtype and preserve impo
     ["holographic", "ホロサイト", "光学機器", "光学機器"],
     ["suppressor", "サプレッサー", "マズル", "外装"],
     ["muzzle-brake", "マズルブレーキ", "マズル", "外装"],
-    ["foregrip", "フォアグリップ", "フォアグリップ", "グリップ"],
-    ["pistol-grip", "ピストルグリップ", "ピストルグリップ", "グリップ"],
-    ["bipod", "バイポッド", "バイポッド", "外装"],
-    ["laser-sight", "レーザーサイト", "レーザーサイト", "光学機器"],
+    ["foregrip", "フォアグリップ", "グリップ・バイポッド", "グリップ"],
+    ["pistol-grip", "ピストルグリップ", "グリップ・バイポッド", "グリップ"],
+    ["bipod", "バイポッド", "グリップ・バイポッド", "外装"],
+    ["laser-sight", "レーザーサイト", "ライト・レーザー", "光学機器"],
   ])
     assert.deepEqual(partCategory(id), {
       id,
