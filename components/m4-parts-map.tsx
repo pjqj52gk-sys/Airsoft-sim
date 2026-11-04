@@ -12,12 +12,18 @@ const locations: Record<
   lights: { x: 790, y: 80, point: [729, 201], line: "M790 101V142L729 201" },
   muzzle: { x: 900, y: 290, point: [892, 190], line: "M900 269V230L892 190" },
   handguards: {
-    x: 680,
-    y: 315,
+    x: 740,
+    y: 278,
     point: [638, 187],
-    line: "M680 294V250L638 187",
+    line: "M740 257V235L638 187",
   },
-  grips: { x: 300, y: 315, point: [362, 241], line: "M300 294V270L362 241" },
+  grips: { x: 660, y: 337, point: [620, 232], line: "M660 316V283L620 232" },
+  "pistol-grips": {
+    x: 300,
+    y: 315,
+    point: [362, 241],
+    line: "M300 294V270L362 241",
+  },
 };
 
 export default function M4PartsMap({
@@ -33,7 +39,6 @@ export default function M4PartsMap({
 }) {
   const partClass = (id: string) =>
     `map-part ${open === id ? "map-part-active" : ""}`;
-  const foregrip = open === "grips" && active !== "pistol-grip";
   return (
     <div className="m4-parts-map">
       <svg
@@ -63,9 +68,7 @@ export default function M4PartsMap({
               d="M328 194H481M442 178H477V189H442ZM337 178H363"
             />
             <circle className="map-cutout" cx="383" cy="191" r="5" />
-            <g
-              className={`map-part ${open === "grips" && !foregrip ? "map-part-active" : ""}`}
-            >
+            <g className={partClass("pistol-grips")}>
               <path d="M351 211H383L370 272L342 265Z" />
               <path
                 className="map-detail"
@@ -157,17 +160,16 @@ export default function M4PartsMap({
               )}
             </g>
           )}
-          {foregrip && (
-            <g className="map-accessory">
-              <path
-                d={
-                  active === "angled-grip" || active === "hand-stop"
-                    ? "M591 208H645L618 233H602Z"
-                    : "M610 207H632V260H610Z"
-                }
-              />
-            </g>
-          )}
+          <g className={open === "grips" ? "map-accessory" : "map-part"}>
+            <path
+              d={
+                open === "grips" &&
+                (active === "angled-grip" || active === "hand-stop")
+                  ? "M591 208H645L618 233H602Z"
+                  : "M610 207H632V260H610Z"
+              }
+            />
+          </g>
           {open === "lights" && (
             <g className="map-accessory">
               <path d="M705 196H748V212H705Z" />
@@ -177,9 +179,8 @@ export default function M4PartsMap({
           <g className="map-leaders">
             {partCategoryGroups.map((group) => {
               const point = locations[group.id];
-              const gripPoint = group.id === "grips" && foregrip;
-              const line = gripPoint ? "M300 294V279H620V232" : point.line;
-              const [x, y] = gripPoint ? [620, 232] : point.point;
+              const line = point.line;
+              const [x, y] = point.point;
               return (
                 <g key={group.id} className={open === group.id ? "active" : ""}>
                   <path d={line} />

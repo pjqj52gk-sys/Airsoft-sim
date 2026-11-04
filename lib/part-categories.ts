@@ -80,7 +80,7 @@ export const partCategoryGroups: PartCategoryGroup[] = [
   },
   {
     id: "grips",
-    label: "グリップ",
+    label: "フォアグリップ",
     layerCategory: "グリップ",
     children: [
       { id: "foregrip", label: "フォアグリップ", keyword: "フォアグリップ" },
@@ -89,12 +89,19 @@ export const partCategoryGroups: PartCategoryGroup[] = [
         label: "アングルグリップ",
         keyword: "アングルグリップ",
       },
+      { id: "hand-stop", label: "ハンドストップ", keyword: "ハンドストップ" },
+    ],
+  },
+  {
+    id: "pistol-grips",
+    label: "ピストルグリップ",
+    layerCategory: "グリップ",
+    children: [
       {
         id: "pistol-grip",
         label: "ピストルグリップ",
         keyword: "ピストルグリップ",
       },
-      { id: "hand-stop", label: "ハンドストップ", keyword: "ハンドストップ" },
     ],
   },
   {
