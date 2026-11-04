@@ -134,3 +134,70 @@ export function cylinderEndRatio(extent: number, radius: number) {
     throw new Error("端面の太さを確認してください。");
   return Math.max(0, Math.min(1, extent / radius));
 }
+
+export type CylinderEnd = "none" | "start" | "end" | "both";
+export function cylinderSideSurface(
+  guide: CylinderGuide,
+  lengthScale: number,
+  ellipseRatio: number,
+  exclude: CylinderEnd,
+) {
+  const geometry = cylinderGeometry(guide, lengthScale);
+  if (
+    !Number.isFinite(ellipseRatio) ||
+    ellipseRatio < 0 ||
+    ellipseRatio > 1 ||
+    !["none", "start", "end", "both"].includes(exclude)
+  )
+    throw new Error("除く端面と開きを確認してください。");
+  const startExtent =
+    exclude === "start" || exclude === "both"
+      ? guide.startRadius * ellipseRatio
+      : 0;
+  const endExtent =
+    exclude === "end" || exclude === "both"
+      ? guide.endRadius * ellipseRatio
+      : 0;
+  const safeExtent = (extent: number, radius: number) =>
+    extent > 0
+      ? extent + Math.min(1.5, radius * 0.1) + Math.min(1, extent * 0.1)
+      : 0;
+  if (
+    geometry.length -
+      safeExtent(startExtent, guide.startRadius) -
+      safeExtent(endExtent, guide.endRadius) <
+    4
+  )
+    throw new Error(
+      "側面が短すぎます。軸の両端を円の中心に合わせ、端面の開きを確認してください。",
+    );
+  const axis = {
+    x: (guide.end.x - guide.start.x) / geometry.length,
+    y: (guide.end.y - guide.start.y) / geometry.length,
+  };
+  // Follow the inward rim of each visible ellipse for every image row. The
+  // visible cap is an ellipse, so a rectangular crop would either leave its
+  // center behind or discard useful side pixels near the top and bottom.
+  const map = (u: number, v: number): Point => {
+    const t = 2 * v - 1;
+    // Include a small pixel margin around the cap to avoid its anti-aliased
+    // rim leaking into the side, including at the top and bottom of the image.
+    const inset = (extent: number, radius: number) => {
+      if (extent === 0) return 0;
+      const padding = Math.min(1.5, radius * 0.1);
+      const rim = Math.sqrt(
+        Math.max(0, 1 - ((radius * t) / (radius + padding)) ** 2),
+      );
+      return (extent + padding) * rim + Math.min(1, extent * 0.1);
+    };
+    const along =
+      inset(startExtent, guide.startRadius) * (1 - u) +
+      (geometry.length - inset(endExtent, guide.endRadius)) * u;
+    const radius = guide.startRadius * (1 - u) + guide.endRadius * u;
+    return {
+      x: guide.start.x + axis.x * along + geometry.normal.x * radius * t,
+      y: guide.start.y + axis.y * along + geometry.normal.y * radius * t,
+    };
+  };
+  return { ...geometry, map };
+}
