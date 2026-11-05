@@ -1,5 +1,6 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { canEditLink, protectLinkPatch, linkOrigin } from "@/lib/link-policy";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { mapConcurrent } from "@/lib/async-control";
@@ -11,6 +12,11 @@ import LoadingOverlay from "./loading-overlay";
 import type { EditMode } from "./image-editor";
 import Shelf from "./shelf";
 import PurchaseLink from "./purchase-link";
+import {
+  applyCollectionOwnership,
+  collectionInput,
+  collectionKey,
+} from "@/lib/collection";
 import useWishlist from "./use-wishlist";
 import ShoppingList from "./shopping-list";
 import { purchaseLink, monetization } from "@/lib/commerce";
@@ -43,7 +49,6 @@ import {
 import {
   readDraft,
   writeDraft,
-  savePart,
   saveBuild,
   readComparison,
   writeWorkspace,
@@ -61,7 +66,11 @@ const yen = (n: number) =>
   }).format(n);
 export default function Studio() {
   const wishlist = useWishlist();
-  const [project, setProject] = useState<Project>(emptyProject);
+  const [storedProject, setProject] = useState<Project>(emptyProject);
+  const project = useMemo(
+    () => applyCollectionOwnership(storedProject, wishlist.all),
+    [storedProject, wishlist.all],
+  );
   const [plans, setPlans] = useState<ComparisonPlans | null>(null);
   const [logoCleanup, setLogoCleanup] = useState(false);
   const [comparisonOpen, setComparisonOpen] = useState(false);
@@ -90,6 +99,9 @@ export default function Studio() {
   current.current = project;
   const [selected, setSelected] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
+  const [searchSource, setSearchSource] = useState<"rakuten" | "saved">(
+    "rakuten",
+  );
   const [search, setSearch] = useState<"parts" | "guns" | null>(null);
   const [addDialog, setAddDialog] = useState<"base" | "part" | null>(null);
   const [grid, setGrid] = useState(true);
@@ -105,13 +117,14 @@ export default function Studio() {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [ownershipSaving, setOwnershipSaving] = useState(false);
+  const [saveDialog, setSaveDialog] = useState(false);
   const [help, setHelp] = useState(false);
   const [clearDialog, setClearDialog] = useState(false);
   const [tolerance, setTolerance] = useState(28);
   const [editor, setEditor] = useState<EditMode | null>(null);
-  const [shelf, setShelf] = useState<"builds" | "parts" | "wishlist" | null>(
-    null,
-  );
+  const [shelf, setShelf] = useState<
+    "builds" | "parts" | "wishlist" | "owned" | null
+  >(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const projectInput = useRef<HTMLInputElement>(null);
   const dragStart = useRef<Project | null>(null);
@@ -129,7 +142,8 @@ export default function Studio() {
       !logoCleanup &&
       !addDialog &&
       !help &&
-      !clearDialog,
+      !clearDialog &&
+      !saveDialog,
     add: (files, target) => {
       void addFiles(files, target);
     },
@@ -208,31 +222,49 @@ export default function Studio() {
     setHistory((h) => ({ past: [...h.past.slice(-19), previous], future: [] }));
     setProject(next);
   }, []);
-  const update = (id: string, updates: Partial<Layer>) =>
+  const update = (id: string, updates: Partial<Layer>) => {
+    const target = project.layers.find((layer) => layer.id === id);
+    if (!target) return;
     commit({
       ...project,
-      layers: updateLayer(project.layers, id, updates),
+      layers: updateLayer(
+        project.layers,
+        id,
+        protectLinkPatch(target, updates),
+      ),
     });
+  };
   async function changeOwnership(id: string, owned: boolean) {
-    if (ownershipSaving) return;
-    const next = {
-      ...current.current,
-      layers: updateLayer(current.current.layers, id, { owned }),
-    };
-    commit(next);
+    const target = current.current.layers.find((layer) => layer.id === id);
+    if (!target) return;
     setOwnershipSaving(true);
-    setSaved("保存中…");
     try {
-      await writeWorkspace(next, plans ? capturePlan(plans, next) : null);
-      if (current.current === next) setSaved("このブラウザーに保存済み");
-    } catch {
-      notify(
-        "所有状況を保存できませんでした。JSON保存でバックアップしてください。",
-      );
+      if (!(await wishlist.setOwned(collectionInput(target), owned)))
+        notify("所有状況を保存できませんでした。");
     } finally {
       setOwnershipSaving(false);
     }
   }
+  const seeded = useRef(new Set<string>());
+  useEffect(() => {
+    if (!ready || !wishlist.ready || wishlist.pending) return;
+    const missing = project.layers.filter(
+      (layer) =>
+        !wishlist.get(collectionInput(layer)) &&
+        !seeded.current.has(collectionKey(collectionInput(layer))),
+    );
+    if (!missing.length) return;
+    for (const item of missing)
+      seeded.current.add(collectionKey(collectionInput(item)));
+    void wishlist.seed(missing);
+  }, [
+    ready,
+    project,
+    wishlist.ready,
+    wishlist.pending,
+    wishlist.get,
+    wishlist.seed,
+  ]);
   const undo = () => {
     if (!history.past.length) return;
     setProject(history.past[history.past.length - 1]);
@@ -270,6 +302,7 @@ export default function Studio() {
         target.closest("input, textarea, select, [contenteditable]") ||
         help ||
         clearDialog ||
+        saveDialog ||
         editor ||
         shelf ||
         search ||
@@ -350,6 +383,7 @@ export default function Studio() {
             attachedToBase: !base,
             price: 0,
             url: "",
+            linkOrigin: "upload",
             category: base ? "本体" : "その他",
           };
           return prepareAddedLayer(original, base, tolerance);
@@ -586,6 +620,7 @@ export default function Studio() {
       const part = reuse
         ? { ...original, attachedToBase: !isBase }
         : await prepareAddedLayer(original, isBase, tolerance);
+      await wishlist.register(collectionInput(part));
       commit({ ...project, layers: [...project.layers, part] });
       setSelected(part.id);
       setShelf(null);
@@ -598,6 +633,46 @@ export default function Studio() {
     } finally {
       setBusy(false);
     }
+  }
+  async function addSearchPart(part: Layer, reuse = false) {
+    if (part.category === "本体") {
+      const validated = await parseProject({
+        version: 2,
+        name: "base",
+        layers: [part],
+      });
+      const base = project.layers[0];
+      const original: Layer = {
+        ...validated.layers[0],
+        id: base?.id || uid(),
+        category: "本体",
+        x: base?.x ?? 120,
+        y: base?.y ?? 190,
+        mm: reuse ? part.mm : (base?.mm ?? 800),
+        rotation: base?.rotation ?? 0,
+        flip: base?.flip ?? false,
+        visible: true,
+        attachedToBase: false,
+      };
+      const replacement = reuse
+        ? original
+        : await prepareAddedLayer(original, true, tolerance);
+      await wishlist.register(collectionInput(replacement));
+      commit({
+        ...project,
+        layers: [replacement, ...project.layers.slice(1)],
+      });
+      setSelected(replacement.id);
+      setTab("layers");
+      notify(
+        base
+          ? "本体画像を入れ替えました。実寸を確認してください。"
+          : "本体画像を追加しました。",
+      );
+    } else if (!(await addStoredPart(part, reuse)))
+      throw new Error("追加できません。レイヤー数と画像を確認してください。");
+    setSearch(null);
+    setShelf(null);
   }
   const button = (
     name: string,
@@ -699,20 +774,12 @@ export default function Studio() {
             開く
           </button>
           <button
-            className="button secondary"
-            onClick={save}
+            className="button primary"
+            onClick={() => setSaveDialog(true)}
             disabled={!ready || busy}
           >
             <Icon name="download" />
             保存
-          </button>
-          <button
-            className="button primary"
-            onClick={png}
-            disabled={!project.layers.length || busy}
-          >
-            <Icon name="image" />
-            PNG書き出し
           </button>
         </div>
       </header>
@@ -1218,11 +1285,8 @@ export default function Studio() {
                   className="mini-button full-width"
                   onClick={async () => {
                     try {
-                      await savePart({
-                        id: layer.id,
-                        savedAt: Date.now(),
-                        layer: { ...layer },
-                      });
+                      if (!(await wishlist.register(collectionInput(layer))))
+                        throw Error();
                       notify(
                         "調整済みパーツを保存しました。「登録パーツ」から再利用できます。",
                       );
@@ -1261,22 +1325,30 @@ export default function Studio() {
                     value={layer.url}
                     placeholder="https://…"
                     maxLength={2000}
+                    readOnly={!canEditLink(layer)}
+                    aria-describedby={
+                      !canEditLink(layer) ? "product-url-origin" : undefined
+                    }
                     onChange={(e) => update(layer.id, { url: e.target.value })}
+                    onBlur={() => {
+                      if (canEditLink(layer))
+                        void wishlist.register(collectionInput(layer));
+                    }}
                   />
                 </label>
+                {!canEditLink(layer) && (
+                  <small id="product-url-origin" className="hint">
+                    {linkOrigin(layer) === "shared"
+                      ? "共有された商品リンク"
+                      : "検索から設定された商品リンク"}
+                    （編集不可）
+                  </small>
+                )}
                 <PurchaseLink url={layer.url} label={layer.name} />
                 <button
                   className="mini-button full-width"
                   disabled={!wishlist.ready || wishlist.pending}
-                  onClick={() =>
-                    void wishlist.toggle({
-                      name: layer.name,
-                      url: layer.url,
-                      price: layer.price,
-                      category: layer.category,
-                      image: layer.src,
-                    })
-                  }
+                  onClick={() => void wishlist.toggle(collectionInput(layer))}
                 >
                   {wishlist.has(layer)
                     ? "✓ ほしいものリストに追加済み"
@@ -1341,6 +1413,73 @@ export default function Studio() {
           AIRSOFT CUSTOM STUDIO <small>V0.5</small>
         </span>
       </footer>
+      {saveDialog && (
+        <Dialog
+          label="保存"
+          close={() => {
+            if (!busy) setSaveDialog(false);
+          }}
+        >
+          <div className="add-source-dialog">
+            <button
+              className="modal-close icon-button"
+              aria-label="閉じる"
+              disabled={busy}
+              onClick={() => setSaveDialog(false)}
+            >
+              <Icon name="close" />
+            </button>
+            <h2>保存</h2>
+            <div className="add-source-options">
+              <button
+                className="button secondary"
+                disabled={busy || !project.layers.length}
+                onClick={async () => {
+                  setBusy(true);
+                  try {
+                    await saveBuild({
+                      id: uid(),
+                      savedAt: Date.now(),
+                      project,
+                    });
+                    setSaveDialog(false);
+                    notify("ビルドをライブラリに保存しました。");
+                  } catch {
+                    notify("保存できませんでした。");
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              >
+                <Icon name="layers" />
+                ライブラリに保存
+              </button>
+              <button
+                className="button secondary"
+                disabled={busy}
+                onClick={() => {
+                  save();
+                  setSaveDialog(false);
+                }}
+              >
+                <Icon name="download" />
+                JSONで保存
+              </button>
+              <button
+                className="button secondary"
+                disabled={busy || !project.layers.length}
+                onClick={() => {
+                  setSaveDialog(false);
+                  void png();
+                }}
+              >
+                <Icon name="image" />
+                PNG画像を書き出し
+              </button>
+            </div>
+          </div>
+        </Dialog>
+      )}
       {addDialog && (
         <Dialog
           label={addDialog === "base" ? "本体を追加" : "パーツを追加"}
@@ -1359,6 +1498,7 @@ export default function Studio() {
               <button
                 className="button secondary"
                 onClick={() => {
+                  setSearchSource("rakuten");
                   setSearch(addDialog === "base" ? "guns" : "parts");
                   setAddDialog(null);
                 }}
@@ -1377,6 +1517,17 @@ export default function Studio() {
                 <Icon name="upload" />
                 自分の画像を使う
               </button>
+              <button
+                className="button secondary"
+                onClick={() => {
+                  setSearchSource("saved");
+                  setSearch(addDialog === "base" ? "guns" : "parts");
+                  setAddDialog(null);
+                }}
+              >
+                <Icon name="layers" />
+                登録済みから追加
+              </button>
             </div>
           </div>
         </Dialog>
@@ -1385,56 +1536,21 @@ export default function Studio() {
         <PartSearch
           wishlist={wishlist}
           initialScope={search}
+          initialSource={searchSource}
           close={() => setSearch(null)}
           attachLink={
-            layer
+            layer && canEditLink(layer)
               ? (url) => {
-                  update(layer.id, { url });
+                  update(layer.id, { url, linkOrigin: "search" });
+                  void wishlist.register(
+                    collectionInput({ ...layer, url, linkOrigin: "search" }),
+                  );
                   setSearch(null);
                   notify("購入リンクを設定しました。");
                 }
               : undefined
           }
-          add={async (part, reuse) => {
-            if (part.category === "本体") {
-              const validated = await parseProject({
-                version: 2,
-                name: "base",
-                layers: [part],
-              });
-              const base = project.layers[0];
-              const original: Layer = {
-                ...validated.layers[0],
-                id: base?.id || uid(),
-                category: "本体",
-                x: base?.x ?? 120,
-                y: base?.y ?? 190,
-                mm: base?.mm ?? 800,
-                rotation: base?.rotation ?? 0,
-                flip: base?.flip ?? false,
-                visible: true,
-                attachedToBase: false,
-              };
-              const replacement = reuse
-                ? original
-                : await prepareAddedLayer(original, true, tolerance);
-              commit({
-                ...project,
-                layers: [replacement, ...project.layers.slice(1)],
-              });
-              setSelected(replacement.id);
-              setTab("layers");
-              notify(
-                base
-                  ? "本体画像を入れ替えました。実寸を確認してください。"
-                  : "本体画像を追加しました。",
-              );
-            } else if (!(await addStoredPart(part, reuse)))
-              throw new Error(
-                "追加できません。レイヤー数と画像を確認してください。",
-              );
-            setSearch(null);
-          }}
+          add={addSearchPart}
         />
       )}
       {editor === "perspective" && layer && (
@@ -1461,7 +1577,7 @@ export default function Studio() {
           wishlist={wishlist}
           close={() => setShelf(null)}
           load={openBuild}
-          add={(part) => addStoredPart(part, true)}
+          add={addSearchPart}
         />
       )}
       {logoCleanup && layer && (

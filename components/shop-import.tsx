@@ -124,6 +124,7 @@ export default function ShopImport({
       attachedToBase: false,
       price: referenceCatalogPrice(official?.price),
       url: sourceLink,
+      linkOrigin: "search",
       category,
     });
   }
@@ -212,6 +213,7 @@ export default function ShopImport({
             item={{
               name,
               url: sourceLink,
+              linkOrigin: "search",
               price: referenceCatalogPrice(official?.price),
               category,
               image: photos[photo],

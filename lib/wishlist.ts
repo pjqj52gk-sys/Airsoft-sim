@@ -1,4 +1,6 @@
+import type { LinkOrigin } from "./link-policy";
 export type WishInput = {
+  linkOrigin?: LinkOrigin;
   name: string;
   url: string;
   price: number;

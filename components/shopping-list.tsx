@@ -2,6 +2,8 @@
 import { useState } from "react";
 import type { Project } from "@/lib/project";
 import { shoppingSummary } from "@/lib/shopping";
+import { collectionInput } from "@/lib/collection";
+import WishButton from "./wish-button";
 import PurchaseLink from "./purchase-link";
 import type { WishlistState } from "./use-wishlist";
 import "./shopping-list.css";
@@ -55,8 +57,19 @@ export default function ShoppingList({
         ))}
       </div>
       {items.map((layer) => (
-        <div className="shopping-entry" key={layer.id}>
+        <article
+          className="shopping-entry"
+          key={layer.id}
+          aria-label={layer.name}
+        >
           <div className="shopping-row">
+            <img
+              className="shopping-thumb"
+              src={layer.src}
+              alt=""
+              width={48}
+              height={42}
+            />
             <span>
               <PurchaseLink url={layer.url} label={layer.name} />
               <small>
@@ -67,21 +80,7 @@ export default function ShoppingList({
             <strong>{layer.price ? yen(layer.price) : "価格未登録"}</strong>
           </div>
           <div className="shopping-entry-actions">
-            <button
-              className={`mini-button ${wishlist.has(layer) ? "toggled" : ""}`}
-              disabled={disabled || !wishlist.ready || wishlist.pending}
-              onClick={() =>
-                void wishlist.toggle({
-                  name: layer.name,
-                  url: layer.url,
-                  price: layer.price,
-                  category: layer.category,
-                  image: layer.src,
-                })
-              }
-            >
-              {wishlist.has(layer) ? "✓ 追加済み" : "ほしいものリストに追加"}
-            </button>
+            <WishButton wishlist={wishlist} item={collectionInput(layer)} />
             <button
               className="text-button"
               aria-label={`編集：${layer.name}`}
@@ -92,6 +91,7 @@ export default function ShoppingList({
             <label>
               <input
                 type="checkbox"
+                aria-label={`所有済み：${layer.name}`}
                 checked={layer.owned === true}
                 disabled={disabled}
                 onChange={(e) => setOwned(layer.id, e.target.checked)}
@@ -99,7 +99,7 @@ export default function ShoppingList({
               所有済み
             </label>
           </div>
-        </div>
+        </article>
       ))}
       {!items.length && <p className="hint">該当するアイテムはありません。</p>}
       <p className="hint">

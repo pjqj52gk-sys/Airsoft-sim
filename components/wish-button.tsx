@@ -1,11 +1,11 @@
 "use client";
-import type { WishInput } from "@/lib/wishlist";
+import type { CollectionInput } from "@/lib/collection";
 import type { WishlistState } from "./use-wishlist";
 export default function WishButton({
   item,
   wishlist,
 }: {
-  item: WishInput;
+  item: CollectionInput;
   wishlist?: WishlistState;
 }) {
   if (!wishlist) return null;

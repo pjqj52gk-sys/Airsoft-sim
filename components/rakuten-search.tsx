@@ -1,6 +1,7 @@
 "use client";
 import WishButton from "./wish-button";
 import type { WishlistState } from "./use-wishlist";
+import { purchaseLink } from "@/lib/commerce";
 import PurchaseLink from "./purchase-link";
 import { useEffect, useRef, useState } from "react";
 import type { RakutenItem, RakutenResults } from "@/lib/rakuten";
@@ -246,6 +247,7 @@ export default function RakutenSearch({
         attachedToBase: false,
         price: selected.price,
         url: selected.url,
+        linkOrigin: "search",
         category: selectedLayerCategory,
       });
     } catch (e) {
@@ -453,6 +455,7 @@ export default function RakutenSearch({
             item={{
               name: selected.name,
               url: selected.url,
+              linkOrigin: "search",
               price: selected.price,
               category: selectedLayerCategory,
               image: images[photo],
@@ -559,10 +562,10 @@ export default function RakutenSearch({
                 return (
                   <article className="rakuten-card" key={item.id}>
                     <a
-                      href={item.url}
+                      href={purchaseLink(item.url)?.href}
                       target="_blank"
                       rel={
-                        item.sponsored
+                        purchaseLink(item.url)?.sponsored
                           ? "sponsored noopener noreferrer"
                           : "noopener noreferrer"
                       }
@@ -582,6 +585,7 @@ export default function RakutenSearch({
                       item={{
                         name: item.name,
                         url: item.url,
+                        linkOrigin: "search",
                         price: item.price,
                         category:
                           submitted.scope === "guns" ? "本体" : "その他",

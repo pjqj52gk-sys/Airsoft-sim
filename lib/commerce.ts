@@ -1,5 +1,6 @@
+import { rakutenPurchasePath } from "./rakuten-affiliate.ts";
 // Public affiliate identifiers only. Set the operator's approved ID before enabling.
-export const monetization = { amazonAssociateTag: "" };
+export const monetization = { amazonAssociateTag: "airsoftsimafi-22" };
 export function amazonStore(input: string) {
   try {
     return /(?:^|\.)(?:amazon\.(?:co\.jp|com|co\.uk|de|fr|it|es|ca|com\.au|in|ae|com\.br|com\.mx|nl|se|pl|sg|com\.be|com\.tr|sa|eg|ie)|amzn\.to)$/.test(
@@ -31,6 +32,8 @@ export function purchaseLink(
       url.password
     )
       return null;
+    const rakuten = rakutenPurchasePath(url.href);
+    if (rakuten) return { href: rakuten, sponsored: true };
     const asin = url.pathname
       .match(/\/(?:dp|gp\/product|gp\/aw\/d)\/([A-Z0-9]{10})(?:\/|$)/i)?.[1]
       ?.toUpperCase();

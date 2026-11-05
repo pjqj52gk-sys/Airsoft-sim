@@ -1,6 +1,9 @@
+import type { LinkOrigin } from "./link-policy";
 import { mapConcurrent } from "./async-control.ts";
 import type { ReferenceLengthOption } from "./product-specs.ts";
 export type Layer = {
+  libraryId?: string;
+  linkOrigin?: LinkOrigin;
   id: string;
   name: string;
   src: string;
@@ -185,6 +188,15 @@ export async function parseProject(value: unknown): Promise<Project> {
       attachedToBase: index > 0 && row.attachedToBase === true,
       price: number(row.price, 0, 0, 10000000),
       owned: row.owned === true,
+      linkOrigin: ["search", "upload", "shared"].includes(
+        String(row.linkOrigin),
+      )
+        ? (row.linkOrigin as LinkOrigin)
+        : undefined,
+      libraryId:
+        typeof row.libraryId === "string"
+          ? row.libraryId.slice(0, 2100)
+          : undefined,
       url: typeof row.url === "string" ? row.url.slice(0, 2000) : "",
       category:
         typeof row.category === "string"

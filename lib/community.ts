@@ -130,6 +130,7 @@ export function validateSubmission(value: unknown): CommunitySubmission {
         attachedToBase: index > 0 && l.attachedToBase === true,
         price: Math.round(finite(l.price, 0, 10_000_000)),
         url: link(l.url),
+        linkOrigin: "shared",
         category: text(l.category, 30),
       };
     });

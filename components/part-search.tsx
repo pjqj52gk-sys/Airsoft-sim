@@ -1,7 +1,8 @@
 "use client";
+import CollectionPanel from "./collection-panel";
 import WishButton from "./wish-button";
 import type { WishlistState } from "./use-wishlist";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import PurchaseLink from "./purchase-link";
 import Dialog from "./dialog";
 import ShopImport from "./shop-import";
@@ -12,13 +13,11 @@ import catalogData from "@/lib/parts-catalog.json";
 import type { CatalogProduct } from "@/lib/catalog-match";
 import { referenceCatalogPrice, catalogPriceLabel } from "@/lib/catalog-price";
 import {
-  matchesPart,
   matchesSearchText,
   normalizeSearch,
   searchTerms,
 } from "@/lib/part-search";
 import { catalogImageUrl } from "@/lib/catalog-image";
-import { listParts, type StoredPart } from "@/lib/storage";
 import { readImage, uid, type Layer } from "@/lib/project";
 import {
   referenceLengthOptions,
@@ -45,38 +44,26 @@ export default function PartSearch({
   attachLink,
   wishlist,
   initialScope = "parts",
+  initialSource = "rakuten",
 }: {
   close: () => void;
   add: (part: Layer, reuse?: boolean) => Promise<void>;
   attachLink?: (url: string) => void;
-  wishlist?: WishlistState;
+  wishlist: WishlistState;
   initialScope?: "parts" | "guns";
+  initialSource?: "rakuten" | "saved";
 }) {
   const [visibleCount, setVisibleCount] = useState(48);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
   const [manufacturer, setManufacturer] = useState("");
-  const [source, setSource] = useState("rakuten");
+  const [source, setSource] = useState(initialSource as string);
   const [dimensionOnly, setDimensionOnly] = useState(false);
-  const [saved, setSaved] = useState<StoredPart[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [photos, setPhotos] = useState<Record<string, number>>({});
   const [expanded, setExpanded] = useState<string | null>(null);
   const [imageSizes, setImageSizes] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
-  useEffect(() => {
-    let cancelled = false;
-    listParts()
-      .then((rows) => {
-        if (!cancelled) setSaved(rows.sort((a, b) => b.savedAt - a.savedAt));
-      })
-      .catch(() => {
-        if (!cancelled) setError("登録パーツを読み込めません。");
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
   const terms = useMemo(() => searchTerms(query), [query]);
   const results = useMemo(
     () =>
@@ -89,16 +76,6 @@ export default function PartSearch({
           matchesSearchText(searchableCatalog[index], terms),
       ),
     [category, manufacturer, dimensionOnly, initialScope, terms],
-  );
-  const stored = useMemo(
-    () =>
-      saved.filter(
-        (p) =>
-          (initialScope !== "guns" || p.layer.category === "本体") &&
-          (!category || p.layer.category === category) &&
-          matchesPart(query, [p.layer.name, p.layer.category]),
-      ),
-    [saved, category, query, initialScope],
   );
   async function importPart(item: (typeof catalog)[number]) {
     setBusy(item.id);
@@ -139,6 +116,7 @@ export default function PartSearch({
         attachedToBase: false,
         price: referenceCatalogPrice(item.price),
         url: item.url,
+        linkOrigin: "search",
         category: item.category,
       });
     } catch (e) {
@@ -214,6 +192,8 @@ export default function PartSearch({
           attachLink={attachLink}
           onBusy={(value) => setBusy(value ? "rakuten" : null)}
         />
+      ) : source === "saved" ? (
+        <CollectionPanel collection={wishlist} scope={initialScope} add={add} />
       ) : source === "shop" ? (
         <ShopImport
           wishlist={wishlist}
@@ -293,173 +273,128 @@ export default function PartSearch({
             </p>
           )}
           <p className="search-count" aria-live="polite">
-            {source === "catalog" ? results.length : stored.length}件
+            {results.length}件
           </p>
           <div className="shelf-grid search-results">
-            {source === "catalog"
-              ? results.slice(0, visibleCount).map((p) => (
-                  <article
-                    className={`shelf-card ${expanded === p.id ? "photo-expanded-card" : ""}`}
-                    key={p.id}
-                  >
+            {results.slice(0, visibleCount).map((p) => (
+              <article
+                className={`shelf-card ${expanded === p.id ? "photo-expanded-card" : ""}`}
+                key={p.id}
+              >
+                <button
+                  className={`shelf-part-image catalog-photo ${expanded === p.id ? "expanded" : ""}`}
+                  disabled={!!busy || !p.images.length}
+                  aria-label={`${p.name}の写真を${expanded === p.id ? "縮小" : "拡大"}`}
+                  aria-expanded={expanded === p.id}
+                  onClick={() => setExpanded(expanded === p.id ? null : p.id)}
+                >
+                  <img
+                    key={photos[p.id] || 0}
+                    loading="lazy"
+                    src={catalogImageUrl(p, photos[p.id] || 0)}
+                    alt={p.name}
+                    onLoad={(e) => {
+                      const img = e.currentTarget;
+                      img.parentElement!.removeAttribute("data-error");
+                      const key = catalogImageUrl(p, photos[p.id] || 0),
+                        size = `${img.naturalWidth} × ${img.naturalHeight} px`;
+                      setImageSizes((prev) =>
+                        prev[key] === size ? prev : { ...prev, [key]: size },
+                      );
+                    }}
+                    onError={(e) => {
+                      e.currentTarget.parentElement!.setAttribute(
+                        "data-error",
+                        "画像を取得できません",
+                      );
+                    }}
+                  />
+                  <span className="photo-expand-label">
+                    {expanded === p.id ? "縮小" : "拡大"}
+                  </span>
+                </button>
+                <p className="photo-resolution">
+                  {imageSizes[catalogImageUrl(p, photos[p.id] || 0)] || ""}
+                </p>
+                {p.images.length > 1 && (
+                  <div className="photo-controls">
                     <button
-                      className={`shelf-part-image catalog-photo ${expanded === p.id ? "expanded" : ""}`}
-                      disabled={!!busy || !p.images.length}
-                      aria-label={`${p.name}の写真を${expanded === p.id ? "縮小" : "拡大"}`}
-                      aria-expanded={expanded === p.id}
+                      aria-label={`${p.name}の前の写真`}
+                      disabled={!!busy}
                       onClick={() =>
-                        setExpanded(expanded === p.id ? null : p.id)
+                        setPhotos({
+                          ...photos,
+                          [p.id]:
+                            ((photos[p.id] || 0) + p.images.length - 1) %
+                            p.images.length,
+                        })
                       }
                     >
-                      <img
-                        key={photos[p.id] || 0}
-                        loading="lazy"
-                        src={catalogImageUrl(p, photos[p.id] || 0)}
-                        alt={p.name}
-                        onLoad={(e) => {
-                          const img = e.currentTarget;
-                          img.parentElement!.removeAttribute("data-error");
-                          const key = catalogImageUrl(p, photos[p.id] || 0),
-                            size = `${img.naturalWidth} × ${img.naturalHeight} px`;
-                          setImageSizes((prev) =>
-                            prev[key] === size
-                              ? prev
-                              : { ...prev, [key]: size },
-                          );
-                        }}
-                        onError={(e) => {
-                          e.currentTarget.parentElement!.setAttribute(
-                            "data-error",
-                            "画像を取得できません",
-                          );
-                        }}
-                      />
-                      <span className="photo-expand-label">
-                        {expanded === p.id ? "縮小" : "拡大"}
-                      </span>
+                      ‹
                     </button>
-                    <p className="photo-resolution">
-                      {imageSizes[catalogImageUrl(p, photos[p.id] || 0)] || ""}
-                    </p>
-                    {p.images.length > 1 && (
-                      <div className="photo-controls">
-                        <button
-                          aria-label={`${p.name}の前の写真`}
-                          disabled={!!busy}
-                          onClick={() =>
-                            setPhotos({
-                              ...photos,
-                              [p.id]:
-                                ((photos[p.id] || 0) + p.images.length - 1) %
-                                p.images.length,
-                            })
-                          }
-                        >
-                          ‹
-                        </button>
-                        <span>
-                          写真 {(photos[p.id] || 0) + 1} / {p.images.length}
-                        </span>
-                        <button
-                          aria-label={`${p.name}の次の写真`}
-                          disabled={!!busy}
-                          onClick={() =>
-                            setPhotos({
-                              ...photos,
-                              [p.id]:
-                                ((photos[p.id] || 0) + 1) % p.images.length,
-                            })
-                          }
-                        >
-                          ›
-                        </button>
-                      </div>
-                    )}
-                    <small>
-                      {p.manufacturer} · {p.category}
-                    </small>
-                    <h3>
-                      <PurchaseLink url={p.url} label={p.name} />
-                    </h3>
-                    <p
-                      className="hint"
-                      title={`公式掲載価格・${p.checkedAt}確認`}
-                    >
-                      {p.price ? catalogPriceLabel(p.price) : "価格未掲載"}
-                    </p>
-                    <dl className="part-dimensions">
-                      {p.dimensions.length ? (
-                        p.dimensions.map((d, i) => (
-                          <div key={`${d.label}-${i}`}>
-                            <dt>{d.label}</dt>
-                            <dd>{d.value}</dd>
-                          </div>
-                        ))
-                      ) : (
-                        <div>
-                          <dt>寸法</dt>
-                          <dd>公式ページに未掲載</dd>
-                        </div>
-                      )}
-                    </dl>
-                    <WishButton
-                      wishlist={wishlist}
-                      item={{
-                        name: p.name,
-                        url: p.url,
-                        price: referenceCatalogPrice(p.price),
-                        category: p.category,
-                        image: catalogImageUrl(p),
-                      }}
-                    />
-                    <div className="shelf-card-actions">
-                      <button
-                        className="mini-button toggled"
-                        disabled={!!busy || !p.images.length}
-                        onClick={() => void importPart(p)}
-                      >
-                        {busy === p.id ? "読み込み中…" : "この写真を追加"}
-                      </button>
-                    </div>
-                  </article>
-                ))
-              : stored.map((p) => (
-                  <article className="shelf-card" key={p.id}>
-                    <div className="shelf-part-image">
-                      <img src={p.layer.src} alt={p.layer.name} />
-                    </div>
-                    <h3>
-                      <PurchaseLink url={p.layer.url} label={p.layer.name} />
-                    </h3>
-                    <dl className="part-dimensions">
-                      <div>
-                        <dt>画像横幅</dt>
-                        <dd>{p.layer.mm} mm</dd>
-                      </div>
-                    </dl>
+                    <span>
+                      写真 {(photos[p.id] || 0) + 1} / {p.images.length}
+                    </span>
                     <button
-                      className="mini-button toggled"
+                      aria-label={`${p.name}の次の写真`}
                       disabled={!!busy}
-                      onClick={async () => {
-                        setBusy(p.id);
-                        setError("");
-                        try {
-                          await add(p.layer, true);
-                        } catch (e) {
-                          setError(
-                            e instanceof Error
-                              ? e.message
-                              : "追加できませんでした。",
-                          );
-                        } finally {
-                          setBusy(null);
-                        }
-                      }}
+                      onClick={() =>
+                        setPhotos({
+                          ...photos,
+                          [p.id]: ((photos[p.id] || 0) + 1) % p.images.length,
+                        })
+                      }
                     >
-                      追加
+                      ›
                     </button>
-                  </article>
-                ))}
+                  </div>
+                )}
+                <small>
+                  {p.manufacturer} · {p.category}
+                </small>
+                <h3>
+                  <PurchaseLink url={p.url} label={p.name} />
+                </h3>
+                <p className="hint" title={`公式掲載価格・${p.checkedAt}確認`}>
+                  {p.price ? catalogPriceLabel(p.price) : "価格未掲載"}
+                </p>
+                <dl className="part-dimensions">
+                  {p.dimensions.length ? (
+                    p.dimensions.map((d, i) => (
+                      <div key={`${d.label}-${i}`}>
+                        <dt>{d.label}</dt>
+                        <dd>{d.value}</dd>
+                      </div>
+                    ))
+                  ) : (
+                    <div>
+                      <dt>寸法</dt>
+                      <dd>公式ページに未掲載</dd>
+                    </div>
+                  )}
+                </dl>
+                <WishButton
+                  wishlist={wishlist}
+                  item={{
+                    name: p.name,
+                    url: p.url,
+                    linkOrigin: "search",
+                    price: referenceCatalogPrice(p.price),
+                    category: p.category,
+                    image: catalogImageUrl(p),
+                  }}
+                />
+                <div className="shelf-card-actions">
+                  <button
+                    className="mini-button toggled"
+                    disabled={!!busy || !p.images.length}
+                    onClick={() => void importPart(p)}
+                  >
+                    {busy === p.id ? "読み込み中…" : "この写真を追加"}
+                  </button>
+                </div>
+              </article>
+            ))}
           </div>
           {source === "catalog" && visibleCount < results.length && (
             <button
@@ -471,7 +406,7 @@ export default function PartSearch({
               {results.length}件）
             </button>
           )}
-          {(source === "catalog" ? results.length : stored.length) === 0 && (
+          {results.length === 0 && (
             <p className="shelf-empty">該当するパーツがありません</p>
           )}
           {source === "catalog" && (

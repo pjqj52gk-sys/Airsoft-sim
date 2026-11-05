@@ -12,6 +12,10 @@ export function shoppingSummary(project: Project) {
 export function copyCommunityShoppingPlan(project: Project): Project {
   return {
     ...project,
-    layers: project.layers.map((layer) => ({ ...layer, owned: false })),
+    layers: project.layers.map((layer) => ({
+      ...layer,
+      owned: false,
+      linkOrigin: "shared",
+    })),
   };
 }
