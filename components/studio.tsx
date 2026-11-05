@@ -942,7 +942,6 @@ export default function Studio() {
                 wishlist={wishlist}
                 openWishlist={() => setShelf("wishlist")}
                 project={project}
-                select={setSelected}
                 setOwned={changeOwnership}
                 disabled={!ready || busy || ownershipSaving}
               />

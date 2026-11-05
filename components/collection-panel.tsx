@@ -74,6 +74,9 @@ export default function CollectionPanel({
             key={item.id}
             aria-label={item.name}
           >
+            <h3>
+              <PurchaseLink url={item.url} label={item.name} />
+            </h3>
             <div className="shelf-part-image">
               {item.image ? (
                 <img src={item.image} alt={item.name} loading="lazy" />
@@ -81,15 +84,13 @@ export default function CollectionPanel({
                 <span>画像未登録</span>
               )}
             </div>
-            <h3>
-              <PurchaseLink url={item.url} label={item.name} />
-            </h3>
             <p>
               {item.category}
               {item.layer ? ` · ${item.layer.mm.toFixed(1)} mm` : ""}
             </p>
             <strong>¥{item.price.toLocaleString("ja-JP")}</strong>
             <div className="collection-status">
+              <WishButton item={item} wishlist={collection} />
               <label>
                 <input
                   type="checkbox"
@@ -101,7 +102,6 @@ export default function CollectionPanel({
                 />
                 所有済み
               </label>
-              <WishButton item={item} wishlist={collection} />
             </div>
             <button
               className="mini-button toggled"

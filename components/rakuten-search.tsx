@@ -39,9 +39,14 @@ export default function RakutenSearch({
   add: (layer: Layer) => Promise<void>;
   onBusy: (busy: boolean) => void;
   initialScope?: "parts" | "guns";
-  provider?: "rakuten" | "yahoo";
+  provider?: "rakuten" | "yahoo" | "all";
 }) {
-  const marketName = provider === "yahoo" ? "Yahoo!ショッピング" : "楽天";
+  const marketName =
+    provider === "all"
+      ? "ECサイト"
+      : provider === "yahoo"
+        ? "Yahoo!ショッピング"
+        : "楽天";
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("standard");
   const [scope, setScope] = useState<string>(initialScope);
@@ -275,13 +280,51 @@ export default function RakutenSearch({
     setError("");
     setResult(null);
     try {
-      const response = await fetch(
-        `/api/${provider}/search?${new URLSearchParams({ q: keyword, sort: order, page: String(page), category, scope: searchScope })}`,
-        { signal: current.signal },
+      const providers = provider === "all" ? ["rakuten", "yahoo"] : [provider];
+      const responses = await Promise.allSettled(
+        providers.map(async (market) => {
+          const response = await fetch(
+            `/api/${market}/search?${new URLSearchParams({ q: keyword, sort: order, page: String(page), category, scope: searchScope })}`,
+            { signal: current.signal },
+          );
+          const data = await response.json();
+          if (!response.ok)
+            throw new Error(
+              `${market === "yahoo" ? "Yahoo!ショッピング" : "楽天市場"}：${data.error || "検索できませんでした。"}`,
+            );
+          return data as RakutenResults;
+        }),
       );
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "検索できませんでした。");
-      setResult(data);
+      if (current.signal.aborted) return;
+      const successes = responses.flatMap((response) =>
+        response.status === "fulfilled" ? [response.value] : [],
+      );
+      const failures = responses.flatMap((response) =>
+        response.status === "rejected"
+          ? [
+              response.reason instanceof Error
+                ? response.reason.message
+                : "検索できませんでした。",
+            ]
+          : [],
+      );
+      if (!successes.length) throw new Error(failures.join(" / "));
+      const items = Array.from(
+        { length: Math.max(...successes.map((data) => data.items.length)) },
+        (_, index) =>
+          successes.flatMap((data) =>
+            data.items[index] ? [data.items[index]] : [],
+          ),
+      ).flat();
+      if (order === "+itemPrice") items.sort((a, b) => a.price - b.price);
+      else if (order === "-itemPrice") items.sort((a, b) => b.price - a.price);
+      setResult({
+        items,
+        count: successes.reduce((total, data) => total + data.count, 0),
+        page,
+        pageCount: Math.max(...successes.map((data) => data.pageCount)),
+      });
+      setError(failures.join(" / "));
       setSubmitted({
         query: keyword,
         sort: order,
@@ -634,7 +677,12 @@ export default function RakutenSearch({
                           （{marketName}）
                         </small>
                       )}
-                    <small>{item.shop}</small>
+                    <small>
+                      {item.productUrl.includes("shopping.yahoo.co.jp")
+                        ? "Yahoo!ショッピング"
+                        : "楽天市場"}{" "}
+                      · {item.shop}
+                    </small>
                     <strong>¥{item.price.toLocaleString()}</strong>
 
                     {attachLink && (
@@ -689,13 +737,14 @@ export default function RakutenSearch({
           )}
         </>
       )}
-      {provider === "yahoo" ? (
+      {provider === "yahoo" || provider === "all" ? (
         <span style={{ margin: "15px 15px 15px 15px" }}>
           <a href="https://developer.yahoo.co.jp/sitemap/">
             Webサービス by Yahoo! JAPAN
           </a>
         </span>
-      ) : (
+      ) : null}
+      {provider !== "yahoo" && (
         <p className="rakuten-credit">
           <a href="https://developers.rakuten.com/" target="_blank">
             Supported by Rakuten Developers

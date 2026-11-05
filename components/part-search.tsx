@@ -143,60 +143,44 @@ export default function PartSearch({
       </button>
       <h2>{initialScope === "guns" ? "本体を検索" : "パーツ検索"}</h2>
       {wishlist?.error && <p role="alert">{wishlist.error}</p>}
-      <div className="shelf-tabs" role="tablist" aria-label="検索対象">
-        <button
-          role="tab"
-          aria-selected={source === "rakuten"}
-          className={`mini-button ${source === "rakuten" ? "toggled" : ""}`}
-          disabled={!!busy}
-          onClick={() => setSource("rakuten")}
-        >
-          楽天市場
-        </button>
-        <button
-          role="tab"
-          aria-selected={source === "yahoo"}
-          className={`mini-button ${source === "yahoo" ? "toggled" : ""}`}
-          disabled={!!busy}
-          onClick={() => setSource("yahoo")}
-        >
-          Yahoo!ショッピング
-        </button>
-        <button
-          role="tab"
-          disabled={!!busy}
-          aria-selected={source === "catalog"}
-          className={`mini-button ${source === "catalog" ? "toggled" : ""}`}
-          onClick={() => setSource("catalog")}
-        >
-          公式カタログ
-        </button>
-        <button
-          role="tab"
-          disabled={!!busy}
-          aria-selected={source === "saved"}
-          className={`mini-button ${source === "saved" ? "toggled" : ""}`}
-          onClick={() => setSource("saved")}
-        >
-          登録パーツ
-        </button>
-        <button
-          role="tab"
-          aria-selected={source === "shop"}
-          className={`mini-button ${source === "shop" ? "toggled" : ""}`}
-          disabled={!!busy}
-          onClick={() => {
-            setSource("shop");
-            setError("");
-          }}
-        >
-          商品URLから追加
-        </button>
-      </div>
+      {initialSource !== "saved" && (
+        <div className="shelf-tabs" role="tablist" aria-label="検索対象">
+          <button
+            role="tab"
+            aria-selected={source === "rakuten"}
+            className={`mini-button ${source === "rakuten" ? "toggled" : ""}`}
+            disabled={!!busy}
+            onClick={() => setSource("rakuten")}
+          >
+            ECサイト
+          </button>
+          <button
+            role="tab"
+            disabled={!!busy}
+            aria-selected={source === "catalog"}
+            className={`mini-button ${source === "catalog" ? "toggled" : ""}`}
+            onClick={() => setSource("catalog")}
+          >
+            公式カタログ
+          </button>
+          <button
+            role="tab"
+            aria-selected={source === "shop"}
+            className={`mini-button ${source === "shop" ? "toggled" : ""}`}
+            disabled={!!busy}
+            onClick={() => {
+              setSource("shop");
+              setError("");
+            }}
+          >
+            商品URLから追加
+          </button>
+        </div>
+      )}
       {source === "rakuten" || source === "yahoo" ? (
         <RakutenSearch
           key={source}
-          provider={source as "rakuten" | "yahoo"}
+          provider="all"
           wishlist={wishlist}
           initialScope={initialScope}
           add={add}

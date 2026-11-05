@@ -10,14 +10,12 @@ import "./shopping-list.css";
 const yen = (value: number) => `¥${value.toLocaleString("ja-JP")}`;
 export default function ShoppingList({
   project,
-  select,
   setOwned,
   disabled,
   wishlist,
   openWishlist,
 }: {
   project: Project;
-  select: (id: string) => void;
   setOwned: (id: string, owned: boolean) => void;
   disabled: boolean;
   wishlist: WishlistState;
@@ -62,32 +60,22 @@ export default function ShoppingList({
           key={layer.id}
           aria-label={layer.name}
         >
-          <div className="shopping-row">
-            <img
-              className="shopping-thumb"
-              src={layer.src}
-              alt=""
-              width={48}
-              height={42}
-            />
-            <span>
-              <PurchaseLink url={layer.url} label={layer.name} />
-              <small>
-                {layer.category}
-                {!layer.visible ? " · 非表示" : ""}
-              </small>
-            </span>
-            <strong>{layer.price ? yen(layer.price) : "価格未登録"}</strong>
-          </div>
+          <h3>
+            <PurchaseLink url={layer.url} label={layer.name} />
+          </h3>
+          <img
+            className="shopping-thumb"
+            src={layer.src}
+            alt={layer.name}
+            loading="lazy"
+          />
+          <strong>{layer.price ? yen(layer.price) : "価格未登録"}</strong>
+          <small>
+            {layer.category}
+            {!layer.visible ? " · 非表示" : ""}
+          </small>
           <div className="shopping-entry-actions">
             <WishButton wishlist={wishlist} item={collectionInput(layer)} />
-            <button
-              className="text-button"
-              aria-label={`編集：${layer.name}`}
-              onClick={() => select(layer.id)}
-            >
-              編集
-            </button>
             <label>
               <input
                 type="checkbox"
