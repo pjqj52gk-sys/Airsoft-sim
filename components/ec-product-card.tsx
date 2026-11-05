@@ -40,12 +40,12 @@ export default function EcProductCard({
   };
   return (
     <article className="rakuten-card ec-product-card" aria-label={product.name}>
-      <h3>
+      <h3 title={product.name}>
         <PurchaseLink url={item.url} label={product.name} />
       </h3>
-      {!!product.official?.modelNumbers?.length && (
-        <small>{product.official.modelNumbers.join(" / ")}</small>
-      )}
+      <small className="ec-model">
+        {product.official?.modelNumbers?.join(" / ") || "\u00a0"}
+      </small>
       <img
         src={image}
         alt={product.name}
@@ -77,40 +77,48 @@ export default function EcProductCard({
           </label>
         ))}
       </fieldset>
-      <WishButton wishlist={wishlist} item={input} />
-      {wishlist && (
-        <label className="ec-owned">
-          <input
-            type="checkbox"
-            checked={wishlist.get(input)?.owned === true}
-            disabled={!wishlist.ready || wishlist.pending}
-            onChange={(event) =>
-              void wishlist.setOwned(input, event.target.checked)
-            }
-          />
-          所有済み
-        </label>
-      )}
+      <div className="ec-wish-slot">
+        <WishButton wishlist={wishlist} item={input} />
+      </div>
+      <div className="ec-owned-slot">
+        {wishlist && (
+          <label className="ec-owned">
+            <input
+              type="checkbox"
+              checked={wishlist.get(input)?.owned === true}
+              disabled={!wishlist.ready || wishlist.pending}
+              onChange={(event) =>
+                void wishlist.setOwned(input, event.target.checked)
+              }
+            />
+            所有済み
+          </label>
+        )}
+      </div>
       <button className="button primary" onClick={() => choose(item)}>
         画像を選んで追加
       </button>
-      {product.official && (
-        <small>
-          公式データあり
-          {product.official.dimensions
-            .map((d) => " · " + d.label + " " + d.value)
-            .join("")}
-        </small>
-      )}
+      <small className="ec-specs">
+        {product.official && (
+          <>
+            公式データあり
+            {product.official.dimensions
+              .map((d) => " · " + d.label + " " + d.value)
+              .join("")}
+          </>
+        )}
+      </small>
       <details className="ec-original-title">
         <summary>正式な商品名</summary>
         <PurchaseLink url={item.url} label={item.name} />
       </details>
-      {attachLink && (
-        <button className="mini-button" onClick={() => attachLink(item.url)}>
-          選択中のパーツにリンクのみ設定
-        </button>
-      )}
+      <div className="ec-link-slot">
+        {attachLink && (
+          <button className="mini-button" onClick={() => attachLink(item.url)}>
+            選択中のパーツにリンクのみ設定
+          </button>
+        )}
+      </div>
     </article>
   );
 }

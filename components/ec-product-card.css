@@ -66,3 +66,35 @@
   max-height: 220px;
   overflow-y: auto;
 }
+
+/* Keep every card's twelve content slots aligned across its grid row. */
+.rakuten-card.ec-product-card {
+  display: grid;
+  grid-template-rows: 4.8em 1.6em 150px auto auto 220px auto auto auto 3.2em auto auto;
+  align-items: start;
+  min-width: 0;
+}
+.ec-product-card h3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: clip;
+}
+.ec-model,
+.ec-specs {
+  min-height: 1em;
+}
+.ec-wish-slot > button,
+.ec-link-slot > button {
+  width: 100%;
+}
+.ec-product-card .ec-offers {
+  width: 100%;
+  box-sizing: border-box;
+}
+@supports (grid-template-rows: subgrid) {
+  .rakuten-card.ec-product-card {
+    grid-template-rows: subgrid;
+    grid-row: span 12;
+  }
+}
