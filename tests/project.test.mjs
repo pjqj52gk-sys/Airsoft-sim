@@ -109,7 +109,7 @@ test("invalid numbers are normalized and an empty project can be restored", asyn
   assert.equal(result.layers[0].price, 0);
   assert.deepEqual((await parseProject({ version: 2, layers: [] })).layers, []);
 });
-test("background removal preserves an enclosed matching-color region", async () => {
+test("background removal also clears an enclosed matching-color region", async () => {
   globalThis.Image = class {
     naturalWidth = 5;
     naturalHeight = 5;
@@ -139,7 +139,7 @@ test("background removal preserves an enclosed matching-color region", async () 
   };
   await removeBackground(png, 0);
   assert.equal(result[3], 0); // Outer background is transparent.
-  assert.equal(result[(2 * 5 + 2) * 4 + 3], 255); // Enclosed white detail is preserved.
+  assert.equal(result[(2 * 5 + 2) * 4 + 3], 0); // Enclosed background is transparent.
   assert.equal(result[(1 * 5 + 1) * 4 + 3], 255); // Object boundary is preserved.
 });
 

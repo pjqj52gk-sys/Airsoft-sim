@@ -102,9 +102,7 @@ test("adding an image automatically removes its background and detached margin l
       offsetY: 25,
     });
     const output = images.get(result.src);
-    assert.ok(
-      output.data.every((value, index) => index % 4 !== 3 || value === 255),
-    );
+    assert.equal(output.data[3], 255); // The product remains opaque.
     assert.deepEqual(
       [
         ...output.data.slice(
@@ -112,7 +110,7 @@ test("adding an image automatically removes its background and detached margin l
           ((40 - 25) * 70 + 55 - 30) * 4 + 4,
         ),
       ],
-      [255, 255, 255, 255],
+      [255, 255, 255, 0],
     );
     assert.equal(restoreLayerImage(result).src, src);
     assert.equal(restoreLayerImage(result).mm, 150);

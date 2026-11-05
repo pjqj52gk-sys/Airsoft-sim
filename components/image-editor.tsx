@@ -154,7 +154,7 @@ export default function ImageEditor({
                 ? layer.referenceOptions?.length
                   ? "取得した寸法を選び、画像上の対応する2点を選択してください。"
                   : "長さが分かる区間の両端を選び、その区間の実寸を入力してください。"
-                : "左上の色を基準に外周の背景を透過します。許容差を変えて確認できます。"}
+                : "外周と内側の背景を透過します。"}
         </p>
         <div className="image-edit-surface">
           <svg

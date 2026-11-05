@@ -1,3 +1,4 @@
+import { transparentBackground } from "./background-removal.ts";
 import { safeImportedProductUrl } from "./product-link-policy.ts";
 import type { LinkOrigin } from "./link-policy";
 import { mapConcurrent } from "./async-control.ts";
@@ -278,44 +279,15 @@ export async function removeBackground(
   ctx.drawImage(image, 0, 0);
   const pixels = ctx.getImageData(0, 0, c.width, c.height);
   const d = pixels.data;
-  if (preserveTransparency) {
-    for (let i = 3; i < d.length; i += 4) if (d[i] < 255) return src;
-  }
-  const seen = new Uint8Array(c.width * c.height);
-  const queue = new Int32Array(c.width * c.height);
-  let tail = 0;
-  const color = [d[0], d[1], d[2]];
-  const push = (p: number) => {
-    if (seen[p]) return;
-    seen[p] = 1;
-    const i = p * 4;
-    if (
-      Math.max(
-        Math.abs(d[i] - color[0]),
-        Math.abs(d[i + 1] - color[1]),
-        Math.abs(d[i + 2] - color[2]),
-      ) <= tolerance ||
-      d[i + 3] === 0
-    )
-      queue[tail++] = p;
-  };
-  for (let x = 0; x < c.width; x++) {
-    push(x);
-    push((c.height - 1) * c.width + x);
-  }
-  for (let y = 0; y < c.height; y++) {
-    push(y * c.width);
-    push(y * c.width + c.width - 1);
-  }
-  for (let n = 0; n < tail; n++) {
-    const p = queue[n];
-    d[p * 4 + 3] = 0;
-    if (p % c.width) push(p - 1);
-    if (p % c.width < c.width - 1) push(p + 1);
-    if (p >= c.width) push(p - c.width);
-    if (p < c.width * (c.height - 1)) push(p + c.width);
-  }
-  if (preserveTransparency && tail === c.width * c.height) return src;
+  d.set(
+    transparentBackground(
+      d,
+      c.width,
+      c.height,
+      tolerance,
+      preserveTransparency,
+    ),
+  );
   ctx.putImageData(pixels, 0, 0);
   return c.toDataURL("image/png");
 }

@@ -528,7 +528,7 @@ export default function Studio() {
         originalSrc: target.originalSrc || target.src,
       });
       update(target.id, trimmed);
-      notify("画像の外周につながる背景色を透過しました。");
+      notify("外周と内側の背景色を透過しました。");
     } catch {
       notify("背景を透過できませんでした。");
     } finally {
@@ -1269,7 +1269,7 @@ export default function Studio() {
                   disabled={busy}
                 >
                   <Icon name="wand" size={15} />
-                  外周の背景を透過
+                  背景を透過
                 </button>
                 <button
                   className="mini-button full-width"
