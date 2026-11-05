@@ -1,3 +1,4 @@
+import * as policy from "../lib/product-link-policy.ts";
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
@@ -27,10 +28,7 @@ test("every purchase surface uses the server-controlled affiliate redirect, pres
     assert.equal(result.searchParams.get("pc"), product);
     assert.equal(result.searchParams.get("m"), product);
   }
-  assert.equal(
-    purchaseLink("https://example.com/part").href,
-    "https://example.com/part",
-  );
+  assert.equal(purchaseLink("https://example.com/part"), null);
 });
 test("conversion rejects external destinations, lookalike hosts, credentials, unsupported protocols and nonstandard ports", () => {
   for (const bad of [
@@ -84,7 +82,7 @@ function route(env) {
   const exports = {};
   vm.runInNewContext(compiled, {
     exports,
-    require: () => affiliate,
+    require: (name) => name.includes("product-link-policy") ? policy : affiliate,
     process: { env },
     URL,
     Response,

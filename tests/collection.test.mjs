@@ -220,7 +220,7 @@ test("collection migration and updates commit atomically; retry and later seedin
       source,
       layer("another", {
         name: "別サイト",
-        url: "https://example.com/another",
+        url: "https://item.rakuten.co.jp/shop/another/",
       }),
     ]);
     const after = await listCollection(),

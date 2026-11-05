@@ -1,3 +1,4 @@
+import { approvedProductUrl } from "./product-link-policy.ts";
 import type { Layer, Project } from "./project.ts";
 
 export const gunTypes = [
@@ -82,19 +83,12 @@ export function publicImage(value: unknown) {
   return value;
 }
 function link(value: unknown) {
-  const input = text(value, 2500);
-  if (!input) return "";
   try {
-    const url = new URL(input);
-    if (
-      !["http:", "https:"].includes(url.protocol) ||
-      url.username ||
-      url.password
-    )
-      throw new Error();
-    return url.href;
+    return approvedProductUrl(value);
   } catch {
-    throw new CommunityError("購入リンクの形式を確認してください。");
+    throw new CommunityError(
+      "未対応の商品URLが含まれています。楽天市場・Amazonまたは対応メーカーの商品URLを指定してください。",
+    );
   }
 }
 export function validateSubmission(value: unknown): CommunitySubmission {

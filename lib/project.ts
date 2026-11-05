@@ -1,3 +1,4 @@
+import { safeImportedProductUrl } from "./product-link-policy.ts";
 import type { LinkOrigin } from "./link-policy";
 import { mapConcurrent } from "./async-control.ts";
 import type { ReferenceLengthOption } from "./product-specs.ts";
@@ -111,7 +112,10 @@ export function safeImage(src: unknown): string {
     );
   return src;
 }
-export async function parseProject(value: unknown): Promise<Project> {
+export async function parseProject(
+  value: unknown,
+  onInvalidLink?: () => void,
+): Promise<Project> {
   const data = record(value);
   // V1 projects use pixel offsets relative to the base image. Convert to the common millimetre canvas.
   const legacy = data.version === 1 || (data.baseImg && data.version !== 2);
@@ -197,7 +201,7 @@ export async function parseProject(value: unknown): Promise<Project> {
         typeof row.libraryId === "string"
           ? row.libraryId.slice(0, 2100)
           : undefined,
-      url: typeof row.url === "string" ? row.url.slice(0, 2000) : "",
+      url: safeImportedProductUrl(row.url, onInvalidLink),
       category:
         typeof row.category === "string"
           ? row.category.slice(0, 30)

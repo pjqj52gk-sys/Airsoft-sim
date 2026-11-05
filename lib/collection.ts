@@ -1,3 +1,7 @@
+import {
+  approvedProductUrl,
+  safeImportedProductUrl,
+} from "./product-link-policy.ts";
 import { canEditLink, linkOrigin } from "./link-policy.ts";
 import type { Layer, Project } from "./project";
 import { wishlistKey, type WishInput, type WishItem } from "./wishlist.ts";
@@ -31,7 +35,9 @@ export function mergeCollectionItem(
     previous && !canEditLink(previous)
       ? linkOrigin(previous)
       : input.linkOrigin || previous?.linkOrigin;
-  const url = previous && !canEditLink(previous) ? previous.url : input.url;
+  const url = approvedProductUrl(
+    previous && !canEditLink(previous) ? previous.url : input.url,
+  );
   return {
     ...previous,
     ...input,
@@ -64,6 +70,13 @@ export function migrateCollection(
     time: number,
     flags: Partial<Pick<CollectionItem, "owned" | "wished">> = {},
   ) => {
+    input = {
+      ...input,
+      url: safeImportedProductUrl(input.url),
+      layer: input.layer
+        ? { ...input.layer, url: safeImportedProductUrl(input.layer.url) }
+        : undefined,
+    };
     const id = collectionKey(input),
       previous = rows.get(id);
     rows.set(
@@ -112,4 +125,23 @@ export function applyCollectionOwnership(
     };
   });
   return changed ? { ...project, layers } : project;
+}
+
+export function cleanStoredCollectionItem(
+  item: CollectionItem,
+): CollectionItem {
+  const url = safeImportedProductUrl(item.url);
+  const origin = item.url && !url ? "upload" : linkOrigin(item);
+  if (
+    item.url === url &&
+    item.linkOrigin === origin &&
+    (!item.layer || item.layer.url === url)
+  )
+    return item;
+  return {
+    ...item,
+    url,
+    linkOrigin: origin,
+    layer: item.layer ? { ...item.layer, url, linkOrigin: origin } : undefined,
+  };
 }

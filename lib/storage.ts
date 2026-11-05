@@ -1,5 +1,6 @@
 import {
   migrateCollection,
+  cleanStoredCollectionItem,
   mergeCollectionItem,
   collectionKey,
   type CollectionInput,
@@ -197,8 +198,14 @@ function collectionTransaction<T>(
   });
 }
 export const listCollection = () =>
-  collectionTransaction((_store, rows) =>
-    rows.sort((a, b) => b.savedAt - a.savedAt),
+  collectionTransaction((store, rows) =>
+    rows
+      .map((row) => {
+        const clean = cleanStoredCollectionItem(row);
+        if (clean !== row) store.put(clean, clean.id);
+        return clean;
+      })
+      .sort((a, b) => b.savedAt - a.savedAt),
   );
 export const updateCollection = (
   input: CollectionInput,

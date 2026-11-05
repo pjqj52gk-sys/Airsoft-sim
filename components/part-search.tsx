@@ -155,6 +155,15 @@ export default function PartSearch({
         </button>
         <button
           role="tab"
+          aria-selected={source === "yahoo"}
+          className={`mini-button ${source === "yahoo" ? "toggled" : ""}`}
+          disabled={!!busy}
+          onClick={() => setSource("yahoo")}
+        >
+          Yahoo!ショッピング
+        </button>
+        <button
+          role="tab"
           disabled={!!busy}
           aria-selected={source === "catalog"}
           className={`mini-button ${source === "catalog" ? "toggled" : ""}`}
@@ -181,16 +190,18 @@ export default function PartSearch({
             setError("");
           }}
         >
-          ショップURL
+          商品URLから追加
         </button>
       </div>
-      {source === "rakuten" ? (
+      {source === "rakuten" || source === "yahoo" ? (
         <RakutenSearch
+          key={source}
+          provider={source as "rakuten" | "yahoo"}
           wishlist={wishlist}
           initialScope={initialScope}
           add={add}
           attachLink={attachLink}
-          onBusy={(value) => setBusy(value ? "rakuten" : null)}
+          onBusy={(value) => setBusy(value ? source : null)}
         />
       ) : source === "saved" ? (
         <CollectionPanel collection={wishlist} scope={initialScope} add={add} />

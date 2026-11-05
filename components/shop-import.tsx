@@ -1,4 +1,5 @@
 "use client";
+import { approvedProductUrl } from "@/lib/product-link-policy";
 import WishButton from "./wish-button";
 import type { WishlistState } from "./use-wishlist";
 import PurchaseLink from "./purchase-link";
@@ -7,7 +8,6 @@ import type { Layer } from "@/lib/project";
 import { readImage, uid } from "@/lib/project";
 import type { ShopProduct } from "@/lib/shop-product";
 import { referenceCatalogPrice } from "@/lib/catalog-price";
-import { shopUrl } from "@/lib/shop-url";
 import { catalogImageUrl } from "@/lib/catalog-image";
 import {
   referenceLengthOptions,
@@ -55,7 +55,7 @@ export default function ShopImport({
   };
   let sourceLink = "";
   try {
-    sourceLink = shopUrl(url).href;
+    sourceLink = approvedProductUrl(url);
   } catch {
     /* Incomplete URL while typing. */
   }
@@ -65,10 +65,11 @@ export default function ShopImport({
     setProduct(null);
     setResolution("");
     try {
+      const safeUrl = approvedProductUrl(url.trim());
       const response = await fetch("/api/shop-product", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({ url: safeUrl }),
       });
       const data = await response.json();
       if (!response.ok)
@@ -181,7 +182,7 @@ export default function ShopImport({
             maxLength={2048}
             value={url}
             disabled={busy}
-            placeholder="Amazon・楽天・ショップの商品URL"
+            placeholder="楽天市場・Yahoo!・Amazon・対応メーカーの商品URL"
             onChange={(e) => {
               setUrl(e.target.value);
               setProduct(null);

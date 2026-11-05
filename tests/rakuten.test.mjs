@@ -80,10 +80,7 @@ test("API-issued affiliate URLs stay intact and have advertising attribution", (
   assert.equal(result.url, affiliateUrl);
   assert.equal(result.sponsored, true);
   assert.equal(purchaseLink(result.url).sponsored, true);
-  assert.equal(
-    purchaseLink("https://afl.rakuten.co.jp.evil.example/").sponsored,
-    false,
-  );
+  assert.equal(purchaseLink("https://afl.rakuten.co.jp.evil.example/"), null);
 });
 test("untrusted or malformed product links and thumbnails cannot become cards", () => {
   for (const patch of [

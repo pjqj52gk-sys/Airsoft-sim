@@ -30,7 +30,7 @@ const layer = {
   flip: false,
   visible: true,
   price: 12000,
-  url: "https://example.com/item",
+  url: "https://item.rakuten.co.jp/shop/item/",
   category: "本体",
   originalSrc: png,
   owned: true,

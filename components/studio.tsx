@@ -1,5 +1,5 @@
 "use client";
-import { canEditLink, protectLinkPatch, linkOrigin } from "@/lib/link-policy";
+import { canEditLink, protectLinkPatch } from "@/lib/link-policy";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -11,6 +11,7 @@ import ImageEditor from "./image-editor";
 import LoadingOverlay from "./loading-overlay";
 import type { EditMode } from "./image-editor";
 import Shelf from "./shelf";
+import ProductLinkField from "./product-link-field";
 import PurchaseLink from "./purchase-link";
 import {
   applyCollectionOwnership,
@@ -431,14 +432,21 @@ export default function Studio() {
       if (file.size > 80 * 1024 * 1024)
         throw new Error("プロジェクトファイルは80MB以下にしてください。");
       const data = JSON.parse(await file.text());
+      let invalidLinks = 0;
+      const invalidLink = () => {
+        invalidLinks++;
+      };
       if (data?.type === "part_data") {
         if (project.layers.length >= 60)
           throw new Error("レイヤーは60件まで追加できます。");
-        const imported = await parseProject({
-          version: 1,
-          baseImg: data.part,
-          parts: [],
-        });
+        const imported = await parseProject(
+          {
+            version: 1,
+            baseImg: data.part,
+            parts: [],
+          },
+          invalidLink,
+        );
         const part = await prepareAddedLayer(
           {
             ...imported.layers[0],
@@ -452,13 +460,21 @@ export default function Studio() {
         );
         commit({ ...project, layers: [...project.layers, part] });
         setSelected(part.id);
-        notify("パーツデータを追加しました。");
+        notify(
+          invalidLinks
+            ? `パーツを追加しました。未対応の商品リンク${invalidLinks}件を無効にしました。`
+            : "パーツデータを追加しました。",
+        );
       } else {
-        const next = await parseProject(data);
+        const next = await parseProject(data, invalidLink);
         commit(next);
         setSelected(next.layers[0]?.id ?? null);
         setZoom(1);
-        notify("プロジェクトを読み込みました。");
+        notify(
+          invalidLinks
+            ? `読み込みました。未対応の商品リンク${invalidLinks}件を無効にしました。`
+            : "プロジェクトを読み込みました。",
+        );
       }
     } catch (error) {
       notify(
@@ -1318,31 +1334,22 @@ export default function Studio() {
                   unit="円"
                   onChange={(price) => update(layer.id, { price })}
                 />
-                <label className="field-label">
-                  商品URL
-                  <input
-                    type="url"
-                    value={layer.url}
-                    placeholder="https://…"
-                    maxLength={2000}
-                    readOnly={!canEditLink(layer)}
-                    aria-describedby={
-                      !canEditLink(layer) ? "product-url-origin" : undefined
-                    }
-                    onChange={(e) => update(layer.id, { url: e.target.value })}
-                    onBlur={() => {
-                      if (canEditLink(layer))
-                        void wishlist.register(collectionInput(layer));
+                {canEditLink(layer) && (
+                  <ProductLinkField
+                    key={layer.id + "-" + layer.url}
+                    url={layer.url}
+                    save={async (url) => {
+                      if (
+                        !(await wishlist.register(
+                          collectionInput({ ...layer, url }),
+                        ))
+                      )
+                        return false;
+                      update(layer.id, { url });
+                      notify("商品リンクを保存しました。");
+                      return true;
                     }}
                   />
-                </label>
-                {!canEditLink(layer) && (
-                  <small id="product-url-origin" className="hint">
-                    {linkOrigin(layer) === "shared"
-                      ? "共有された商品リンク"
-                      : "検索から設定された商品リンク"}
-                    （編集不可）
-                  </small>
                 )}
                 <PurchaseLink url={layer.url} label={layer.name} />
                 <button

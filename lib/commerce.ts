@@ -1,3 +1,5 @@
+import { yahooPurchasePath } from "./yahoo-link.ts";
+import { approvedProductUrl } from "./product-link-policy.ts";
 import { rakutenPurchasePath } from "./rakuten-affiliate.ts";
 // Public affiliate identifiers only. Set the operator's approved ID before enabling.
 export const monetization = { amazonAssociateTag: "airsoftsimafi-22" };
@@ -24,7 +26,7 @@ export function purchaseLink(
   tag = monetization.amazonAssociateTag,
 ) {
   try {
-    const url = new URL(input);
+    const url = new URL(approvedProductUrl(input));
     url.hostname = url.hostname.replace(/\.$/, "");
     if (
       !["http:", "https:"].includes(url.protocol) ||
@@ -32,6 +34,8 @@ export function purchaseLink(
       url.password
     )
       return null;
+    const yahoo = yahooPurchasePath(url.href);
+    if (yahoo) return { href: yahoo, sponsored: true };
     const rakuten = rakutenPurchasePath(url.href);
     if (rakuten) return { href: rakuten, sponsored: true };
     const asin = url.pathname

@@ -7,7 +7,7 @@ import {
   applyCollectionOwnership,
 } from "../lib/collection.ts";
 import { parseProject } from "../lib/project.ts";
-const url = "https://item.rakuten.co.jp/shop/sight/?rafcid=operator";
+const url = "https://item.rakuten.co.jp/shop/sight/";
 const layer = {
   id: "sight",
   name: "サイト",
@@ -27,7 +27,7 @@ const layer = {
 };
 test("search and shared links cannot be replaced or downgraded by other editor patches; uploaded links remain editable", () => {
   assert.equal(canEditLink(layer), false);
-  assert.equal(canEditLink({ url }), false);
+  assert.equal(canEditLink({ url: url + "?rafcid=operator" }), false);
   const patch = protectLinkPatch(layer, {
     url: "https://example.com/other",
     linkOrigin: "upload",

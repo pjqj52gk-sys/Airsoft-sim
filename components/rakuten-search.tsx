@@ -32,13 +32,16 @@ export default function RakutenSearch({
   add,
   onBusy,
   initialScope = "parts",
+  provider = "rakuten",
 }: {
   attachLink?: (url: string) => void;
   wishlist?: WishlistState;
   add: (layer: Layer) => Promise<void>;
   onBusy: (busy: boolean) => void;
   initialScope?: "parts" | "guns";
+  provider?: "rakuten" | "yahoo";
 }) {
+  const marketName = provider === "yahoo" ? "Yahoo!ショッピング" : "楽天";
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("standard");
   const [scope, setScope] = useState<string>(initialScope);
@@ -273,7 +276,7 @@ export default function RakutenSearch({
     setResult(null);
     try {
       const response = await fetch(
-        `/api/rakuten/search?${new URLSearchParams({ q: keyword, sort: order, page: String(page), category, scope: searchScope })}`,
+        `/api/${provider}/search?${new URLSearchParams({ q: keyword, sort: order, page: String(page), category, scope: searchScope })}`,
         { signal: current.signal },
       );
       const data = await response.json();
@@ -300,7 +303,7 @@ export default function RakutenSearch({
       {selected ? (
         <section
           className="rakuten-photo-picker"
-          aria-label="楽天の商品画像を選択"
+          aria-label={`${marketName}の商品画像を選択`}
         >
           <button
             className="mini-button"
@@ -375,7 +378,9 @@ export default function RakutenSearch({
                   <dd>
                     {d.value}{" "}
                     <small>
-                      {d.source === "official" ? "公式" : "楽天・販売店"}
+                      {d.source === "official"
+                        ? "公式"
+                        : `${marketName}・販売店`}
                       {d.conflict && "／値に差あり"}
                     </small>
                   </dd>
@@ -500,7 +505,7 @@ export default function RakutenSearch({
           >
             <input
               type="search"
-              aria-label="楽天の商品名"
+              aria-label={`${marketName}の商品名`}
               placeholder="エアガン用品の商品名・メーカー"
               value={query}
               onChange={(e) => {
@@ -522,7 +527,7 @@ export default function RakutenSearch({
               <option value="guns">エアガン本体</option>
             </select>
             <select
-              aria-label="楽天の並び順"
+              aria-label={`${marketName}の並び順`}
               value={sort}
               onChange={(e) => setSort(e.target.value)}
             >
@@ -626,7 +631,7 @@ export default function RakutenSearch({
                             .slice(0, 2)
                             .map((d) => `${d.label} ${d.value}`)
                             .join(" · ")}
-                          （楽天）
+                          （{marketName}）
                         </small>
                       )}
                     <small>{item.shop}</small>
@@ -684,11 +689,19 @@ export default function RakutenSearch({
           )}
         </>
       )}
-      <p className="rakuten-credit">
-        <a href="https://developers.rakuten.com/" target="_blank">
-          Supported by Rakuten Developers
-        </a>
-      </p>
+      {provider === "yahoo" ? (
+        <span style={{ margin: "15px 15px 15px 15px" }}>
+          <a href="https://developer.yahoo.co.jp/sitemap/">
+            Webサービス by Yahoo! JAPAN
+          </a>
+        </span>
+      ) : (
+        <p className="rakuten-credit">
+          <a href="https://developers.rakuten.com/" target="_blank">
+            Supported by Rakuten Developers
+          </a>
+        </p>
+      )}
     </div>
   );
 }

@@ -137,8 +137,8 @@ test("purchase links keep product sources separate from the operator affiliate t
     sponsored: true,
   });
   assert.equal(
-    purchaseLink("https://shop.example.com/item", "unit-test-22").sponsored,
-    false,
+    purchaseLink("https://shop.example.com/item", "unit-test-22"),
+    null,
   );
 });
 

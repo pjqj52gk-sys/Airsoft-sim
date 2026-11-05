@@ -33,7 +33,7 @@ test("V2 round-trip preserves coordinates, visibility, rotation and purchase not
     visible: false,
     price: 12000,
     owned: true,
-    url: "https://example.com/part",
+    url: "https://item.rakuten.co.jp/shop/part/",
     attachedToBase: true,
     referenceMm: 67,
     referenceOptions: [

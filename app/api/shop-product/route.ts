@@ -1,3 +1,4 @@
+import { approvedProductUrl } from "@/lib/product-link-policy";
 import { readShopFile, decodeShopHtml, ShopReadError } from "@/lib/shop-fetch";
 import { extractShopProduct } from "@/lib/shop-product";
 import { amazonStore } from "@/lib/commerce";
@@ -13,7 +14,7 @@ export async function POST(request: Request) {
     if (body.length > 8192)
       return Response.json({ error: "URLが長すぎます。" }, { status: 400 });
     const data = JSON.parse(body);
-    const source = shopUrl(data.url);
+    const source = shopUrl(approvedProductUrl(data.url));
     const amazon = (url: string) =>
       Response.json(
         {
@@ -29,8 +30,9 @@ export async function POST(request: Request) {
         { headers: { "Cache-Control": "no-store" } },
       );
     if (amazonStore(source.href)) return amazon(source.href);
-    const file = await readShopFile(data.url, "page");
+    const file = await readShopFile(source.href, "page");
     if (amazonStore(file.url)) return amazon(file.url);
+    approvedProductUrl(file.url);
     const product = extractShopProduct(decodeShopHtml(file), file.url);
     const images = await rankShopImages(product.images);
     const officialMatch = matchCatalog(

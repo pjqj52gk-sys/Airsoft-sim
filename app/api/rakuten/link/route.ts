@@ -1,3 +1,4 @@
+import { approvedProductUrl } from "@/lib/product-link-policy";
 import {
   rakutenAffiliateUrl,
   resolveRakutenTarget,
@@ -15,7 +16,9 @@ export async function GET(request: Request) {
     );
   try {
     const target = await resolveRakutenTarget(input),
-      href = target && rakutenAffiliateUrl(target, affiliateId);
+      href =
+        target &&
+        rakutenAffiliateUrl(approvedProductUrl(target, true), affiliateId);
     if (!href)
       return new Response("楽天市場の商品URLを確認してください。", {
         status: 400,
