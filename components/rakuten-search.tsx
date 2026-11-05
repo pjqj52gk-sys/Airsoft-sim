@@ -1,9 +1,10 @@
 "use client";
 import WishButton from "./wish-button";
 import type { WishlistState } from "./use-wishlist";
-import { purchaseLink } from "@/lib/commerce";
+import EcProductCard from "./ec-product-card";
+import { groupEcProducts, conciseProductName } from "@/lib/ec-products";
 import PurchaseLink from "./purchase-link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { RakutenItem, RakutenResults } from "@/lib/rakuten";
 import { readImage, uid, type Layer } from "@/lib/project";
 import type { ShopProduct } from "@/lib/shop-product";
@@ -80,6 +81,17 @@ export default function RakutenSearch({
   const [referenceOptions, setReferenceOptions] = useState<
     ReferenceLengthOption[]
   >([]);
+  const productGroups = useMemo(
+    () =>
+      groupEcProducts(
+        result?.items || [],
+        submitted.scope === "guns"
+          ? catalog.filter((p) => p.category === "本体")
+          : catalog,
+        submitted.sort,
+      ),
+    [result, submitted.scope, submitted.sort],
+  );
   const controller = useRef<AbortController | null>(null);
   useEffect(() => () => controller.current?.abort(), []);
   function loadingImage(value: boolean) {
@@ -243,7 +255,7 @@ export default function RakutenSearch({
       await add({
         ...image,
         id: uid(),
-        name: selected.name,
+        name: conciseProductName(selected.name),
         mm: selectedLayerCategory === "本体" ? 800 : 150,
         referenceMm,
         referenceOptions,
@@ -501,7 +513,7 @@ export default function RakutenSearch({
           <WishButton
             wishlist={wishlist}
             item={{
-              name: selected.name,
+              name: conciseProductName(selected.name),
               url: selected.url,
               linkOrigin: "search",
               price: selected.price,
@@ -591,111 +603,27 @@ export default function RakutenSearch({
               <p>
                 {partCategory(submitted.category) &&
                   `${partCategory(submitted.category)!.group} › ${partCategory(submitted.category)!.label} · `}
-                {result.count.toLocaleString()}件
+                {result.count.toLocaleString()}件の出品 · このページは
+                {productGroups.length}商品
                 {result.items.length === 0 && "：商品が見つかりません。"}
               </p>
             )}
           </div>
           {result && (
             <div className="rakuten-grid">
-              {result.items.map((item) => {
-                const matched = matchCatalog(
-                  item.name,
-                  submitted.scope === "guns"
-                    ? catalog.filter((p) => p.category === "本体")
-                    : catalog,
-                  item.identifiers,
-                );
-                const official = matched?.product;
-                return (
-                  <article className="rakuten-card" key={item.id}>
-                    <a
-                      href={purchaseLink(item.url)?.href}
-                      target="_blank"
-                      rel={
-                        purchaseLink(item.url)?.sponsored
-                          ? "sponsored noopener noreferrer"
-                          : "noopener noreferrer"
-                      }
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        width={128}
-                        height={128}
-                        loading="lazy"
-                      />
-                      <span>{item.name}</span>
-                    </a>
-                    <WishButton
-                      wishlist={wishlist}
-                      item={{
-                        name: item.name,
-                        url: item.url,
-                        linkOrigin: "search",
-                        price: item.price,
-                        category:
-                          submitted.scope === "guns" ? "本体" : "その他",
-                        image: item.image,
-                      }}
-                    />
-                    <button
-                      className="button primary"
-                      onClick={() => void chooseImages(item)}
-                    >
-                      画像を選んで追加
-                    </button>
-                    {official && (
-                      <div className="catalog-match-summary">
-                        <span>
-                          {matched?.method === "jan"
-                            ? "JAN一致・公式データあり"
-                            : matched?.method === "model"
-                              ? "型番一致・公式データあり"
-                              : "公式データ候補あり"}
-                        </span>
-                        {official.dimensions.length > 0 && (
-                          <small>
-                            {official.dimensions
-                              .map((d) => `${d.label} ${d.value}`)
-                              .join(" · ")}
-                          </small>
-                        )}
-                      </div>
-                    )}
-                    {(!official || !official.dimensions.length) &&
-                      (item.dimensions || []).some(
-                        (d) => d.kind === "product",
-                      ) && (
-                        <small className="retail-dimension-summary">
-                          {item.dimensions
-                            .filter((d) => d.kind === "product")
-                            .slice(0, 2)
-                            .map((d) => `${d.label} ${d.value}`)
-                            .join(" · ")}
-                          （{marketName}）
-                        </small>
-                      )}
-                    <small>
-                      {item.productUrl.includes("shopping.yahoo.co.jp")
-                        ? "Yahoo!ショッピング"
-                        : "楽天市場"}{" "}
-                      · {item.shop}
-                    </small>
-                    <strong>¥{item.price.toLocaleString()}</strong>
-
-                    {attachLink && (
-                      <button
-                        className="mini-button"
-                        onClick={() => attachLink(item.url)}
-                      >
-                        選択中のパーツにリンクのみ設定
-                      </button>
-                    )}
-                  </article>
-                );
-              })}
+              {productGroups.map((product) => (
+                <EcProductCard
+                  key={product.id}
+                  product={product}
+                  wishlist={wishlist}
+                  category={
+                    product.official?.category ||
+                    (submitted.scope === "guns" ? "本体" : "その他")
+                  }
+                  choose={(item) => void chooseImages(item)}
+                  attachLink={attachLink}
+                />
+              ))}
             </div>
           )}
           {result && result.pageCount > 1 && (
