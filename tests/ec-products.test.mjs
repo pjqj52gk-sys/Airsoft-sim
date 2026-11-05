@@ -1,6 +1,11 @@
 import test from "node:test";
+import fs from "node:fs";
 import assert from "node:assert/strict";
-import { conciseProductName, groupEcProducts } from "../lib/ec-products.ts";
+import {
+  conciseProductName,
+  groupEcProducts,
+  productDisplayName,
+} from "../lib/ec-products.ts";
 const jan = "4952839176257";
 const offer = (id, name, options = {}) => ({
   id,
@@ -148,4 +153,60 @@ test("equivalent generation notation merges without adding a duplicate generatio
   const groups = groupEcProducts([a, b], [c]);
   assert.equal(groups.length, 1);
   assert.equal(groups[0].name, "Vector Maverick Gen II ブラック");
+});
+
+test("a unique catalog-name match uses the official display name without merging uncertain offers", () => {
+  const catalog = JSON.parse(
+    fs.readFileSync(
+      new URL("../lib/parts-catalog.json", import.meta.url),
+      "utf8",
+    ),
+  );
+  const a = offer(
+    "name-a",
+    "【送料無料】東京マルイ マイクロプロサイト ブラック ドットサイト",
+    { identifiers: { janCodes: [], modelNumbers: [] } },
+  );
+  const b = offer("name-b", "東京マルイ マイクロプロサイト BK", {
+    identifiers: { janCodes: [], modelNumbers: [] },
+  });
+  const groups = groupEcProducts([a, b], catalog);
+  assert.equal(groups.length, 2);
+  for (const group of groups) {
+    assert.equal(group.official?.id, "396");
+    assert.equal(group.name, "東京マルイ マイクロプロサイト ブラック");
+  }
+  assert.equal(productDisplayName(a.name, groups[0].official), groups[0].name);
+});
+test("official display names never hide bundled contents or replace unknown products", () => {
+  const official = {
+    name: "マイクロプロサイト ブラック",
+    manufacturer: "東京マルイ",
+  };
+  const title = "東京マルイ マイクロプロサイト ブラック 予備マガジンセット";
+  assert.equal(productDisplayName(title, official), title);
+  assert.equal(
+    productDisplayName("【送料無料】不明なドットサイト"),
+    "不明なドットサイト",
+  );
+});
+
+test("official accessory names also apply when compatibility wording prevents offer grouping", () => {
+  const catalog = JSON.parse(
+    fs.readFileSync(
+      new URL("../lib/parts-catalog.json", import.meta.url),
+      "utf8",
+    ),
+  );
+  const item = offer(
+    "mount",
+    "【送料無料】東京マルイ マイクロプロサイト用 ミドル/ハイマウント",
+    { identifiers: { janCodes: [], modelNumbers: [] } },
+  );
+  const groups = groupEcProducts([item], catalog);
+  assert.equal(groups[0].official?.id, "405");
+  assert.equal(
+    groups[0].name,
+    "東京マルイ マイクロプロサイト用 ミドル/ハイマウント",
+  );
 });

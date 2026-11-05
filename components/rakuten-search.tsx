@@ -2,7 +2,7 @@
 import WishButton from "./wish-button";
 import type { WishlistState } from "./use-wishlist";
 import EcProductCard from "./ec-product-card";
-import { groupEcProducts, conciseProductName } from "@/lib/ec-products";
+import { groupEcProducts, productDisplayName } from "@/lib/ec-products";
 import PurchaseLink from "./purchase-link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { RakutenItem, RakutenResults } from "@/lib/rakuten";
@@ -255,7 +255,7 @@ export default function RakutenSearch({
       await add({
         ...image,
         id: uid(),
-        name: conciseProductName(selected.name),
+        name: productDisplayName(selected.name, selectedOfficial),
         mm: selectedLayerCategory === "本体" ? 800 : 150,
         referenceMm,
         referenceOptions,
@@ -373,7 +373,7 @@ export default function RakutenSearch({
           <h3>
             <PurchaseLink
               url={selected.url}
-              label={selected.name}
+              label={productDisplayName(selected.name, selectedOfficial)}
               sponsored={selected.sponsored}
             />
           </h3>
@@ -513,7 +513,7 @@ export default function RakutenSearch({
           <WishButton
             wishlist={wishlist}
             item={{
-              name: conciseProductName(selected.name),
+              name: productDisplayName(selected.name, selectedOfficial),
               url: selected.url,
               linkOrigin: "search",
               price: selected.price,

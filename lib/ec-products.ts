@@ -80,8 +80,18 @@ function separateOffer(name: string) {
     ) || /用/.test(name.replace(/(?:[0-9]+[才歳]以上用|対象年齢)/g, ""))
   );
 }
-function displayName(name: string, official?: CatalogProduct) {
-  if (!official) return name;
+export function productDisplayName(
+  input: string,
+  official?: CatalogProduct | null,
+) {
+  const name = conciseProductName(input);
+  if (
+    !official ||
+    /セット|キット|SET\b|KIT\b|中古|ジャンク|訳あり/i.test(
+      name.replace(official.name, ""),
+    )
+  )
+    return name;
   const base = official.name.startsWith(official.manufacturer)
     ? official.name
     : official.manufacturer + " " + official.name;
@@ -136,15 +146,15 @@ export function groupEcProducts(
           .filter((code): code is string => !!code),
       ),
     ].sort();
-    const matched = isolated
-      ? null
-      : matchCatalog(item.name, catalog, item.identifiers);
-    const official =
+    const matched = matchCatalog(item.name, catalog, item.identifiers);
+    const official = matched?.product;
+    // A display name may use a unique catalog-name match; merging still requires identifiers.
+    const identityOfficial =
       matched && matched.method !== "name" ? matched.product : undefined;
     const identity =
       !isolated && janCodes.length <= 1
-        ? official
-          ? "catalog:" + official.id
+        ? identityOfficial
+          ? "catalog:" + identityOfficial.id
           : janCodes[0]
             ? "jan:" + janCodes[0]
             : ""
@@ -164,7 +174,7 @@ export function groupEcProducts(
     else
       groups.set(key, {
         id: key,
-        name: displayName(name, official),
+        name: productDisplayName(name, official),
         offers: [item],
         official,
       });
